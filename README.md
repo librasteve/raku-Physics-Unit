@@ -1,6 +1,5 @@
-...put travis ci here...
+[![Build Status](https://travis-ci.com/p6steve/raku-Physics-Unit.svg?branch=master)](https://travis-ci.com/p6steve/raku-Physics-Unit)
 
-#WORK IN PROGRESS - PLEASE IGNORE
 # raku-Physics-Unit
 A set of SI, Imperial and US Unit objects that can be consumed by Physics::Measure objects.
 
