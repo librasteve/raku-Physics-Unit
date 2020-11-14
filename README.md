@@ -26,7 +26,7 @@ my $ff = Unit.new( defn => 'furlong / fortnight', names => ['ff'] );
 
 say "$ff";              #'ff'
 say $ff.type;           #'Speed' (this is automatically induced from the dimensions of the defn expression)
-say $ff.canonical;      #'m.s-1' 
+say $ff.canonical;      #'m.s-1' (unit expressed in terms of SI base units)
 say $ff.pretty;         #'m⋅s⁻¹' (unicode variant as recommended by the SI standard)
 
 say $ff.raku;
