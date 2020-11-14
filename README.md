@@ -12,12 +12,6 @@ zef install --verbose https://github.com/p6steve/raku-Physics-Unit.git
 
 and, conversely, zef uninstall Physics::Unit
 
-For more control, the following also work:
-
-zef --verbose install https://github.com/p6steve/raku-Physics-Unit.git@v1.0.0
-
-zef --verbose install https://github.com/p6steve/raku-Physics-Unit.git@latest
-
 # Synopsis - Physics::Unit
 
 ```perl6
