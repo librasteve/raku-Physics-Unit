@@ -33,6 +33,8 @@ say "{$u1.factor} {$u1.pretty}";
 # SI derived unit representation
 say "{$u1.factor} {$u1.name}";
 
+dd ListUnits();
+
 #`[[
 ##### Principles & Behaviours ######
 Principles
