@@ -15,7 +15,7 @@ and, conversely, zef uninstall Physics::Unit
 use Physics::Unit;
 
 #Unit objects can be selected or created with GetUnit:
-    my Unit   $u  = GetUnit( 'm' );
+my Unit   $u  = GetUnit( 'm' );
     
 # Define your own unit named "ff" (named args)
 my $ff = Unit.new( defn => 'furlong / fortnight', names => ['ff'] );
