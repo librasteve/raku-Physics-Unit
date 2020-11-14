@@ -30,9 +30,9 @@ say $ff.canonical;      #'m.s-1'
 say $ff.pretty;         #'m⋅s⁻¹' (unicode variant as recommended by the SI standard)
 
 say $ff.raku;
-      #Unit.new( factor => 0.00016631, offset => 0, defn => 'furlong / fortnight', type => '',
-	  dims => [1,0,-1,0,0,0,0,0], dmix => ("fortnight"=>-1,"furlong"=>1).MixHash, 
-	  names => ['ff'] );
+	#Unit.new( factor => 0.00016631, offset => 0, defn => 'furlong / fortnight', type => '',
+	#dims => [1,0,-1,0,0,0,0,0], dmix => ("fortnight"=>-1,"furlong"=>1).MixHash, 
+	#names => ['ff'] );
 
 # New Unit by reference to an existing one
 my $fh = $ff.new( <fh fi> );     #optional argument: list of names
