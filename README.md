@@ -46,6 +46,8 @@ my $gonzo = Unit.new( defn => "13 square millimeters per ff", names => ['gonzo']
 # Parsing of input
 my $u1 = GetUnit( 'kg m^2 / s^2' );
 my $u2 = GetUnit( 'kg m^2/s^2' );
+
+# Comparison by dimensions
 say "compare $u1, $u2... " ~ $u2.same-dims($u1);    #'compare J, J... 1'
 
 # SI recommended string representation
