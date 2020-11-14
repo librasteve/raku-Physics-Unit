@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.com/p6steve/raku-Physics-Unit.svg?branch=master)](https://travis-ci.com/p6steve/raku-Physics-Unit)
 
-# raku-Physics-Unit
-A set of stock SI, Imperial and US Unit objects that are employed by Physics::Measure objects.
+# Physics::Unit
+A set of stock SI, Imperial and US Unit objects for raku that are employed by Physics::Measure objects.
 
 See also Physics::UnitAffix for support of SI Prefixes.
 
