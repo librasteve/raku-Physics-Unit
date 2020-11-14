@@ -1,4 +1,4 @@
-unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>; 
+unit module Physics::Unit:ver<1.0.0>:auth<Steve Roe (p6steve@furnival.net)>; 
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 ##Read the Stock Unit Guidance (~line 725 below) prior to editing this module##
