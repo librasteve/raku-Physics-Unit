@@ -2,7 +2,8 @@
 
 # raku-Physics-Unit
 A set of stock SI, Imperial and US Unit objects that are employed by Physics::Measure objects.
-See also raku-Physics-UnitAffix for support of SI Prefixes.
+
+See also Physics::UnitAffix for support of SI Prefixes.
 
 # Instructions
 zef install --verbose https://github.com/p6steve/raku-Physics-Unit.git
