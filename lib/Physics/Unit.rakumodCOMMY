@@ -1,18 +1,21 @@
-unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>; 
+unit module Physics::Unit:ver<1.0.0>:auth<Steve Roe (p6steve@furnival.net)>; 
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
-##Read the Stock Unit Guidance (~line 725 below) prior to editing this module##
+my $db = 0;           #debug (also uncomment Grammar::Tracer below)
 
-my $db = 0;           #debug 
-
-##### Constant Declarations ######
-constant \locale = "imp";   #Imperial="imp"; US="us' FIXME v2 make tag
+##### Constants and Data Maps ######
+constant \preload  = 0;       #Preload Derived Units   FIXME v2 make tag 
+constant \locale   = "imp";   #Imperial="imp"; US="us' FIXME v2 make tag
 constant \NumBases = 8; 
 my Str   @BaseNames;
 
-my %unit-by-name;
-my %prefix-by-name;
-my %prototype-by-type;		#ie. Unit objects that exemplify each type 
+my @list-of-names;			#all known Unit object names
+my %defn-to-names;			#map defn => [names] of pre-defined Units
+my %unit-by-name;			#map name => Unit objects (when instantiated)
+my %prefix-by-name;			#map name => Prefix objects
+my %protoname-to-type;		#map name of prototype Unit => Type
+my %type-to-prototype;		#map Type name to a Unit object that exemplifies the type 
+my %odd-type-by-name;		#mop up remaining odd ambiguous types
 
 #Power synonyms
 my %pwr-preword   = ( square  => 2, sq => 2, cubic => 3, );   
@@ -26,6 +29,9 @@ my %pwr-superscript = (
 
 ######## Classes & Roles ########
 class Unit is export {
+
+	### attributes ###
+
     has Real $!factor = 1;
     has Real $!offset = 0;				#i.e. for K <=> °C
     has Str  $!defn   = '';
@@ -33,9 +39,9 @@ class Unit is export {
     has Str  @.names  is rw = [];
     has Int  @.dims   = 0 xx NumBases;
 	has MixHash $.dmix is rw = ∅.MixHash;
-    has Bool $!stock;					#for pre-cooked 'stock' units
 
     ### accessor methods ###		    #use 'self.attr: 42' not 'self.attr = 42'
+
     multi method factor($f) { self.CheckChange; $!factor = $f } 
     multi method factor     { $!factor }
 
@@ -52,8 +58,8 @@ class Unit is export {
         return 'prefix' if %prefix-by-name{self.name};
 
         my @t;
-        for %prototype-by-type.keys -> $k { 
-            push @t, $k if self.dims eqv %prototype-by-type{$k}.dims
+        for %type-to-prototype.keys -> $k { 
+            push @t, $k if self.dims eqv %type-to-prototype{$k}.dims
         }    
         #return value depends on whether we got zero, one or multiple types
 		if @t == 0 { return '' }
@@ -64,38 +70,33 @@ class Unit is export {
 
     ### new & clone methods ###
 
-    #new as used by sub CreateUnit() to make a stub Unit
-    multi method new( Bool:U :$stock ) { callsame }             #calls base Unit.new()
-    multi submethod BUILD( Bool:U :$!stock ) { }                #then no-op in build phase
-
-    #new for stock units avoids CreateUnit() for performance, never calls base Unit.new()
-    multi method new( %args, Bool:D :$stock ) {
-        self.bless( %args, :$stock )
-    }
-    #parameter capture does work binds named args to the (private) attributes
-    multi submethod BUILD( :$!factor, :$!offset, :$!defn, :$!type,
-                              :@!names, :@!dims, :$!dmix, Bool:D :$!stock ) {
-        self.SetNames: @!names;
+    #new - named arguments 
+    multi method new( :$defn!, :@names ) {
+say "new Unit: " ~ $defn ~ '::' ~ @names;
+        my $n = CreateUnit( $defn );
+say "new Unit after CU"; say $n;
+        $n.SetNames: @names;
+		#$n.SetType();
+say $n.type;
+        return $n
     }
 
-    #new by deep cloning an existing Unit
+    #new - deep clone existing Unit
     method clone {
         nextwith :names([]), :type(''), :dims(@.dims.clone)
     }
     multi method new( Unit:D $u: @names ) {
         my $n = $u.clone;
         $n.SetNames: @names;
-        return $n
-    }
-
-    #new by named arguments 
-    multi method new( :$defn!, :@names, Bool:U :$stock ) {
-        my $n = CreateUnit( $defn );
-        $n.SetNames: @names;
+		#$n.SetType();
+dd  $n.dims;
+say $n.type;
+dd %type-to-prototype; #iamerejh
         return $n
     }
 
     ### output methods ###
+
     method Str { self.name }
 
     multi method name()         { @!names[0] || '' }
@@ -126,50 +127,50 @@ class Unit is export {
         }
         return @dim-str.join('⋅')
     }
-    method raku( :$stock ) {								#can make stock units
-		my $s-str = $stock ?? ', stock => True' !! '';
-		my $t-str = $stock ?? "''" !! "'$!type'";			#suppress type if stock
-        return qq:to/END/;
-        Unit.new( factor => $.factor, offset => $.offset, defn => '$.defn', type => $t-str,
-		  dims => [{@.dims.join(',')}], dmix => {$.dmix.raku}, 
-		  names => [{@.names.map( ->$n {"'$n'"}).join(',')}]$s-str );
-        END
-    }
 
     ### behavioural methods ###
-    method SetNames( @_ is copy, :$noplural ) {
+
+    method SetNames( @new-names is copy ) {
         @.names = [];			#clears then sets
-        for @_ -> $n {
-            push @.names, $n;
+        for @new-names -> $n {
+            @.names.push: $n;
             %unit-by-name{$n} = self;
 
             #naive plurals - append 's' unless...
-            if     $n.chars > 2                 #...too short
-                && $n.comb.first(:end) ne 's'   #...already ends with 's'
-                && $n !~~ /<[\d\/^*]>/          #...contains a digit or a symbol
-                && ! $noplural                  #...instructed not to
-                && ! $!stock                    #...not a stock unit (already done)
-            {
-                my $ns = $n ~ 's';
-                push @.names, $ns;
-                %unit-by-name{$ns} = self;
-            }
+			if my $ns = naive-plural( $n ) {
+				@.names.push: $ns;
+				%unit-by-name{$ns} = self;
+			}
         }
+		@.names.push: $.defn unless @.names;
+		@list-of-names.push: |@.names;
+
+		say "Set names: {@.names}" if $db;
     }
-    method NewType( $t ) {
-        $!type = $t;
-        %prototype-by-type{$t} = self;
+    method SetType( $t? ) {
+		my $p = '';
+		for @.names -> $n {						#is this unit a prototype?
+			if $p = %protoname-to-type{$n} { last }
+		}
+		if my $x = $t // $p // '' {
+			$!type = $x;
+			%type-to-prototype{$x} = self;
+		}
+
+		say "Set type: $.type" if $db;
     }
     method CheckChange {
         die "You're not allowed to change named units!" if self.name;
     }
 
-    ### mathematical mutating Module methods ###
+    ### math methods (Grammar Actions) ###
+
     multi method times( Real $t ) {
         self.factor: self.factor * $t;
 		return self
     }    
     multi method times( Unit $t ) {
+say "times: "; say $t;
         self.factor: self.factor * $t.factor;
         self.dims >>+=<< $t.dims;
 		self.dmix = ( self.dmix (+) $t.dmix ).MixHash;
@@ -183,6 +184,7 @@ class Unit is export {
         return self 
     }    
     multi method share( Real $d ) {
+say "share: "; say $d;
         self.factor: self.factor / $d;
 		return self
     }    
@@ -200,6 +202,7 @@ class Unit is export {
     }    
 
 	#### convert & compare methods ####
+
     method same-dims( Unit $u ) {
         return 0 unless $u.dmix eqv self.dmix;
         return 0 unless $u.factor == self.factor;
@@ -211,18 +214,18 @@ class Unit is export {
         return 1
 	}
 
-    ### mathematical Measure methods ###
+    ### math methods (Measure support) ###
     method multiply( Unit $r --> Unit ) {
 		my $l = self.clone;
 		my $x = $l.times( $r );
-		my $t = $x.type( just1 => 1 );		#occasionally can be > one type
-		return %prototype-by-type{$t};
+		my $t = $x.type( :just1(1) );		#occasionally can be > one type
+		return %type-to-prototype{$t};
     }
     method divide( Unit $r ) {
 		my $l = self.clone;
 		my $x = $l.share( $r );
-		my $t = $x.type( just1 => 1 );		#occasionally can be > one type
-		return %prototype-by-type{$t}
+		my $t = $x.type( :just1(1) );		#occasionally can be > one type
+		return %type-to-prototype{$t}
     }
 	method root-extract( Int $n where 1 <= $n <= 4 ) {
         #only when all dims divisible by root
@@ -232,41 +235,76 @@ class Unit is export {
 		$l.type: '';
 		$l.dims = $l.dims.map({($_/$n).Int});
 		for $l.dmix.kv -> $k,$v { $l.dmix{$k} = $v/$n }
-		return %prototype-by-type{$l.type}
+		return %type-to-prototype{$l.type}
 	}
 }
 
 ######## Subroutines ########
-sub ListUnits is export {		
+sub ListUnits is export {
+    return @list-of-names 
+}
+sub ListUnitInstances is export {
     return sort keys %unit-by-name
 }
 sub ListTypes is export {
-    return sort keys %prototype-by-type
+    return sort keys %type-to-prototype
 }
 sub ListBases is export {
     return @BaseNames
 }
 sub GetPrototype( Str $t ) is export {
-	return %prototype-by-type{$t}
+	return %type-to-prototype{$t}
 }
 sub GetUnit( $u ) is export {
-    return $u if $u ~~ Unit;
-
-    for %unit-by-name.kv -> $k,$v { return $v if $k eq $u }
+	#1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
+    if $u ~~ Unit {
+		return $u
+	}
+##say "seed is: " ~ $u;
+	#2 if name of unit or prefix that's already instantiated
+    for %unit-by-name.kv   -> $k,$v { return $v if $k eq $u }
     for %prefix-by-name.kv -> $k,$v { return $v if $k eq $u }
 
-	my $c = CreateUnit($u);				#finally, try as a definition
+	#3 if name on our list, instantiate it (bypass CreateUnit) 
+	if @list-of-names.grep(/$u/) {
+##say "seed is listed";
+		for %defn-to-names -> %p {
+			if %p.value.grep($u) {
+##say "++++++ matched seed";
+				my $nuo = Unit.new( defn => %p.key, names => %p.value ); 
+##say "seed makes: "; say $nuo;
+				return $nuo;
+			}
+		}
+	}
 
- 	#look for same dims (shortest name wins if >1)
+	#4 if no match, instantiate from definition 
+	my $nuo = Unit.new( defn => $u );
+    return subst-shortest( $nuo ) // $nuo;
+
+}
+sub subst-shortest( Unit $u ) {
+	#subtitutes shortest name if >1 unit name has same dimensions 
+	# ... so that eg. 'J' beats 'kg m^2 / s^2'
+
 	my @same-by-name;
     for %unit-by-name.kv -> $k,$v { 
-		@same-by-name.push($k) if $v.same-dims($c) 
+		@same-by-name.push($k) if $v.same-dims($u) 
 	}
     if @same-by-name {	
 		my @same-by-size = @same-by-name.sort({$^a.chars cmp $^b.chars});
 		return %unit-by-name{@same-by-size[0]}	#shortest
 	}
-    return $c
+}
+sub naive-plural( $n ) {
+	#naive plurals - append 's' unless...
+	if     $n.chars > 2                 #...too short
+		&& $n.comb.first(:end) ne 's'   #...already ends with 's'
+		&& $n.comb.first(:end) ne 'z'   #...already ends with 'z'
+		&& $n !~~ /<[\d\/^*]>/          #...contains a digit or a symbol
+	{
+		return $n ~ 's';
+	}
 }
 sub disambiguate( @t ) {
 	#bias rules to help when multiple types are found
@@ -279,9 +317,11 @@ sub disambiguate( @t ) {
 
 ######## Grammars ########
 sub CreateUnit( $defn is copy ) {
+	$defn .= trim;
+
     #6.d faster regexes with Strings {<$str>} & slower with Arrays {<@arr>}
-	#strip compound names to force dmix generation
-    my $unit-names       = %unit-by-name.keys.grep({! /<[\s*^./]>/}).join('|');
+	#erase compound names from element name match candidates (to force generation of dmix)
+    my $unit-names       = @list-of-names.grep({! /<[\s*^./]>/}).join('|');
     my $prefix-names     = %prefix-by-name.keys.join('|');
     my $pwr-prewords     = %pwr-preword.keys.join('|');
     my $pwr-postwords    = %pwr-postword.keys.join('|');
@@ -292,9 +332,8 @@ sub CreateUnit( $defn is copy ) {
     $pwr-superscripts ~~ s:g/ ( <-[a..z A..Z 0..9 \|]> ) / '$0' /;
 
     my $u = Unit.new();         #stub unit we are creating
-	$defn .= trim;
 
-    ##use Grammar::Tracer;
+    use Grammar::Tracer;
     grammar UnitGrammar {
         token TOP         { ^  \s* <compound>
                               [\s* <divider> \s* <compound>]?
@@ -334,24 +373,34 @@ sub CreateUnit( $defn is copy ) {
         method factor($/)      { !$ad ?? $u.times($/.Real) !! $u.share($/.Real) }
         method offset($/)      { $u.offset($/.Real) }
 
-        method name($/)        { $e=$/.Str; $n=GetUnit($e).clone; $n.dmix=∅.MixHash }
+        method name($/)        { $e=$/.Str; $n=GetUnit($e).clone;
+        ##method name($/)        { $e=$/.Str; $n=GetUnit([$e]).clone;
+say "new e: "; say ~$e;
+say "new n: "; say $n;
+ $n.dmix=∅.MixHash }
         method prefix($/)      { $p=GetUnit($/.Str).clone; $p.dmix=∅.MixHash }
-        method prefix-name($/) { $n.times($p) if $p       }
+        method prefix-name($/) { $n.times($p) if $p }
 
         method pwr-before($/)  { $d=%pwr-preword{$/.Str}     }
         method pwr-postwd($/)  { $d=%pwr-postword{$/.Str}    }
         method pwr-supers($/)  { $d=%pwr-superscript{$/.Str} }
         method pwr-normal($/)  { $d=$<pwr-digits>.Int        }
 
-		method element($/)     { if $n { $n.raise($d, $e);
-									     !$ad ?? $u.times($n) !! $u.share($n) }
-								 $d=1; $e=''; $n=$p=Nil;     }
+		method element($/)     { 
+say "=====> "; say $n; say $u;
+			if $n { 
+say "+++++!";
+			##if $n ~~ Unit { 
+				$n.raise($d, $e);
+			    !$ad ?? $u.times($n) !! $u.share($n); 
+			}
+			$d=1; $e=''; $n=$p=Nil;
+		}
     }
 
     my $match = UnitGrammar.parse( $defn, :actions(UnitActions) );
     if $match.so {
         $u.defn: $defn;
-        $u.SetNames: [$defn], :noplural;
         return $u
     } else {
         die "Couldn't parse defn Str $defn.";
@@ -359,6 +408,19 @@ sub CreateUnit( $defn is copy ) {
 }
 
 ######## Initialization ########
+sub InitPrefix( @_ ) {
+    for @_ -> $name, $factor {
+        my $u = Unit.new;
+        $u.factor:     $factor;
+        $u.defn:       $factor;
+        $u.names.push: $name;
+        $u.type:       'prefix';
+
+        %prefix-by-name{$name} = $u;
+
+        say "Initialized Prefix $name" if $db;
+    }
+}
 sub InitBaseUnit( @_ ) {
     my $i = 0;
     for @_ -> %h {
@@ -373,44 +435,48 @@ sub InitBaseUnit( @_ ) {
         $u.dims[$i++] = 1;
 		$u.dmix{$u.name} = 1;
 
-        $u.NewType: $type;
+        $u.SetType: $type;
 
         say "Initialized Base Unit $names[0]" if $db;
     }
 }
-sub InitPrefix( @_ ) {
-    for @_ -> $name, $factor {
-        my $u = Unit.new;
-        $u.factor:     $factor;
-        $u.defn:       $factor;
-        $u.names.push: $name;
-        $u.type:       'prefix';
-
-        %prefix-by-name{$name} = $u;
-
-        say "Initialized Prefix $name" if $db;
-    }
+sub InitDerivedUnit( @_ ) {
+	if preload {
+		for @_ -> $names, $defn {
+			Unit.new( defn => $defn, names => [|$names] );
+		}
+	} else {
+		InitUnit( @_ )
+	}
 }
-sub InitUnit( @_ ) is export {
-    for @_ -> $names, $defn {
-        my $u = CreateUnit( $defn );
-        $u.SetNames: $names;    #decont from scalar to list
+sub InitUnit( @_ ) {
+	#eg. ['N',  'newton'],			 'kg m / s^2',
+	#      ^ ,   ^^^^^^ names         ^^^^^^^^^^ defn
 
-        say "Initialized Unit $names[0]"  if $db;
-        say "================ >>>"        if $db;
-        say "UG.parsed: ≪$defn≫"          if $db;
-        say "UG.result: "                 if $db;
-        say $u.gist                       if $db;
+    for @_ -> $names, $defn {
+		my @newbies;
+		for |$names -> $n {
+			@newbies.push: $n;
+			if naive-plural( $n ) -> $p {
+				@newbies.push: $p;
+			}
+		}
+		@list-of-names.push: |@newbies;
+		%defn-to-names{$defn} = [@newbies];
     }
 }
 sub InitTypes( @_ )  {
     for @_ -> %p {
-        my ($t, $u) = %p.key, %p.value;
-		GetUnit($u).NewType($t)
-    }
+		%protoname-to-type{%p.value} = %p.key; #ie. reversed
+	}
+}
+sub InitOddTypes( @_ ) {
+    for @_ -> %p {
+		%odd-type-by-name{%p.key} = %p.value;
+	}
 }
 
-######## Unit Data ########
+########## Data ##########
 InitPrefix (
     #SI Prefixes
     #avoid 1e2 format to encourage Rats
@@ -447,13 +513,7 @@ InitBaseUnit (
     'Luminosity'  => ['cd', 'candela', 'candle'],
 	'Angle'		  => ['radian'],		
 );
-
-InitUnit (
-
-	# Dimensionless
-	['pi'],          '3.1415926535897932385',
-#FIXME try ['pi'], 'π', #or similar
-
+InitDerivedUnit (
 	#SI Derived Units with special names & symbols
 	['sr', 'steradian'],                    'radian^2',
 	['Hz', 'hertz'],                        '1 / s',
@@ -472,14 +532,17 @@ InitUnit (
 	['°C', 'celsius', 'Centigrade'],        'K + 273.15',
 	['lm', 'lumen'],                        'cd sr',
 	['lx', 'lux'],                          'm^-2 cd',
-	['Bq', 'becquerel'],                    '1 Hz',
-	['Gy', 'gray'],                         'J / kg',
-	['Sv', 'sievert'],                      'J / kg',
+	['Bq', 'becquerel'],                    '1 Hz',		#FIXME add mop up Type vs Frequency
+	['Gy', 'gray'],                         'J / kg',	# ""
+	['Sv', 'sievert'],                      'J / kg',	# ""
 	['kat', 'katal'],                       'mol s^-1',
 	#SI coherent Derived Units in terms of base units - TBD [see url]
 	#SI coherent Derived Units that include units with special names - TBD [see url]
-
+);
+InitUnit (
 	# Dimensionless
+	['pi'],          '3.1415926535897932385',
+#FIXME try ['pi'], 'π', #or similar
 	['one', 'unity'],							'1',
 	['semi','demi','hemi'],						'1/2',
 	['%','percent'],							'1/100',
@@ -709,6 +772,21 @@ InitTypes (
     'Dose'               => 'gray',
 );
 
+InitOddTypes (
+	#mop up any odd ambiguous types
+	'eV'    => 'Energy',
+	'MeV'   => 'Energy',
+	'GeV'   => 'Energy',
+	'TeV'   => 'Energy',
+	'cal'   => 'Energy',
+	'kcal'  => 'Energy',
+	'btu'   => 'Energy',
+	'erg'   => 'Energy',
+	'kWh'   => 'Energy',
+	'ft-lb' => 'Torque',
+);
+
+#`[[ move to late init iamerejh (and debug ff type)
 #mop up remaining ambiguous types
 GetUnit('eV').type:    'Energy';
 GetUnit('MeV').type:   'Energy';
@@ -720,6 +798,7 @@ GetUnit('btu').type:   'Energy';
 GetUnit('erg').type:   'Energy';
 GetUnit('kWh').type:   'Energy';
 GetUnit('ft-lb').type: 'Torque';
+#]]
 
 if $db {
 say "+++++++++++++++++++";

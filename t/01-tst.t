@@ -23,9 +23,9 @@ is ~$ff.pretty,'m⋅s⁻¹',		'$ff.pretty ok';
 my $fh = $ff.new( <fh fi> );
 is ~$fh,'fh',				'new by ref ok'; 
 
-#new Unit (positional args)
+#new Unit (named args)
 my $fg = Unit.new( defn => 'furlong / fortnight', names => ['fg'] );
-is ~$fg,'fg',				'new positional ok'; 
+is ~$fg,'fg',				'new named ok'; 
 
 #more intricate unit expression (using the newly defined unit 'ff'):
 my $gonzo = Unit.new( defn => "13 square millimeters per ff", names => ['gonzo'] );

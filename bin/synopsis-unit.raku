@@ -4,13 +4,17 @@ use Physics::Unit;
 
 #SYNOPSIS
 
+#my $a1 = Unit.new( defn => '5 radians per second', names => ['radians per second'] ); say "$a1";
+my $a2 = Unit.new( defn => '2 ft', names => ['2f'] ); say $a2;
+
+die "woah";
+
 # Define your own unit named "ff" (named args)
 my $ff = Unit.new( defn => 'furlong / fortnight', names => ['ff'] );
 say "$ff";
 say $ff.type;
 say $ff.canonical;
 say $ff.pretty;
-say $ff.gist;
 say $ff.raku;
 
 # New Unit by reference to an existing one
@@ -23,17 +27,21 @@ my $fg = Unit.new( defn => 'furlong / fortnight', names => ['fg'] );
 my $gonzo = Unit.new( defn => "13 square millimeters per ff", names => ['gonzo'] );
 
 # Parsing of input  
-my $u1 = GetUnit( 'kg m^2 / s^2' );
-my $u2 = GetUnit( 'kg m^2/s^2' ); 
+my $u1 = GetUnit( 'J' );
+my $u2 = GetUnit( 'kg m^2 / s^2' );
+my $u3 = GetUnit( 'kg m^2/s^2' ); 
 say "compare $u1, $u2... " ~ $u2.same-dims($u1);
 
 # SI recommended string representation
-say "{$u1.factor} {$u1.pretty}";
+say "{$u2.factor} {$u2.pretty}";
 
 # SI derived unit representation
-say "{$u1.factor} {$u1.name}";
+say "{$u2.factor} {$u2.canonical}";
 
-dd ListUnits();
+# SI derived unit representation
+say "{$u2.factor} {$u2.name}";
+
+#put ListUnits();
 
 #`[[
 ##### Principles & Behaviours ######
