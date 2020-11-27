@@ -1,18 +1,21 @@
 unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>; 
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
-##Read the Stock Unit Guidance (~line 725 below) prior to editing this module##
-
 my $db = 0;           #debug 
 
-##### Constant Declarations ######
+##### Constants and Data Maps ######
+#888constant \preload  = 0;       #Preload Derived Units   FIXME v2 make tag
 constant \locale = "imp";   #Imperial="imp"; US="us' FIXME v2 make tag
 constant \NumBases = 8; 
 my Str   @BaseNames;
 
-my %unit-by-name;
-my %prefix-by-name;
-my %prototype-by-type;		#ie. Unit objects that exemplify each type 
+my @list-of-names;          #all known Unit object names
+my %defn-to-names;          #map defn => [names] of pre-defined Units
+my %unit-by-name;           #map name => Unit objects (when instantiated)
+my %prefix-by-name;         #map name => Prefix objects
+my %protoname-to-type;      #map name of prototype Unit => Type
+my %type-to-prototype;      #map Type name to a Unit object that exemplifies the type 
+my %odd-type-by-name;       #mop up remaining odd ambiguous types
 
 #Power synonyms
 my %pwr-preword   = ( square  => 2, sq => 2, cubic => 3, );   
