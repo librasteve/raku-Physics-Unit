@@ -70,20 +70,6 @@ class Unit is export {
 
     ### new & clone methods ###
 
-    #new as used by sub CreateUnit() to make a stub Unit
-    multi method new( Bool:U :$stock ) { callsame }             #calls base Unit.new()
-    multi submethod BUILD( Bool:U :$!stock ) { }                #then no-op in build phase
-
-    #new for stock units avoids CreateUnit() for performance, never calls base Unit.new()
-    multi method new( %args, Bool:D :$stock ) {
-        self.bless( %args, :$stock )
-    }
-    #parameter capture does work binds named args to the (private) attributes
-    multi submethod BUILD( :$!factor, :$!offset, :$!defn, :$!type,
-                              :@!names, :@!dims, :$!dmix, Bool:D :$!stock ) {
-        self.SetNames: @!names;
-    }
-
     #new by deep cloning an existing Unit
     method clone {
         nextwith :names([]), :type(''), :dims(@.dims.clone)

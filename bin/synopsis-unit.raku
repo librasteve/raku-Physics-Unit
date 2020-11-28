@@ -5,7 +5,7 @@ use Physics::Unit;
 #SYNOPSIS
 
 #my $a1 = Unit.new( defn => '5 radians per second', names => ['radians per second'] ); say "$a1";
-my $a2 = Unit.new( defn => '2 ft', names => ['2f'] ); say $a2;
+my $a2 = Unit.new( defn => '2 ft', names => ['2f'] ); say $a2; say $a2.type;
 
 die "woah";
 
