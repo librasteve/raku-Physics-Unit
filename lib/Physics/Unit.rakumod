@@ -2,9 +2,11 @@ unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>;
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 #snagging
+#NewType to SetType
 #-preload
 #- odd type mop up
 #-rereview data map names
+
 
 my $db = 0;           #debug 
 
@@ -139,10 +141,12 @@ class Unit is export {
             }
         }
     }
+#`[[888 mv to SetType
     method NewType( $t ) {
         $!type = $t;
         %type-to-prototype{$t} = self;
     }
+#]]
     method CheckChange {
         die "You're not allowed to change named units!" if self.name;
     }
