@@ -1,6 +1,11 @@
 unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>; 
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
+#snagging
+#-preload
+#- odd type mop up
+#-rereview data map names
+
 my $db = 0;           #debug 
 
 ##### Constants and Data Maps ######
@@ -8,8 +13,6 @@ my $db = 0;           #debug
 constant \locale = "imp";   #Imperial="imp"; US="us' FIXME v2 make tag
 constant \NumBases = 8; 
 my Str   @BaseNames;
-
-my %prototype-by-type;		#ie. Unit objects that exemplify each type 
 
 my @list-of-names;          #all known Unit object names
 my %defn-to-names;          #map defn => [names] of pre-defined Units
@@ -56,8 +59,8 @@ class Unit is export {
         return 'prefix' if %prefix-by-name{self.name};
 
         my @t;
-        for %prototype-by-type.keys -> $k { 
-            push @t, $k if self.dims eqv %prototype-by-type{$k}.dims
+        for %type-to-prototype.keys -> $k { 
+            push @t, $k if self.dims eqv %type-to-prototype{$k}.dims
         }    
         #return value depends on whether we got zero, one or multiple types
 		if @t == 0 { return '' }
@@ -138,7 +141,7 @@ class Unit is export {
     }
     method NewType( $t ) {
         $!type = $t;
-        %prototype-by-type{$t} = self;
+        %type-to-prototype{$t} = self;
     }
     method CheckChange {
         die "You're not allowed to change named units!" if self.name;
@@ -196,13 +199,13 @@ class Unit is export {
 		my $l = self.clone;
 		my $x = $l.times( $r );
 		my $t = $x.type( just1 => 1 );		#occasionally can be > one type
-		return %prototype-by-type{$t};
+		return %type-to-prototype{$t};
     }
     method divide( Unit $r ) {
 		my $l = self.clone;
 		my $x = $l.share( $r );
 		my $t = $x.type( just1 => 1 );		#occasionally can be > one type
-		return %prototype-by-type{$t}
+		return %type-to-prototype{$t}
     }
 	method root-extract( Int $n where 1 <= $n <= 4 ) {
         #only when all dims divisible by root
@@ -212,7 +215,7 @@ class Unit is export {
 		$l.type: '';
 		$l.dims = $l.dims.map({($_/$n).Int});
 		for $l.dmix.kv -> $k,$v { $l.dmix{$k} = $v/$n }
-		return %prototype-by-type{$l.type}
+		return %type-to-prototype{$l.type}
 	}
 }
 
@@ -221,13 +224,13 @@ sub ListUnits is export {
     return sort keys %unit-by-name
 }
 sub ListTypes is export {
-    return sort keys %prototype-by-type
+    return sort keys %type-to-prototype
 }
 sub ListBases is export {
     return @BaseNames
 }
 sub GetPrototype( Str $t ) is export {
-	return %prototype-by-type{$t}
+	return %type-to-prototype{$t}
 }
 sub GetUnit( $u ) is export {
     return $u if $u ~~ Unit;
