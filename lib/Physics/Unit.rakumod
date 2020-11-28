@@ -2,7 +2,6 @@ unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>;
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 #snagging
-#NewType to SetType
 #-preload
 #- odd type mop up
 #-rereview data map names
@@ -155,12 +154,6 @@ class Unit is export {
 
         say "Set type: $.type" if $db;
     }   
-#`[[888 mv to SetType
-    method NewType( $t ) {
-        $!type = $t;
-        %type-to-prototype{$t} = self;
-    }
-#]]
     method CheckChange {
         die "You're not allowed to change named units!" if self.name;
     }
@@ -251,23 +244,29 @@ sub GetPrototype( Str $t ) is export {
 	return %type-to-prototype{$t}
 }
 sub GetUnit( $u ) is export {
-    return $u if $u ~~ Unit;
+    #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
+    if $u ~~ Unit {
+        return $u
+    }   
 
-    for %unit-by-name.kv -> $k,$v { return $v if $k eq $u }
+    #2 if name of unit or prefix that's already instantiated
+    for %unit-by-name.kv   -> $k,$v { return $v if $k eq $u }
     for %prefix-by-name.kv -> $k,$v { return $v if $k eq $u }
 
-	my $c = CreateUnit($u);				#finally, try as a definition
+    #3 if name on our list, instantiate it (bypass CreateUnit) 
+    if @list-of-names.grep(/$u/) {
+        for %defn-to-names -> %p {
+            if %p.value.grep($u) {
+                my $nuo = Unit.new( defn => %p.key, names => %p.value );  
+                return $nuo;
+            }   
+        }   
+    }   
 
- 	#look for same dims (shortest name wins if >1)
-	my @same-by-name;
-    for %unit-by-name.kv -> $k,$v { 
-		@same-by-name.push($k) if $v.same-dims($c) 
-	}
-    if @same-by-name {	
-		my @same-by-size = @same-by-name.sort({$^a.chars cmp $^b.chars});
-		return %unit-by-name{@same-by-size[0]}	#shortest
-	}
-    return $c
+    #4 if no match, instantiate from definition 
+    my $nuo = Unit.new( defn => $u );
+###888    return subst-shortest( $nuo ) // $nuo;
+    return $nuo;
 }
 sub disambiguate( @t ) {
 	#bias rules to help when multiple types are found
@@ -374,7 +373,6 @@ sub InitBaseUnit( @_ ) {
         $u.dims[$i++] = 1;
 		$u.dmix{$u.name} = 1;
 
-        ###888$u.NewType: $type;
         $u.SetType: $type;
 
         say "Initialized Base Unit $names[0]" if $db;
@@ -410,15 +408,6 @@ sub InitTypes( @_ )  {
         %protoname-to-type{%p.value} = %p.key; #ie. reversed
     }   
 }
-#`[[[888
-sub InitTypes( @_ )  {
-    for @_ -> %p {
-        my ($t, $u) = %p.key, %p.value; #888 del
-		GetUnit($u).NewType($t);		#888 del
-		%protoname-to-type{%p.value} = %p.key; #ie. reversed
-    }
-}
-#]]]
 sub InitOddTypes( @_ ) { 
     for @_ -> %p {
         %odd-type-by-name{%p.key} = %p.value;
