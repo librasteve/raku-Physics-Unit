@@ -19,7 +19,6 @@ my %protoname-to-type;      #map name of prototype Unit => Type
 my %type-to-prototype;      #map Type name to a Unit object that exemplifies the type 
 my %odd-type-by-name;       #mop up remaining odd ambiguous types
 
-
 #Power synonyms
 my %pwr-preword   = ( square  => 2, sq => 2, cubic => 3, );   
 my %pwr-postword  = ( squared => 2,          cubed => 3, );   
@@ -391,7 +390,11 @@ sub InitTypes( @_ )  {
 		%protoname-to-type{%p.value} = %p.key; #ie. reversed
     }
 }
-
+sub InitOddTypes( @_ ) { 
+    for @_ -> %p {
+        %odd-type-by-name{%p.key} = %p.value;
+    }   
+}
 ######## Unit Data ########
 InitPrefix (
     #SI Prefixes
@@ -691,6 +694,21 @@ InitTypes (
     'Dose'               => 'gray',
 );
 
+InitOddTypes (
+    #mop up any odd ambiguous types
+    'eV'    => 'Energy',
+    'MeV'   => 'Energy',
+    'GeV'   => 'Energy',
+    'TeV'   => 'Energy',
+    'cal'   => 'Energy',
+    'kcal'  => 'Energy',
+    'btu'   => 'Energy',
+    'erg'   => 'Energy',
+    'kWh'   => 'Energy',
+    'ft-lb' => 'Torque',
+);
+
+#`[[888
 #mop up remaining ambiguous types
 GetUnit('eV').type:    'Energy';
 GetUnit('MeV').type:   'Energy';
@@ -702,6 +720,7 @@ GetUnit('btu').type:   'Energy';
 GetUnit('erg').type:   'Energy';
 GetUnit('kWh').type:   'Energy';
 GetUnit('ft-lb').type: 'Torque';
+#]]
 
 if $db {
 say "+++++++++++++++++++";
