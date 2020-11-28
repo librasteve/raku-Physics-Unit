@@ -265,8 +265,20 @@ sub GetUnit( $u ) is export {
 
     #4 if no match, instantiate from definition 
     my $nuo = Unit.new( defn => $u );
-###888    return subst-shortest( $nuo ) // $nuo;
-    return $nuo;
+    return subst-shortest( $nuo ) // $nuo;
+}
+sub subst-shortest( Unit $u ) { 
+    #subtitutes shortest name if >1 unit name has same dimensions 
+    # ... so that eg. 'J' beats 'kg m^2 / s^2'
+
+    my @same-by-name;
+    for %unit-by-name.kv -> $k,$v { 
+        @same-by-name.push($k) if $v.same-dims($u) 
+    }   
+    if @same-by-name {   
+        my @same-by-size = @same-by-name.sort({$^a.chars cmp $^b.chars});
+        return %unit-by-name{@same-by-size[0]}  #shortest
+    }   
 }
 sub disambiguate( @t ) {
 	#bias rules to help when multiple types are found
