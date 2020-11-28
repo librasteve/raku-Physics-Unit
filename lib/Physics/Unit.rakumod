@@ -9,6 +9,8 @@ constant \locale = "imp";   #Imperial="imp"; US="us' FIXME v2 make tag
 constant \NumBases = 8; 
 my Str   @BaseNames;
 
+my %prototype-by-type;		#ie. Unit objects that exemplify each type 
+
 my @list-of-names;          #all known Unit object names
 my %defn-to-names;          #map defn => [names] of pre-defined Units
 my %unit-by-name;           #map name => Unit objects (when instantiated)
@@ -16,6 +18,7 @@ my %prefix-by-name;         #map name => Prefix objects
 my %protoname-to-type;      #map name of prototype Unit => Type
 my %type-to-prototype;      #map Type name to a Unit object that exemplifies the type 
 my %odd-type-by-name;       #mop up remaining odd ambiguous types
+
 
 #Power synonyms
 my %pwr-preword   = ( square  => 2, sq => 2, cubic => 3, );   
@@ -408,8 +411,9 @@ sub InitUnit( @_ ) is export {
 }
 sub InitTypes( @_ )  {
     for @_ -> %p {
-        my ($t, $u) = %p.key, %p.value;
-		GetUnit($u).NewType($t)
+        my ($t, $u) = %p.key, %p.value; #888 del
+		GetUnit($u).NewType($t);		#888 del
+		%protoname-to-type{%p.value} = %p.key; #ie. reversed
     }
 }
 
