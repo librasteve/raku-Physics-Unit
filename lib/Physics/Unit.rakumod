@@ -80,6 +80,7 @@ class Unit is export {
     multi method new( Unit:D $u: @names ) {
         my $n = $u.clone;
         $n.SetNames: @names;
+        $n.SetType();
         return $n
     }
 
@@ -87,6 +88,7 @@ class Unit is export {
     multi method new( :$defn!, :@names ) {
         my $n = CreateUnit( $defn );
         $n.SetNames: @names;
+        $n.SetType();
         return $n
     }
 
@@ -141,6 +143,18 @@ class Unit is export {
             }
         }
     }
+    method SetType( $t? ) { 
+        my $p = ''; 
+        for @.names -> $n {                     #is this unit a prototype?
+            if $p = %protoname-to-type{$n} { last }
+        }   
+        if my $x = $t // $p // '' {
+            $!type = $x; 
+            %type-to-prototype{$x} = self;
+        }   
+
+        say "Set type: $.type" if $db;
+    }   
 #`[[888 mv to SetType
     method NewType( $t ) {
         $!type = $t;
@@ -360,7 +374,8 @@ sub InitBaseUnit( @_ ) {
         $u.dims[$i++] = 1;
 		$u.dmix{$u.name} = 1;
 
-        $u.NewType: $type;
+        ###888$u.NewType: $type;
+        $u.SetType: $type;
 
         say "Initialized Base Unit $names[0]" if $db;
     }
@@ -392,11 +407,18 @@ sub InitUnit( @_ ) is export {
 }
 sub InitTypes( @_ )  {
     for @_ -> %p {
+        %protoname-to-type{%p.value} = %p.key; #ie. reversed
+    }   
+}
+#`[[[888
+sub InitTypes( @_ )  {
+    for @_ -> %p {
         my ($t, $u) = %p.key, %p.value; #888 del
 		GetUnit($u).NewType($t);		#888 del
 		%protoname-to-type{%p.value} = %p.key; #ie. reversed
     }
 }
+#]]]
 sub InitOddTypes( @_ ) { 
     for @_ -> %p {
         %odd-type-by-name{%p.key} = %p.value;
