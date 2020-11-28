@@ -39,7 +39,6 @@ class Unit is export {
     has Str  @.names  is rw = [];
     has Int  @.dims   = 0 xx NumBases;
 	has MixHash $.dmix is rw = ∅.MixHash;
-    has Bool $!stock;					#for pre-cooked 'stock' units
 
     ### accessor methods ###		    #use 'self.attr: 42' not 'self.attr = 42'
     multi method factor($f) { self.CheckChange; $!factor = $f } 
@@ -131,7 +130,6 @@ class Unit is export {
                 && $n.comb.first(:end) ne 's'   #...already ends with 's'
                 && $n !~~ /<[\d\/^*]>/          #...contains a digit or a symbol
                 && ! $noplural                  #...instructed not to
-                && ! $!stock                    #...not a stock unit (already done)
             {
                 my $ns = $n ~ 's';
                 push @.names, $ns;
