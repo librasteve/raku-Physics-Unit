@@ -135,18 +135,6 @@ class Unit is export {
                 @.names.push: $ns;
                 %unit-by-name{$ns} = self;
             }   
-#`[[[888
-            #naive plurals - append 's' unless...
-            if     $n.chars > 2                 #...too short
-                && $n.comb.first(:end) ne 's'   #...already ends with 's'
-                && $n !~~ /<[\d\/^*]>/          #...contains a digit or a symbol
-                && ! $noplural                  #...instructed not to
-            {
-                my $ns = $n ~ 's';
-                push @.names, $ns;
-                %unit-by-name{$ns} = self;
-            }
-#]]]
         }
         @.names.push: $.defn unless @.names;
         @list-of-names.push: |@.names;
@@ -243,7 +231,7 @@ class Unit is export {
 
 ######## Subroutines ########
 sub ListUnits is export {		
-    return sort keys %unit-by-name
+	return @list-of-names
 }
 sub ListTypes is export {
     return sort keys %type-to-prototype
@@ -425,6 +413,21 @@ sub InitPrefix( @_ ) {
     }
 }
 sub InitUnit( @_ ) is export {
+    #eg. ['N',  'newton'],           'kg m / s^2',
+    #      ^ ,   ^^^^^^ names         ^^^^^^^^^^ defn
+
+    for @_ -> $names, $defn {
+        my @newbies;
+        for |$names -> $n {
+            @newbies.push: $n; 
+            if naive-plural( $n ) -> $p {
+                @newbies.push: $p; 
+            }   
+        }   
+        @list-of-names.push: |@newbies;
+        %defn-to-names{$defn} = [@newbies];
+    }   
+#`[[[888
     for @_ -> $names, $defn {
         my $u = CreateUnit( $defn );
         $u.SetNames: $names;    #decont from scalar to list
@@ -435,6 +438,7 @@ sub InitUnit( @_ ) is export {
         say "UG.result: "                 if $db;
         say $u.gist                       if $db;
     }
+#]]]
 }
 sub InitTypes( @_ )  {
     for @_ -> %p {
