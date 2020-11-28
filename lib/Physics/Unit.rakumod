@@ -2,16 +2,16 @@ unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>;
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 #snagging
-#-preload
 #- odd type mop up
 #-rereview data map names
+#-list-of-names should be a key only hash to avoid dupes
 
 
-my $db = 0;           #debug 
+my $db = 1;           #debug 
 
 ##### Constants and Data Maps ######
-#888constant \preload  = 0;       #Preload Derived Units   FIXME v2 make tag
-constant \locale = "imp";   #Imperial="imp"; US="us' FIXME v2 make tag
+constant \preload  = 1;     #Preload Derived Units   FIXME v2 make tag
+constant \locale   = "imp"; #Imperial="imp"; US="us' FIXME v2 make tag
 constant \NumBases = 8; 
 my Str   @BaseNames;
 
@@ -300,9 +300,9 @@ sub naive-plural( $n ) {
 
 ######## Grammars ########
 sub CreateUnit( $defn is copy ) {
-    #6.d faster regexes with Strings {<$str>} & slower with Arrays {<@arr>}
-	#strip compound names to force dmix generation
-    my $unit-names       = %unit-by-name.keys.grep({! /<[\s*^./]>/}).join('|');
+	#6.d faster regexes with Strings {<$str>} & slower with Arrays {<@arr>}
+    #erase compound names from element name match candidates (to force generation of dmix)
+    my $unit-names       = @list-of-names.grep({! /<[\s*^./]>/}).join('|');
     my $prefix-names     = %prefix-by-name.keys.join('|');
     my $pwr-prewords     = %pwr-preword.keys.join('|');
     my $pwr-postwords    = %pwr-postword.keys.join('|');
@@ -315,7 +315,7 @@ sub CreateUnit( $defn is copy ) {
     my $u = Unit.new();         #stub unit we are creating
 	$defn .= trim;
 
-    ##use Grammar::Tracer;
+    use Grammar::Tracer;
     grammar UnitGrammar {
         token TOP         { ^  \s* <compound>
                               [\s* <divider> \s* <compound>]?
@@ -380,6 +380,19 @@ sub CreateUnit( $defn is copy ) {
 }
 
 ######## Initialization ########
+sub InitPrefix( @_ ) {
+    for @_ -> $name, $factor {
+        my $u = Unit.new;
+        $u.factor:     $factor;
+        $u.defn:       $factor;
+        $u.names.push: $name;
+        $u.type:       'prefix';
+
+        %prefix-by-name{$name} = $u;
+
+        say "Initialized Prefix $name" if $db;
+    }
+}
 sub InitBaseUnit( @_ ) {
     my $i = 0;
     for @_ -> %h {
@@ -399,20 +412,17 @@ sub InitBaseUnit( @_ ) {
         say "Initialized Base Unit $names[0]" if $db;
     }
 }
-sub InitPrefix( @_ ) {
-    for @_ -> $name, $factor {
-        my $u = Unit.new;
-        $u.factor:     $factor;
-        $u.defn:       $factor;
-        $u.names.push: $name;
-        $u.type:       'prefix';
-
-        %prefix-by-name{$name} = $u;
-
-        say "Initialized Prefix $name" if $db;
-    }
+sub InitDerivedUnit( @_ ) { 
+    if preload {
+        for @_ -> $names, $defn {
+            Unit.new( defn => $defn, names => [|$names] );
+        }   
+    } else {
+        InitUnit( @_ )
+    }   
 }
 sub InitUnit( @_ ) is export {
+#[[[888
     #eg. ['N',  'newton'],           'kg m / s^2',
     #      ^ ,   ^^^^^^ names         ^^^^^^^^^^ defn
 
@@ -427,16 +437,11 @@ sub InitUnit( @_ ) is export {
         @list-of-names.push: |@newbies;
         %defn-to-names{$defn} = [@newbies];
     }   
-#`[[[888
+#]]]
+#`[[[888 stet
     for @_ -> $names, $defn {
         my $u = CreateUnit( $defn );
         $u.SetNames: $names;    #decont from scalar to list
-
-        say "Initialized Unit $names[0]"  if $db;
-        say "================ >>>"        if $db;
-        say "UG.parsed: ≪$defn≫"          if $db;
-        say "UG.result: "                 if $db;
-        say $u.gist                       if $db;
     }
 #]]]
 }
@@ -487,13 +492,7 @@ InitBaseUnit (
     'Luminosity'  => ['cd', 'candela', 'candle'],
 	'Angle'		  => ['radian'],		
 );
-
-InitUnit (
-
-	# Dimensionless
-	['pi'],          '3.1415926535897932385',
-#FIXME try ['pi'], 'π', #or similar
-
+InitDerivedUnit (
 	#SI Derived Units with special names & symbols
 	['sr', 'steradian'],                    'radian^2',
 	['Hz', 'hertz'],                        '1 / s',
@@ -518,8 +517,11 @@ InitUnit (
 	['kat', 'katal'],                       'mol s^-1',
 	#SI coherent Derived Units in terms of base units - TBD [see url]
 	#SI coherent Derived Units that include units with special names - TBD [see url]
-
+);
+InitUnit (
 	# Dimensionless
+	#FIXME v2 try ['pi'], 'π', #extend Number regex
+	['pi'],										'3.1415926535897932385', 
 	['one', 'unity'],							'1',
 	['semi','demi','hemi'],						'1/2',
 	['%','percent'],							'1/100',
