@@ -81,7 +81,7 @@ class Unit is export {
     }
 
     #new by named arguments 
-    multi method new( :$defn!, :@names, Bool:U :$stock ) {
+    multi method new( :$defn!, :@names ) {
         my $n = CreateUnit( $defn );
         $n.SetNames: @names;
         return $n
@@ -117,15 +117,6 @@ class Unit is export {
             @dim-str.push: $ds if $ds;
         }
         return @dim-str.join('⋅')
-    }
-    method raku( :$stock ) {								#can make stock units
-		my $s-str = $stock ?? ', stock => True' !! '';
-		my $t-str = $stock ?? "''" !! "'$!type'";			#suppress type if stock
-        return qq:to/END/;
-        Unit.new( factor => $.factor, offset => $.offset, defn => '$.defn', type => $t-str,
-		  dims => [{@.dims.join(',')}], dmix => {$.dmix.raku}, 
-		  names => [{@.names.map( ->$n {"'$n'"}).join(',')}]$s-str );
-        END
     }
 
     ### behavioural methods ###
