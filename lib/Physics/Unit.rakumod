@@ -131,6 +131,12 @@ class Unit is export {
             %unit-by-name{$n} = self;
 
             #naive plurals - append 's' unless...
+            if my $ns = naive-plural( $n ) { 
+                @.names.push: $ns;
+                %unit-by-name{$ns} = self;
+            }   
+#`[[[888
+            #naive plurals - append 's' unless...
             if     $n.chars > 2                 #...too short
                 && $n.comb.first(:end) ne 's'   #...already ends with 's'
                 && $n !~~ /<[\d\/^*]>/          #...contains a digit or a symbol
@@ -140,7 +146,12 @@ class Unit is export {
                 push @.names, $ns;
                 %unit-by-name{$ns} = self;
             }
+#]]]
         }
+        @.names.push: $.defn unless @.names;
+        @list-of-names.push: |@.names;
+
+        say "Set names: {@.names}" if $db;
     }
     method SetType( $t? ) { 
         my $p = ''; 
@@ -253,7 +264,7 @@ sub GetUnit( $u ) is export {
     for %unit-by-name.kv   -> $k,$v { return $v if $k eq $u }
     for %prefix-by-name.kv -> $k,$v { return $v if $k eq $u }
 
-    #3 if name on our list, instantiate it (bypass CreateUnit) 
+    #3 if name on our list, instantiate it (bypass CreateUnit)  #888 huh?
     if @list-of-names.grep(/$u/) {
         for %defn-to-names -> %p {
             if %p.value.grep($u) {
@@ -287,6 +298,16 @@ sub disambiguate( @t ) {
 		<Frequency>   => <Angular-Speed Frequency>,
 	);
 	for %dh.kv -> $k,$v { return $k if @t.sort eq $v.sort } 
+}
+sub naive-plural( $n ) { 
+    #naive plurals - append 's' unless...
+    if     $n.chars > 2                 #...too short
+        && $n.comb.first(:end) ne 's'   #...already ends with 's' 
+        && $n.comb.first(:end) ne 'z'   #...already ends with 'z' 
+        && $n !~~ /<[\d\/^*]>/          #...contains a digit or a symbol
+    {   
+        return $n ~ 's';
+    }   
 }
 
 ######## Grammars ########
