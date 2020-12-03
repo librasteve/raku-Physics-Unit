@@ -2,15 +2,25 @@ unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>;
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 #snagging
-#- odd type mop up
+#-odd type mop up
 #-rereview data map names
 #-list-of-names should be a key only hash to avoid dupes
+#-anyway defn-to-names has same info (except where externally defined in which case GU2)
+#`[ to Measure
+495     'Luminous-Flux'      => 'lumen',
+496     'Illuminance'        => 'lux',
+497     'Radioactivity'      => 'becquerel',
+4_99     'Catalytic-Activity' => 'kat',
+##check - not _
+'Magnetic-Flux'      => 'weber',
+'Magnetic-Field'     => 'tesla',
+#]
 
 
-my $db = 1;           #debug 
+my $db = 0;           #debug 
 
 ##### Constants and Data Maps ######
-constant \preload  = 1;     #Preload Derived Units   FIXME v2 make tag
+constant \preload  = 0;     #Preload Derived Units   FIXME v2 make tag
 constant \locale   = "imp"; #Imperial="imp"; US="us' FIXME v2 make tag
 constant \NumBases = 8; 
 my Str   @BaseNames;
@@ -55,7 +65,7 @@ class Unit is export {
 
     multi method type($t)   { $!type = $t.Str }
     multi method type(:$just1) {    
-        return $!type   if $!type;		#rarely set ... just to disambiguate
+        return $!type   if $!type;		#rarely set ... used to avoid ambiguous state
 
         return 'prefix' if %prefix-by-name{self.name};
 
@@ -72,20 +82,20 @@ class Unit is export {
 
     ### new & clone methods ###
 
-    #new by deep cloning an existing Unit
-    method clone {
-        nextwith :names([]), :type(''), :dims(@.dims.clone)
-    }
-    multi method new( Unit:D $u: @names ) {
-        my $n = $u.clone;
+    #new by named arguments 
+    multi method new( :$defn!, :@names ) {
+        my $n = CreateUnit( $defn );
         $n.SetNames: @names;
         $n.SetType();
         return $n
     }
 
-    #new by named arguments 
-    multi method new( :$defn!, :@names ) {
-        my $n = CreateUnit( $defn );
+    #new by deep cloning an existing Unit
+    method clone {
+        nextwith :names([]), :type(''), :dims(@.dims.clone), :dmix($.dmix.clone)
+    }
+    multi method new( Unit:D $u: @names ) {
+        my $n = $u.clone;
         $n.SetNames: @names;
         $n.SetType();
         return $n
@@ -122,6 +132,14 @@ class Unit is export {
         }
         return @dim-str.join('⋅')
     }
+    method raku {
+		my $t-str = self.type;
+        return qq:to/END/;
+        Unit.new( factor => $.factor, offset => $.offset, defn => '$.defn', type => $t-str,
+		  dims => [{@.dims.join(',')}], dmix => {$.dmix.raku}, names => [{@.names.map( ->$n {"'$n'"}).join(',')}] );
+        END
+    }
+
 
     ### behavioural methods ###
     method SetNames( @_ is copy, :$noplural ) {
@@ -139,19 +157,17 @@ class Unit is export {
         @.names.push: $.defn unless @.names;
         @list-of-names.push: |@.names;
 
-        say "Set names: {@.names}" if $db;
+        say "SetNames: {@.names}" if $db;
     }
     method SetType( $t? ) { 
-        my $p = ''; 
-        for @.names -> $n {                     #is this unit a prototype?
-            if $p = %protoname-to-type{$n} { last }
-        }   
-        if my $x = $t // $p // '' {
-            $!type = $x; 
-            %type-to-prototype{$x} = self;
-        }   
+		for @.names -> $n {                 #set up this unit as a prototype
+			if my $p = %protoname-to-type{$n} {
+				$!type = $p;	
+				%type-to-prototype{$!type} = self;
+			}
+		}   
 
-        say "Set type: $.type" if $db;
+        say "SetType: $.type" if $db;
     }   
     method CheckChange {
         die "You're not allowed to change named units!" if self.name;
@@ -160,6 +176,7 @@ class Unit is export {
     ### mathematical mutating Module methods ###
     multi method times( Real $t ) {
         self.factor: self.factor * $t;
+#put "times-real -> r: "; say self;
 		return self
     }    
     multi method times( Unit $t ) {
@@ -167,6 +184,7 @@ class Unit is export {
         self.dims >>+=<< $t.dims;
 		self.dmix = ( self.dmix (+) $t.dmix ).MixHash;
 		self.type: '';
+#put "times-unit -> r: "; say self;
         return self 
     }  
     method invert {
@@ -248,20 +266,22 @@ sub GetUnit( $u ) is export {
         return $u
     }   
 
-    #2 if name of unit or prefix that's already instantiated
+say "GU2 from $u";
+    #2 if name already instantiated
     for %unit-by-name.kv   -> $k,$v { return $v if $k eq $u }
     for %prefix-by-name.kv -> $k,$v { return $v if $k eq $u }
 
-    #3 if name on our list, instantiate it (bypass CreateUnit)  #888 huh?
-    if @list-of-names.grep(/$u/) {
-        for %defn-to-names -> %p {
-            if %p.value.grep($u) {
-                my $nuo = Unit.new( defn => %p.key, names => %p.value );  
-                return $nuo;
-            }   
-        }   
-    }   
+say "GU3 from $u";
+    #3 if name in our defns, instantiate it 
+	for %defn-to-names -> %p {
+		if %p.value.grep($u) {
+			my $nuo = Unit.new( defn => %p.key, names => %p.value );  
+#say "GU3 nuo: "; say $nuo;
+			return $nuo;
+		}   
+	}   
 
+say "GU4 from $u";
     #4 if no match, instantiate from definition 
     my $nuo = Unit.new( defn => $u );
     return subst-shortest( $nuo ) // $nuo;
@@ -300,6 +320,7 @@ sub naive-plural( $n ) {
 
 ######## Grammars ########
 sub CreateUnit( $defn is copy ) {
+say "CU enter with $defn";
 	#6.d faster regexes with Strings {<$str>} & slower with Arrays {<@arr>}
     #erase compound names from element name match candidates (to force generation of dmix)
     my $unit-names       = @list-of-names.grep({! /<[\s*^./]>/}).join('|');
@@ -353,26 +374,47 @@ sub CreateUnit( $defn is copy ) {
     class UnitActions   {
         method divider($/)     { $ad = 1 }
         method factor($/)      { !$ad ?? $u.times($/.Real) !! $u.share($/.Real) }
-        method offset($/)      { $u.offset($/.Real) }
+        method offset($/)      { $u.offset($/.Real)          }
 
-        method name($/)        { $e=$/.Str; $n=GetUnit($e).clone; $n.dmix=∅.MixHash }
-        method prefix($/)      { $p=GetUnit($/.Str).clone; $p.dmix=∅.MixHash }
-        method prefix-name($/) { $n.times($p) if $p       }
+        method name($/)        { 
+			$e=$/.Str; 
+			$n=GetUnit($e).clone; 
+			#$n.dmix=∅.MixHash; 
+		}
+        method prefix($/)      { $p=GetUnit($/.Str).clone    }
+        ##method prefix($/)      { $p=GetUnit($/.Str).clone; $p.dmix=∅.MixHash }
+        method prefix-name($/) { $n.times($p) if $p          }
 
         method pwr-before($/)  { $d=%pwr-preword{$/.Str}     }
         method pwr-postwd($/)  { $d=%pwr-postword{$/.Str}    }
         method pwr-supers($/)  { $d=%pwr-superscript{$/.Str} }
         method pwr-normal($/)  { $d=$<pwr-digits>.Int        }
 
-		method element($/)     { if $n { $n.raise($d, $e);
-									     !$ad ?? $u.times($n) !! $u.share($n) }
-								 $d=1; $e=''; $n=$p=Nil;     }
+		method element($/)     { 
+			if $n { 
+				$n.raise($d, $e);
+			    !$ad ?? $u.times($n) !! $u.share($n) 
+			}
+			$d=1; $e=''; $n=$p=Nil;     
+		}
+		method compound($/) { 
+			$/.make([~] ( $<element>[*-1] // ''), ( $/.made // '' ) );
+		}
+		method TOP($/)      { 
+			$/.make( $/.made // 'm' );
+			given $<name>[0] {
+				when 'm' { say 'yoyo' }
+			}
+			$/.make([~] ( $<compound> // ''), $/.made );
+			$/.make([~] ( $<divider> // ''), $/.made );
+			$/.make([~] ( $<name> // ''), $/.made );
+		}
     }
 
     my $match = UnitGrammar.parse( $defn, :actions(UnitActions) );
     if $match.so {
         $u.defn: $defn;
-        $u.SetNames: [$defn], :noplural;
+say "Made: $match\t= ", $match.made;
         return $u
     } else {
         die "Couldn't parse defn Str $defn.";
@@ -380,6 +422,16 @@ sub CreateUnit( $defn is copy ) {
 }
 
 ######## Initialization ########
+sub InitTypes( @_ )  {
+    for @_ -> %p {
+        %protoname-to-type{%p.value} = %p.key; #ie. reversed
+    }   
+}
+sub InitOddTypes( @_ ) { 
+    for @_ -> %p {
+        %odd-type-by-name{%p.key} = %p.value;
+    }   
+}
 sub InitPrefix( @_ ) {
     for @_ -> $name, $factor {
         my $u = Unit.new;
@@ -407,7 +459,9 @@ sub InitBaseUnit( @_ ) {
         $u.dims[$i++] = 1;
 		$u.dmix{$u.name} = 1;
 
-        $u.SetType: $type;
+        $u.type: $type;
+		%protoname-to-type{$u.name} = $type;
+		%type-to-prototype{$type} = $u;
 
         say "Initialized Base Unit $names[0]" if $db;
     }
@@ -445,17 +499,69 @@ sub InitUnit( @_ ) is export {
     }
 #]]]
 }
-sub InitTypes( @_ )  {
-    for @_ -> %p {
-        %protoname-to-type{%p.value} = %p.key; #ie. reversed
-    }   
-}
-sub InitOddTypes( @_ ) { 
-    for @_ -> %p {
-        %odd-type-by-name{%p.key} = %p.value;
-    }   
-}
 ######## Unit Data ########
+InitTypes (
+	#sets name of prototype unit
+    'Dimensionless'      => 'unity',
+    'Angle'              => 'radian',
+    'Angular-Speed'		 => 'radians per second',
+    'Solid-Angle'        => 'steradian',
+    'Frequency'          => 'hertz',
+    'Area'               => 'm^2',
+    'Volume'             => 'm^3',
+    'Speed'              => 'm/s',
+    'Acceleration'       => 'm/s^2',
+    'Momentum'           => 'kg m/s',
+    'Force'              => 'newton',
+    'Torque'             => 'Nm',
+    'Impulse'            => 'Ns',
+    'Moment-of-Inertia'  => 'kg m^2',
+    'Angular-Momentum'   => 'kg m^2/s',
+    'Pressure'           => 'pascal',
+    'Density'			 => 'kg/m^3',
+    'Energy'             => 'joule',
+    'Power'              => 'watt',
+    'Charge'             => 'coulomb',
+    'Potential'			 => 'volt',
+    'Resistance'         => 'ohm',
+    'Conductance'        => 'siemens',
+    'Capacitance'        => 'farad',
+    'Inductance'         => 'henry',
+    'Magnetic-Flux'      => 'weber',
+    'Magnetic-Field'     => 'tesla',
+    'Luminous-Flux'      => 'lumen',
+    'Illuminance'        => 'lux',
+    'Radioactivity'      => 'becquerel',
+    'Dose'               => 'gray',
+    'Catalytic-Activity' => 'kat',
+);
+InitOddTypes (
+    #mop up any odd ambiguous types
+    'eV'    => 'Energy',
+    'MeV'   => 'Energy',
+    'GeV'   => 'Energy',
+    'TeV'   => 'Energy',
+    'cal'   => 'Energy',
+    'kcal'  => 'Energy',
+    'btu'   => 'Energy',
+    'erg'   => 'Energy',
+    'kWh'   => 'Energy',
+    'ft-lb' => 'Torque',
+);
+#`[[888
+#mop up remaining ambiguous types
+GetUnit('eV').type:    'Energy';
+GetUnit('MeV').type:   'Energy';
+GetUnit('GeV').type:   'Energy';
+GetUnit('TeV').type:   'Energy';
+GetUnit('cal').type:   'Energy';
+GetUnit('kcal').type:  'Energy';
+GetUnit('btu').type:   'Energy';
+GetUnit('erg').type:   'Energy';
+GetUnit('kWh').type:   'Energy';
+GetUnit('ft-lb').type: 'Torque';
+#]]
+
 InitPrefix (
     #SI Prefixes
     #avoid 1e2 format to encourage Rats
@@ -718,66 +824,6 @@ InitUnit (
 	['rad'],           'gray / 100',
 	['rem'],           'sievert / 100',
 );
-
-InitTypes (
-	#sets name of prototype unit
-    'Dimensionless'      => 'unity',
-    'Angle'              => 'radian',
-	'Angular-Speed'		 => 'radians per second',
-    'Solid-Angle'        => 'steradian',
-    'Frequency'          => 'hertz',
-    'Area'               => 'm^2',
-    'Volume'             => 'm^3',
-    'Speed'              => 'm/s',
-    'Acceleration'       => 'm/s^2',
-    'Momentum'           => 'kg m/s',
-    'Force'              => 'newton',
-    'Torque'             => 'Nm',
-    'Impulse'            => 'Ns',
-    'Moment-of-Inertia'  => 'kg m^2',
-    'Angular-Momentum'   => 'kg m^2/s',
-    'Pressure'           => 'pascal',
-	'Density'			 => 'kg/m^3',
-    'Energy'             => 'joule',
-    'Power'              => 'watt',
-    'Charge'             => 'coulomb',
-    'Potential'			 => 'volt',
-    'Resistance'         => 'ohm',
-    'Conductance'        => 'siemens',
-    'Capacitance'        => 'farad',
-    'Inductance'         => 'henry',
-    'Magnetic_Flux'      => 'weber',
-    'Magnetic_Field'     => 'tesla',
-    'Dose'               => 'gray',
-);
-
-InitOddTypes (
-    #mop up any odd ambiguous types
-    'eV'    => 'Energy',
-    'MeV'   => 'Energy',
-    'GeV'   => 'Energy',
-    'TeV'   => 'Energy',
-    'cal'   => 'Energy',
-    'kcal'  => 'Energy',
-    'btu'   => 'Energy',
-    'erg'   => 'Energy',
-    'kWh'   => 'Energy',
-    'ft-lb' => 'Torque',
-);
-
-#`[[888
-#mop up remaining ambiguous types
-GetUnit('eV').type:    'Energy';
-GetUnit('MeV').type:   'Energy';
-GetUnit('GeV').type:   'Energy';
-GetUnit('TeV').type:   'Energy';
-GetUnit('cal').type:   'Energy';
-GetUnit('kcal').type:  'Energy';
-GetUnit('btu').type:   'Energy';
-GetUnit('erg').type:   'Energy';
-GetUnit('kWh').type:   'Energy';
-GetUnit('ft-lb').type: 'Torque';
-#]]
 
 if $db {
 say "+++++++++++++++++++";

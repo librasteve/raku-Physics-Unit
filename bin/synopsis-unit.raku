@@ -8,6 +8,9 @@ use Physics::Unit;
 my $a2 = Unit.new( defn => '2 ft', names => ['2f'] ); say $a2; say $a2.type;
 
 die "woah";
+#my $f1 = GetUnit( 'ft' ); say $f1;
+
+
 
 # Define your own unit named "ff" (named args)
 my $ff = Unit.new( defn => 'furlong / fortnight', names => ['ff'] );

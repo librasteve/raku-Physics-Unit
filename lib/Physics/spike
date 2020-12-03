@@ -1,0 +1,24 @@
+grammar ArithmGrammar {
+	token TOP { \s* <num> \s* <operation> \s* <num> \s*}
+	token operation { <[^*+/-]> }
+	token num { \d+ | \d+\.\d+ | \.\d+ }
+}
+class ArithmActions {
+	method TOP($/) {
+		$/.make( 999 );
+		given $<operation> {
+			##when '*' { $/.make([*] $/<num>)}
+			when '*' { $/.make([*] $/<num>, 333, $/.made ) }
+			when '+' { $/.make([+] $<num>)}
+			when '/' { $/.make($<num>[0] / $<num>[1]) }
+			when '-' { $/.make([-] $<num>) }
+			when '^' { $/.make($<num>[0] ** $<num>[1]) }
+		}
+	}
+}
+for ' 6*7 ', '46.2 -4.2', '28+ 14.0 ', '70 * .6 ', '126 /3', '6.4807407 ^ 2' 
+-> $op {
+	my $match = ArithmGrammar.parse($op, :actions(ArithmActions));
+	say "$match\t= ", $match.made;
+##dd $match;
+}
