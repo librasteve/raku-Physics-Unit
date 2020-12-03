@@ -372,10 +372,17 @@ say "CU enter with $defn";
 	my Str  $e = '';	#element name
     my Unit ($n,$p);    #new units for each element name & prefix
     class UnitActions   {
-        method divider($/)     { $ad = 1 }
-        method factor($/)      { !$ad ?? $u.times($/.Real) !! $u.share($/.Real) }
-        method offset($/)      { $u.offset($/.Real)          }
-
+        method divider($/)     { 
+			$ad = 1;
+		}
+        method factor($/)      { 
+			say "factor-number: " ~ $<number>;
+			!$ad ?? $u.times($/.Real) !! $u.share($/.Real);
+		}
+        method offset($/)      { 
+			say "offset-number: " ~ $<number>;
+			$u.offset($/.Real);
+		}
         method name($/)        { 
 			$e=$/.Str; 
 			$n=GetUnit($e).clone; 
@@ -391,6 +398,8 @@ say "CU enter with $defn";
         method pwr-normal($/)  { $d=$<pwr-digits>.Int        }
 
 		method element($/)     { 
+			#say "element: " ~ @<element>;
+			$/.make([~] ( $<element>[*-1] // ''), ( $/.made // '' ) );
 			if $n { 
 				$n.raise($d, $e);
 			    !$ad ?? $u.times($n) !! $u.share($n) 
@@ -398,6 +407,7 @@ say "CU enter with $defn";
 			$d=1; $e=''; $n=$p=Nil;     
 		}
 		method compound($/) { 
+			say "element: " ~ @<element>;
 			$/.make([~] ( $<element>[*-1] // ''), ( $/.made // '' ) );
 		}
 		method TOP($/)      { 

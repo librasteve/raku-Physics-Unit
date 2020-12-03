@@ -22,3 +22,9 @@ for ' 6*7 ', '46.2 -4.2', '28+ 14.0 ', '70 * .6 ', '126 /3', '6.4807407 ^ 2'
 	say "$match\t= ", $match.made;
 ##dd $match;
 }
+
+#`[[
+Notes
+there is only one made
+it is a variable (can be data structure)
+#]]
