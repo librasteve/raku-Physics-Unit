@@ -170,7 +170,7 @@ class Unit is export {
         say "SetType: $.type" if $db;
     }   
     method CheckChange {
-        die "You're not allowed to change named units!" if self.name;
+        warn "You're not allowed to change named units!" if self.name;
     }
 
     ### mathematical mutating Module methods ###
@@ -261,28 +261,36 @@ sub GetPrototype( Str $t ) is export {
 	return %type-to-prototype{$t}
 }
 sub GetUnit( $u ) is export {
+
     #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
     if $u ~~ Unit {
+		say "GU1 from $u" if $db;
         return $u
     }   
 
-say "GU2 from $u";
-    #2 if name already instantiated
-    for %unit-by-name.kv   -> $k,$v { return $v if $k eq $u }
-    for %prefix-by-name.kv -> $k,$v { return $v if $k eq $u }
+    #2 if name or prefix already instantiated
+		say "GU2 from $u" if $db;
 
-say "GU3 from $u";
+    for %unit-by-name.kv   -> $k,$v { 
+		return $v if $k eq $u 
+	} 
+    for %prefix-by-name.kv -> $k,$v { 
+		return $v if $k eq $u 
+	}
+
     #3 if name in our defns, instantiate it 
+		say "GU3 from $u" if $db;
+
 	for %defn-to-names -> %p {
 		if %p.value.grep($u) {
 			my $nuo = Unit.new( defn => %p.key, names => %p.value );  
-#say "GU3 nuo: "; say $nuo;
 			return $nuo;
 		}   
 	}   
 
-say "GU4 from $u";
     #4 if no match, instantiate from definition 
+		say "GU4 from $u" if $db;
+
     my $nuo = Unit.new( defn => $u );
     return subst-shortest( $nuo ) // $nuo;
 }
@@ -320,7 +328,7 @@ sub naive-plural( $n ) {
 
 ######## Grammars ########
 sub CreateUnit( $defn is copy ) {
-say "CU enter with $defn";
+say "CU enter with $defn" if $db;
 	#6.d faster regexes with Strings {<$str>} & slower with Arrays {<@arr>}
     #erase compound names from element name match candidates (to force generation of dmix)
     my $unit-names       = @list-of-names.grep({! /<[\s*^./]>/}).join('|');
@@ -333,13 +341,12 @@ say "CU enter with $defn";
     $unit-names       ~~ s:g/ ( <-[a..z A..Z 0..9 \|]> ) / '$0' /;
     $pwr-superscripts ~~ s:g/ ( <-[a..z A..Z 0..9 \|]> ) / '$0' /;
 
-    my $u = Unit.new();         #stub unit we are creating
 	$defn .= trim;
 
-    use Grammar::Tracer;
+    ##use Grammar::Tracer;
     grammar UnitGrammar {
-        token TOP         { ^  \s* <compound>
-                              [\s* <divider> \s* <compound>]?
+        token TOP         { ^  \s* <numerator=.compound>
+                              [\s* <divider> \s* <denominator=.compound>]?
                               [\s*    '+'    \s* <offset>  ]? \s* $ } #'+' is hardwired
         token divider     { '/' || 'per' }
         token compound    { <element>+ % <sep> }
@@ -367,65 +374,120 @@ say "CU enter with $defn";
         token pwr-symbol  { '**' || '^' }
     }
 
-    my $ad = 0;         #after the divider?
-    my Int  $d = 1;	    #digits from power
-	my Str  $e = '';	#element name
-    my Unit ($n,$p);    #new units for each element name & prefix
     class UnitActions   {
-        method divider($/)     { 
-			$ad = 1;
+		#| from key value pair example https://docs.raku.org/language/grammars#Action_objects
+		method TOP($/)			{ 
+			my $nu = $<numerator>.made;
+			my $de = $<denominator>.made;
+			$nu.share($de) if $de;
+			make $nu;
+say "in top...", $/.made if $db;
 		}
-        method factor($/)      { 
-			say "factor-number: " ~ $<number>;
-			!$ad ?? $u.times($/.Real) !! $u.share($/.Real);
-		}
-        method offset($/)      { 
-			say "offset-number: " ~ $<number>;
-			$u.offset($/.Real);
-		}
-        method name($/)        { 
-			$e=$/.Str; 
-			$n=GetUnit($e).clone; 
-			#$n.dmix=∅.MixHash; 
-		}
-        method prefix($/)      { $p=GetUnit($/.Str).clone    }
-        ##method prefix($/)      { $p=GetUnit($/.Str).clone; $p.dmix=∅.MixHash }
-        method prefix-name($/) { $n.times($p) if $p          }
 
-        method pwr-before($/)  { $d=%pwr-preword{$/.Str}     }
-        method pwr-postwd($/)  { $d=%pwr-postword{$/.Str}    }
-        method pwr-supers($/)  { $d=%pwr-superscript{$/.Str} }
-        method pwr-normal($/)  { $d=$<pwr-digits>.Int        }
+		#| accumulates element Units using times
+		method compound($/)		{ 
+			my $acc = Unit.new();
+			for $<element>>>.made -> $x {
+				$acc.times($x);
+			}
+			make $acc;
+#say "in comp..."; say $/.made;
+		}
 
-		method element($/)     { 
-			#say "element: " ~ @<element>;
-			$/.make([~] ( $<element>[*-1] // ''), ( $/.made // '' ) );
-			if $n { 
-				$n.raise($d, $e);
-			    !$ad ?? $u.times($n) !! $u.share($n) 
+		#| makes a list of element units from factor, offset, prefix and name
+		method element($/)		{ 
+			my $nn = $<pnp-before><prefix-name>.made<unit> || 
+					 $<pnp-after><prefix-name>.made<unit>;
+			my $ee = $<pnp-before><prefix-name>.made<defn> || 
+					 $<pnp-after><prefix-name>.made<defn>;
+			my $dd = $<pnp-before><pwr-before>.made || 
+					 $<pnp-after><pwr-after>.made   // 1;
+			if $nn { 
+				$nn.raise($dd, $ee);
+				make $nn;
 			}
-			$d=1; $e=''; $n=$p=Nil;     
-		}
-		method compound($/) { 
-			say "element: " ~ @<element>;
-			$/.make([~] ( $<element>[*-1] // ''), ( $/.made // '' ) );
-		}
-		method TOP($/)      { 
-			$/.make( $/.made // 'm' );
-			given $<name>[0] {
-				when 'm' { say 'yoyo' }
+			my $fu = $<factor>.made;
+			if $fu {
+				make $fu;
 			}
-			$/.make([~] ( $<compound> // ''), $/.made );
-			$/.make([~] ( $<divider> // ''), $/.made );
-			$/.make([~] ( $<name> // ''), $/.made );
+			my $ou = $<factor>.made;
+			if $ou {
+				make $ou;
+			}
+##say "in elem..."; say $/.made;
+		}
+
+		#| make Unit from factor
+        method factor($/)		{ 
+			my $fu = Unit.new();
+			$fu.times($/.Real);
+			make $fu;
+##say "in factor..."; say $/.made;
+		}
+
+		#| make Unit from offset 
+        method offset($/)		{ 
+			my $ou = Unit.new();
+			$ou.offset($/.Real);
+			make $ou;
+##say "in offset..."; say $/.made;
+		}
+
+        method prefix-name($/)	{ 
+			my $en = $<name>.made<defn>;
+			my $nn = $<name>.made<unit>;
+			my $pn = $<prefix>.made;
+			$nn.times($pn) if $pn;
+			make %( defn => $en, unit => $nn );
+##say "in prefix-name..."; say $/.made;
+		}
+
+        method prefix($/)		{ 
+			my $pf=GetUnit($/.Str).clone;
+			make %( p => $pf );
+##say "in prefix..."; say $/.made;
+		}
+
+        method name($/)			{ 
+			my $en=$/.Str; 
+			my $nn=GetUnit($en).clone; 
+			make %( defn => $en, unit => $nn );
+##say "in name..."; say $/.made;
+		}
+
+        method pwr-before($/)	{
+			my $dp=%pwr-preword{$/.Str};
+			make $dp;
+##say "in pnp-before..."; say $/.made;
+		}
+
+		method pnp-after($/)	{
+			my $nn = $<pwr-postwd>.made || 
+					 $<pwr-supers>.made ||
+					 $<pwr-normal>.made;
+			make $nn;
+##say "in pnp-after..."; say $/.made;
+		}
+        method pwr-postwd($/)	{
+			my $dp=%pwr-postword{$/.Str};
+			make $dp;
+		}
+        method pwr-supers($/)	{ 
+			my $dp=%pwr-superscript{$/.Str}; 
+			make $dp;
+		}
+        method pwr-normal($/)	{ 
+			my $dp=$<pwr-digits>.Int;
+			make $dp;
 		}
     }
 
     my $match = UnitGrammar.parse( $defn, :actions(UnitActions) );
     if $match.so {
-        $u.defn: $defn;
-say "Made: $match\t= ", $match.made;
-        return $u
+		say "Made: $match\t= ", $match.made if $db;
+		my $mu = $match.made;
+        $mu.defn: $defn;
+        return $mu;
     } else {
         die "Couldn't parse defn Str $defn.";
     }

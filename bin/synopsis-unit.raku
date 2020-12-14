@@ -4,13 +4,8 @@ use Physics::Unit;
 
 #SYNOPSIS
 
-#my $a1 = Unit.new( defn => '5 radians per second', names => ['radians per second'] ); say "$a1";
-my $a2 = Unit.new( defn => '2 ft', names => ['2f'] ); say $a2; say $a2.type;
-
-die "woah";
-#my $f1 = GetUnit( 'ft' ); say $f1;
-
-
+my $a1 = Unit.new( defn => '5 radians per second', names => ['radians per second'] ); say "$a1";
+my $a2 = Unit.new( defn => '2 ft', names => ['2f'] ); say ~$a2; say $a2.type;
 
 # Define your own unit named "ff" (named args)
 my $ff = Unit.new( defn => 'furlong / fortnight', names => ['ff'] );
@@ -19,6 +14,7 @@ say $ff.type;
 say $ff.canonical;
 say $ff.pretty;
 say $ff.raku;
+die "woah";
 
 # New Unit by reference to an existing one
 my $fh = $ff.new( <fh fi> );

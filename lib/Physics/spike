@@ -26,5 +26,16 @@ for ' 6*7 ', '46.2 -4.2', '28+ 14.0 ', '70 * .6 ', '126 /3', '6.4807407 ^ 2'
 #`[[
 Notes
 there is only one made
-it is a variable (can be data structure)
+it is a variable (so can contain a data structure)
+make can be called from an action
+only previous match variables are available in an action as $<varname>
+.made is called on the token(?) so if not available lower in the tree
+must use grammar dynamic variables for that (e.g. ad) NOPE
+
+#operation of $/ (viz https://docs.raku.org/language/variables#The_$/_variable
+say $/.hash;        
+say %$/.join;
+say $<factor>;
+say $<factor><number>;
+say $/.made;
 #]]
