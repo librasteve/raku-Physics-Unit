@@ -6,6 +6,8 @@ unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>;
 #-rereview data map names
 #-list-of-names should be a key only hash to avoid dupes
 #-anyway defn-to-names has same info (except where externally defined in which case GU2)
+#-remove preload takes too long
+#-remove protoype / SetType logic?
 #`[ to Measure
 495     'Luminous-Flux'      => 'lumen',
 496     'Illuminance'        => 'lux',
@@ -31,6 +33,7 @@ my %unit-by-name;           #map name => Unit objects (when instantiated)
 my %prefix-by-name;         #map name => Prefix objects
 my %protoname-to-type;      #map name of prototype Unit => Type
 my %type-to-prototype;      #map Type name to a Unit object that exemplifies the type 
+my %type-to-dims;			#map Type name to dims vector
 my %odd-type-by-name;       #mop up remaining odd ambiguous types
 
 #Power synonyms
@@ -65,14 +68,30 @@ class Unit is export {
 
     multi method type($t)   { $!type = $t.Str }
     multi method type(:$just1) {    
+		#1 type has been manually set (eg. to discriminate ambiguous situations)
         return $!type   if $!type;		#rarely set ... used to avoid ambiguous state
 
+		#2 we have a prefix
         return 'prefix' if %prefix-by-name{self.name};
 
+		#3 by looking up dims
+		my @d;
+		for %type-to-dims.keys -> $k {
+			push @d, $k if self.dims cmp %type-to-dims{$k} ~~ Same;
+		}
+		if @d {
+			if @d == 1 { return @d[0] }
+			if $just1  { return disambiguate(@d) }
+			if @d > 1  { return @d.sort }
+		}
+		
+		#4 by matching dims to prototype unit (only works if prototype has been instantiated
+		#FIXME maybe remove this part?
         my @t;
         for %type-to-prototype.keys -> $k { 
             push @t, $k if self.dims eqv %type-to-prototype{$k}.dims
         }    
+
         #return value depends on whether we got zero, one or multiple types
 		if @t == 0 { return '' }
 		if @t == 1 { return @t[0] }
@@ -140,7 +159,6 @@ class Unit is export {
         END
     }
 
-
     ### behavioural methods ###
     method SetNames( @_ is copy, :$noplural ) {
         @.names = [];			#clears then sets
@@ -176,7 +194,6 @@ class Unit is export {
     ### mathematical mutating Module methods ###
     multi method times( Real $t ) {
         self.factor: self.factor * $t;
-#put "times-real -> r: "; say self;
 		return self
     }    
     multi method times( Unit $t ) {
@@ -184,7 +201,6 @@ class Unit is export {
         self.dims >>+=<< $t.dims;
 		self.dmix = ( self.dmix (+) $t.dmix ).MixHash;
 		self.type: '';
-#put "times-unit -> r: "; say self;
         return self 
     }  
     method invert {
@@ -328,7 +344,7 @@ sub naive-plural( $n ) {
 
 ######## Grammars ########
 sub CreateUnit( $defn is copy ) {
-say "CU enter with $defn" if $db;
+
 	#6.d faster regexes with Strings {<$str>} & slower with Arrays {<@arr>}
     #erase compound names from element name match candidates (to force generation of dmix)
     my $unit-names       = @list-of-names.grep({! /<[\s*^./]>/}).join('|');
@@ -381,7 +397,7 @@ say "CU enter with $defn" if $db;
 			my $de = $<denominator>.made;
 			$nu.share($de) if $de;
 			make $nu;
-say "in top...", $/.made if $db;
+#say "in top...", $/.made if $db;
 		}
 
 		#| accumulates element Units using times
@@ -391,7 +407,7 @@ say "in top...", $/.made if $db;
 				$acc.times($x);
 			}
 			make $acc;
-#say "in comp..."; say $/.made;
+#say "in comp, acc made..."; say $/.made;
 		}
 
 		#| makes a list of element units from factor, offset, prefix and name
@@ -451,6 +467,7 @@ say "in top...", $/.made if $db;
         method name($/)			{ 
 			my $en=$/.Str; 
 			my $nn=GetUnit($en).clone; 
+			$nn.dmix=∅.MixHash;
 			make %( defn => $en, unit => $nn );
 ##say "in name..."; say $/.made;
 		}
@@ -494,16 +511,6 @@ say "in top...", $/.made if $db;
 }
 
 ######## Initialization ########
-sub InitTypes( @_ )  {
-    for @_ -> %p {
-        %protoname-to-type{%p.value} = %p.key; #ie. reversed
-    }   
-}
-sub InitOddTypes( @_ ) { 
-    for @_ -> %p {
-        %odd-type-by-name{%p.key} = %p.value;
-    }   
-}
 sub InitPrefix( @_ ) {
     for @_ -> $name, $factor {
         my $u = Unit.new;
@@ -539,7 +546,7 @@ sub InitBaseUnit( @_ ) {
     }
 }
 sub InitDerivedUnit( @_ ) { 
-    if preload {
+    if preload { #FIXME remove preload
         for @_ -> $names, $defn {
             Unit.new( defn => $defn, names => [|$names] );
         }   
@@ -547,8 +554,23 @@ sub InitDerivedUnit( @_ ) {
         InitUnit( @_ )
     }   
 }
+sub InitTypes( @_ )  {
+    for @_ -> %p {
+        %protoname-to-type{%p.value} = %p.key; #ie. reversed
+    }   
+}
+sub InitTypeDims( @_ ) {
+    for @_ -> %p {
+		%type-to-dims{%p.key} = %p.value;
+	}
+say %type-to-dims;
+}
+sub InitOddTypes( @_ ) { 
+    for @_ -> %p {
+        %odd-type-by-name{%p.key} = %p.value;
+    }   
+}
 sub InitUnit( @_ ) is export {
-#[[[888
     #eg. ['N',  'newton'],           'kg m / s^2',
     #      ^ ,   ^^^^^^ names         ^^^^^^^^^^ defn
 
@@ -563,8 +585,9 @@ sub InitUnit( @_ ) is export {
         @list-of-names.push: |@newbies;
         %defn-to-names{$defn} = [@newbies];
     }   
-#]]]
-#`[[[888 stet
+
+#`[[[888 stet FIXME - maybe need for export duties / UnitAffix
+#if resurrect, maybe use Unit.new() see preload above
     for @_ -> $names, $defn {
         my $u = CreateUnit( $defn );
         $u.SetNames: $names;    #decont from scalar to list
@@ -572,67 +595,6 @@ sub InitUnit( @_ ) is export {
 #]]]
 }
 ######## Unit Data ########
-InitTypes (
-	#sets name of prototype unit
-    'Dimensionless'      => 'unity',
-    'Angle'              => 'radian',
-    'Angular-Speed'		 => 'radians per second',
-    'Solid-Angle'        => 'steradian',
-    'Frequency'          => 'hertz',
-    'Area'               => 'm^2',
-    'Volume'             => 'm^3',
-    'Speed'              => 'm/s',
-    'Acceleration'       => 'm/s^2',
-    'Momentum'           => 'kg m/s',
-    'Force'              => 'newton',
-    'Torque'             => 'Nm',
-    'Impulse'            => 'Ns',
-    'Moment-of-Inertia'  => 'kg m^2',
-    'Angular-Momentum'   => 'kg m^2/s',
-    'Pressure'           => 'pascal',
-    'Density'			 => 'kg/m^3',
-    'Energy'             => 'joule',
-    'Power'              => 'watt',
-    'Charge'             => 'coulomb',
-    'Potential'			 => 'volt',
-    'Resistance'         => 'ohm',
-    'Conductance'        => 'siemens',
-    'Capacitance'        => 'farad',
-    'Inductance'         => 'henry',
-    'Magnetic-Flux'      => 'weber',
-    'Magnetic-Field'     => 'tesla',
-    'Luminous-Flux'      => 'lumen',
-    'Illuminance'        => 'lux',
-    'Radioactivity'      => 'becquerel',
-    'Dose'               => 'gray',
-    'Catalytic-Activity' => 'kat',
-);
-InitOddTypes (
-    #mop up any odd ambiguous types
-    'eV'    => 'Energy',
-    'MeV'   => 'Energy',
-    'GeV'   => 'Energy',
-    'TeV'   => 'Energy',
-    'cal'   => 'Energy',
-    'kcal'  => 'Energy',
-    'btu'   => 'Energy',
-    'erg'   => 'Energy',
-    'kWh'   => 'Energy',
-    'ft-lb' => 'Torque',
-);
-#`[[888
-#mop up remaining ambiguous types
-GetUnit('eV').type:    'Energy';
-GetUnit('MeV').type:   'Energy';
-GetUnit('GeV').type:   'Energy';
-GetUnit('TeV').type:   'Energy';
-GetUnit('cal').type:   'Energy';
-GetUnit('kcal').type:  'Energy';
-GetUnit('btu').type:   'Energy';
-GetUnit('erg').type:   'Energy';
-GetUnit('kWh').type:   'Energy';
-GetUnit('ft-lb').type: 'Torque';
-#]]
 
 InitPrefix (
     #SI Prefixes
@@ -696,14 +658,115 @@ InitDerivedUnit (
 	#SI coherent Derived Units in terms of base units - TBD [see url]
 	#SI coherent Derived Units that include units with special names - TBD [see url]
 );
+InitTypes (
+	#sets name of prototype unit
+    'Dimensionless'      => 'unity',
+    'Angle'              => 'radian',
+    'Angular-Speed'		 => 'radians per second',
+    'Solid-Angle'        => 'steradian',
+    'Frequency'          => 'hertz',
+    'Area'               => 'm^2',
+    'Volume'             => 'm^3',
+    'Speed'              => 'm/s',
+    'Acceleration'       => 'm/s^2',
+    'Momentum'           => 'kg m/s',
+    'Force'              => 'newton',
+    'Torque'             => 'Nm',
+    'Impulse'            => 'Ns',
+    'Moment-of-Inertia'  => 'kg m^2',
+    'Angular-Momentum'   => 'kg m^2/s',
+    'Pressure'           => 'pascal',
+    'Density'			 => 'kg/m^3',
+    'Energy'             => 'joule',
+    'Power'              => 'watt',
+    'Charge'             => 'coulomb',
+    'Potential'			 => 'volt',
+    'Resistance'         => 'ohm',
+    'Conductance'        => 'siemens',
+    'Capacitance'        => 'farad',
+    'Inductance'         => 'henry',
+    'Magnetic-Flux'      => 'weber',
+    'Magnetic-Field'     => 'tesla',
+    'Luminous-Flux'      => 'lumen',
+    'Illuminance'        => 'lux',
+    'Radioactivity'      => 'becquerel',
+    'Dose'               => 'gray',
+    'Catalytic-Activity' => 'kat',
+);
+InitTypeDims (
+	#sets name of prototype unit
+    'Dimensionless'      => (0,0,0,0,0,0,0,0),
+    'Speed'              => (1,0,-1,0,0,0,0,0),
+);
+#`[
+    'Dimensionless'      => 'unity',
+    'Angle'              => 'radian',
+    'Angular-Speed'		 => 'radians per second',
+    'Solid-Angle'        => 'steradian',
+    'Frequency'          => 'hertz',
+    'Area'               => 'm^2',
+    'Volume'             => 'm^3',
+    'Speed'              => 'm/s',
+    'Acceleration'       => 'm/s^2',
+    'Momentum'           => 'kg m/s',
+    'Force'              => 'newton',
+    'Torque'             => 'Nm',
+    'Impulse'            => 'Ns',
+    'Moment-of-Inertia'  => 'kg m^2',
+    'Angular-Momentum'   => 'kg m^2/s',
+    'Pressure'           => 'pascal',
+    'Density'			 => 'kg/m^3',
+    'Energy'             => 'joule',
+    'Power'              => 'watt',
+    'Charge'             => 'coulomb',
+    'Potential'			 => 'volt',
+    'Resistance'         => 'ohm',
+    'Conductance'        => 'siemens',
+    'Capacitance'        => 'farad',
+    'Inductance'         => 'henry',
+    'Magnetic-Flux'      => 'weber',
+    'Magnetic-Field'     => 'tesla',
+    'Luminous-Flux'      => 'lumen',
+    'Illuminance'        => 'lux',
+    'Radioactivity'      => 'becquerel',
+    'Dose'               => 'gray',
+    'Catalytic-Activity' => 'kat',
+);
+#]
+InitOddTypes (
+    #mop up any odd ambiguous types
+    'eV'    => 'Energy',
+    'MeV'   => 'Energy',
+    'GeV'   => 'Energy',
+    'TeV'   => 'Energy',
+    'cal'   => 'Energy',
+    'kcal'  => 'Energy',
+    'btu'   => 'Energy',
+    'erg'   => 'Energy',
+    'kWh'   => 'Energy',
+    'ft-lb' => 'Torque',
+);
+#`[[888
+#mop up remaining ambiguous types
+GetUnit('eV').type:    'Energy';
+GetUnit('MeV').type:   'Energy';
+GetUnit('GeV').type:   'Energy';
+GetUnit('TeV').type:   'Energy';
+GetUnit('cal').type:   'Energy';
+GetUnit('kcal').type:  'Energy';
+GetUnit('btu').type:   'Energy';
+GetUnit('erg').type:   'Energy';
+GetUnit('kWh').type:   'Energy';
+GetUnit('ft-lb').type: 'Torque';
+#]]
 InitUnit (
 	# Dimensionless
-	#FIXME v2 try ['pi'], 'π', #extend Number regex
-	['pi'],										'3.1415926535897932385', 
 	['one', 'unity'],							'1',
 	['semi','demi','hemi'],						'1/2',
 	['%','percent'],							'1/100',
 	['ABV'],									'1',   
+	#FIXME v2 try ['pi'], 'π', #extend Number regex
+	['pi'],										'3.1415926535897932385', 
 
 	# Angle
 	['°', 'degree', 'deg', 'º'],                'pi radians / 180',
