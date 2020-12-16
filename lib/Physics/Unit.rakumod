@@ -7,7 +7,7 @@ unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>;
 #-list-of-names should be a key only hash to avoid dupes
 #-anyway defn-to-names has same info (except where externally defined in which case GU2)
 #-remove protoype / SetType logic?
-#-new test
+#-new test 02...
 #`[ to Measure
 495     'Luminous-Flux'      => 'lumen',
 496     'Illuminance'        => 'lux',
