@@ -6,7 +6,6 @@ unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>;
 #-rereview data map names
 #-list-of-names should be a key only hash to avoid dupes
 #-anyway defn-to-names has same info (except where externally defined in which case GU2)
-#-remove preload takes too long
 #-remove protoype / SetType logic?
 #`[ to Measure
 495     'Luminous-Flux'      => 'lumen',
@@ -22,7 +21,7 @@ unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>;
 my $db = 0;           #debug 
 
 ##### Constants and Data Maps ######
-constant \preload  = 0;     #Preload Derived Units   FIXME v2 make tag
+constant \preload  = 0;     #Preload Derived Units (ie. debug / slow)
 constant \locale   = "imp"; #Imperial="imp"; US="us' FIXME v2 make tag
 constant \NumBases = 8; 
 my Str   @BaseNames;
@@ -68,10 +67,10 @@ class Unit is export {
 
     multi method type($t)   { $!type = $t.Str }
     multi method type(:$just1) {    
-		#1 type has been manually set (eg. to discriminate ambiguous situations)
-        return $!type   if $!type;		#rarely set ... used to avoid ambiguous state
+		#1 type has been explicitly set ... rarely used to avoid ambiguous state
+        return $!type   if $!type;
 
-		#2 we have a prefix
+		#2 we are a prefix
         return 'prefix' if %prefix-by-name{self.name};
 
 		#3 by looking up dims
@@ -79,12 +78,12 @@ class Unit is export {
 		for %type-to-dims.keys -> $k {
 			push @d, $k if self.dims cmp %type-to-dims{$k} ~~ Same;
 		}
-		if @d {
-			if @d == 1 { return @d[0] }
-			if $just1  { return disambiguate(@d) }
-			if @d > 1  { return @d.sort }
-		}
+		if @d == 0 { return '' }
+		if @d == 1 { return @d[0] }
+		if $just1  { return disambiguate(@d) }
+		if @d > 1  { return @d.sort }
 		
+#`[[
 		#4 by matching dims to prototype unit (only works if prototype has been instantiated
 		#FIXME maybe remove this part?
         my @t;
@@ -97,6 +96,7 @@ class Unit is export {
 		if @t == 1 { return @t[0] }
 		if $just1  { return disambiguate(@t) }
 		if @t > 1  { return @t.sort }
+#]]
     }    
 
     ### new & clone methods ###
@@ -273,11 +273,18 @@ sub ListTypes is export {
 sub ListBases is export {
     return @BaseNames
 }
-sub GetPrototype( Str $t ) is export {
-	return %type-to-prototype{$t}
+sub GetPrototype( Str $type ) is export {
+#FIXME needs testing -- Measure calls for rebase (ie convert to base==proto type)
+	if my $pt = %type-to-prototype{$type} {
+		return $pt;
+	} else {
+		for %protoname-to-type -> %p {
+			return GetUnit(%p.key) if %p.value eq $type;
+		}
+	}	
 }
-sub GetUnit( $u ) is export {
 
+sub GetUnit( $u ) is export {
     #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
     if $u ~~ Unit {
 		say "GU1 from $u" if $db;
@@ -452,7 +459,7 @@ sub CreateUnit( $defn is copy ) {
         method prefix-name($/)	{ 
 			my $en = $<name>.made<defn>;
 			my $nn = $<name>.made<unit>;
-			my $pn = $<prefix>.made;
+			my $pn = $<prefix>.made<unit>;
 			$nn.times($pn) if $pn;
 			make %( defn => $en, unit => $nn );
 ##say "in prefix-name..."; say $/.made;
@@ -460,7 +467,7 @@ sub CreateUnit( $defn is copy ) {
 
         method prefix($/)		{ 
 			my $pf=GetUnit($/.Str).clone;
-			make %( p => $pf );
+			make %( unit => $pf );
 ##say "in prefix..."; say $/.made;
 		}
 
@@ -546,7 +553,7 @@ sub InitBaseUnit( @_ ) {
     }
 }
 sub InitDerivedUnit( @_ ) { 
-    if preload { #FIXME remove preload
+    if preload {
         for @_ -> $names, $defn {
             Unit.new( defn => $defn, names => [|$names] );
         }   
@@ -563,7 +570,6 @@ sub InitTypeDims( @_ ) {
     for @_ -> %p {
 		%type-to-dims{%p.key} = %p.value;
 	}
-say %type-to-dims;
 }
 sub InitOddTypes( @_ ) { 
     for @_ -> %p {
@@ -571,28 +577,26 @@ sub InitOddTypes( @_ ) {
     }   
 }
 sub InitUnit( @_ ) is export {
-    #eg. ['N',  'newton'],           'kg m / s^2',
-    #      ^ ,   ^^^^^^ names         ^^^^^^^^^^ defn
+	if preload {
+		for @_ -> $names, $defn {
+            Unit.new( defn => $defn, names => [|$names] );
+		}
+	} else {
+		#eg. ['N',  'newton'],           'kg m / s^2',
+		#      ^ ,   ^^^^^^ names         ^^^^^^^^^^ defn
 
-    for @_ -> $names, $defn {
-        my @newbies;
-        for |$names -> $n {
-            @newbies.push: $n; 
-            if naive-plural( $n ) -> $p {
-                @newbies.push: $p; 
-            }   
-        }   
-        @list-of-names.push: |@newbies;
-        %defn-to-names{$defn} = [@newbies];
-    }   
-
-#`[[[888 stet FIXME - maybe need for export duties / UnitAffix
-#if resurrect, maybe use Unit.new() see preload above
-    for @_ -> $names, $defn {
-        my $u = CreateUnit( $defn );
-        $u.SetNames: $names;    #decont from scalar to list
-    }
-#]]]
+		for @_ -> $names, $defn {
+			my @newbies;
+			for |$names -> $n {
+				@newbies.push: $n; 
+				if naive-plural( $n ) -> $p {
+					@newbies.push: $p; 
+				}   
+			}   
+			@list-of-names.push: |@newbies;
+			%defn-to-names{$defn} = [@newbies];
+		}   
+	}
 }
 ######## Unit Data ########
 
@@ -694,45 +698,40 @@ InitTypes (
     'Catalytic-Activity' => 'kat',
 );
 InitTypeDims (
-	#sets name of prototype unit
-    'Dimensionless'      => (0,0,0,0,0,0,0,0),
-    'Speed'              => (1,0,-1,0,0,0,0,0),
+	#sets dims for type lookup 
+	'Acceleration'		=> (1,0,-1,0,0,0,0,0),
+	'Angle'				=> (0,0,0,0,0,0,0,1),
+	'Angular-Momentum'	=> (1,1,-1,0,0,0,0,0),
+	'Angular-Speed'		=> (0,0,-1,0,0,0,0,0),
+	'Area'				=> (2,0,0,0,0,0,0,0),
+	'Capacitance'		=> (-1,-1,1,1,0,0,0,0),
+	'Catalytic-Activity'=> (0,0,1,0,0,1,0,0),
+	'Charge'			=> (0,0,1,1,0,0,0,0),
+	'Conductance'		=> (-1,-1,1,1,0,0,0,0),
+	'Density'			=> (-1,1,0,0,0,0,0,0),
+	'Dimensionless'		=> (0,0,0,0,0,0,0,0),
+	'Dose'				=> (1,0,-1,0,0,0,0,0),
+	'Energy'			=> (1,1,-1,0,0,0,0,0),
+	'Force'				=> (1,1,-1,0,0,0,0,0),
+	'Frequency'			=> (0,0,-1,0,0,0,0,0),
+	'Illuminance'		=> (1,0,0,0,0,0,1,0),
+	'Impulse'			=> (1,1,0,0,0,0,0,0),
+	'Inductance'		=> (1,1,-1,-1,0,0,0,0),
+	'Luminous-Flux'		=> (0,0,0,0,0,0,1,1),
+	'Magnetic-Field'	=> (0,1,-1,-1,0,0,0,0),
+	'Magnetic-Flux'		=> (1,1,-1,-1,0,0,0,0),
+	'Moment-of-Inertia'	=> (1,1,0,0,0,0,0,0),
+	'Momentum'			=> (1,1,-1,0,0,0,0,0),
+	'Potential'			=> (1,1,-1,-1,0,0,0,0),
+	'Power'				=> (1,1,-1,0,0,0,0,0),
+	'Pressure'			=> (0,1,-1,0,0,0,0,0),
+	'Radioactivity'		=> (0,0,-1,0,0,0,0,0),
+	'Resistance'		=> (1,1,-1,-1,0,0,0,0),
+	'Solid-Angle'		=> (0,0,0,0,0,0,0,1),
+	'Speed'				=> (1,0,-1,0,0,0,0,0),
+	'Torque'			=> (2,1,-1,0,0,0,0,0),
+	'Volume'			=> (3,0,0,0,0,0,0,0),
 );
-#`[
-    'Dimensionless'      => 'unity',
-    'Angle'              => 'radian',
-    'Angular-Speed'		 => 'radians per second',
-    'Solid-Angle'        => 'steradian',
-    'Frequency'          => 'hertz',
-    'Area'               => 'm^2',
-    'Volume'             => 'm^3',
-    'Speed'              => 'm/s',
-    'Acceleration'       => 'm/s^2',
-    'Momentum'           => 'kg m/s',
-    'Force'              => 'newton',
-    'Torque'             => 'Nm',
-    'Impulse'            => 'Ns',
-    'Moment-of-Inertia'  => 'kg m^2',
-    'Angular-Momentum'   => 'kg m^2/s',
-    'Pressure'           => 'pascal',
-    'Density'			 => 'kg/m^3',
-    'Energy'             => 'joule',
-    'Power'              => 'watt',
-    'Charge'             => 'coulomb',
-    'Potential'			 => 'volt',
-    'Resistance'         => 'ohm',
-    'Conductance'        => 'siemens',
-    'Capacitance'        => 'farad',
-    'Inductance'         => 'henry',
-    'Magnetic-Flux'      => 'weber',
-    'Magnetic-Field'     => 'tesla',
-    'Luminous-Flux'      => 'lumen',
-    'Illuminance'        => 'lux',
-    'Radioactivity'      => 'becquerel',
-    'Dose'               => 'gray',
-    'Catalytic-Activity' => 'kat',
-);
-#]
 InitOddTypes (
     #mop up any odd ambiguous types
     'eV'    => 'Energy',
