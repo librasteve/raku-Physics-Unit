@@ -3,11 +3,12 @@ unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>;
 
 #snagging
 #-odd type mop up
-#-rereview data map names
+#-rereview data map names (ie protoname should be type-to-protoname & type-to-protounit
 #-list-of-names should be a key only hash to avoid dupes
 #-anyway defn-to-names has same info (except where externally defined in which case GU2)
 #-remove protoype / SetType logic?
 #-new test 02...
+#-clean up UnitActions code
 #`[ to Measure
 495     'Luminous-Flux'      => 'lumen',
 496     'Illuminance'        => 'lux',
@@ -28,7 +29,7 @@ constant \NumBases = 8;
 my Str   @BaseNames;
 
 my @list-of-names;          #all known Unit object names
-my %defn-to-names;          #map defn => [names] of pre-defined Units
+my %defn-to-names;          #map defn => [names] of stock Units
 my %unit-by-name;           #map name => Unit objects (when instantiated)
 my %prefix-by-name;         #map name => Prefix objects
 my %protoname-to-type;      #map name of prototype Unit => Type
