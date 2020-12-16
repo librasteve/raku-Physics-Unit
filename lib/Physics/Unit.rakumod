@@ -7,6 +7,7 @@ unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>;
 #-list-of-names should be a key only hash to avoid dupes
 #-anyway defn-to-names has same info (except where externally defined in which case GU2)
 #-remove protoype / SetType logic?
+#-new test
 #`[ to Measure
 495     'Luminous-Flux'      => 'lumen',
 496     'Illuminance'        => 'lux',
@@ -82,21 +83,6 @@ class Unit is export {
 		if @d == 1 { return @d[0] }
 		if $just1  { return disambiguate(@d) }
 		if @d > 1  { return @d.sort }
-		
-#`[[
-		#4 by matching dims to prototype unit (only works if prototype has been instantiated
-		#FIXME maybe remove this part?
-        my @t;
-        for %type-to-prototype.keys -> $k { 
-            push @t, $k if self.dims eqv %type-to-prototype{$k}.dims
-        }    
-
-        #return value depends on whether we got zero, one or multiple types
-		if @t == 0 { return '' }
-		if @t == 1 { return @t[0] }
-		if $just1  { return disambiguate(@t) }
-		if @t > 1  { return @t.sort }
-#]]
     }    
 
     ### new & clone methods ###
@@ -627,6 +613,7 @@ InitPrefix (
 );
 InitBaseUnit (
     #SI Base Units 
+	#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
     'Length'      => ['m', 'metre', 'meter'],
     'Mass'        => ['kg', 'kilogram'],
     'Time'        => ['s', 'second', 'sec'],
@@ -698,36 +685,38 @@ InitTypes (
     'Catalytic-Activity' => 'kat',
 );
 InitTypeDims (
-	#sets dims for type lookup 
-	'Acceleration'		=> (1,0,-1,0,0,0,0,0),
+	#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
+	#                      (L,M,T,I,Θ,N,J,A)  [A=Angle]
+
+	'Acceleration'		=> (1,0,-2,0,0,0,0,0),
 	'Angle'				=> (0,0,0,0,0,0,0,1),
-	'Angular-Momentum'	=> (1,1,-1,0,0,0,0,0),
+	'Angular-Momentum'	=> (2,1,-1,0,0,0,0,0),
 	'Angular-Speed'		=> (0,0,-1,0,0,0,0,0),
 	'Area'				=> (2,0,0,0,0,0,0,0),
-	'Capacitance'		=> (-1,-1,1,1,0,0,0,0),
-	'Catalytic-Activity'=> (0,0,1,0,0,1,0,0),
+	'Capacitance'		=> (-2,-1,4,2,0,0,0,0),
+	'Catalytic-Activity'=> (0,0,-1,0,0,1,0,0),
 	'Charge'			=> (0,0,1,1,0,0,0,0),
-	'Conductance'		=> (-1,-1,1,1,0,0,0,0),
-	'Density'			=> (-1,1,0,0,0,0,0,0),
+	'Conductance'		=> (-2,-1,3,2,0,0,0,0),
+	'Density'			=> (-3,1,0,0,0,0,0,0),
 	'Dimensionless'		=> (0,0,0,0,0,0,0,0),
-	'Dose'				=> (1,0,-1,0,0,0,0,0),
-	'Energy'			=> (1,1,-1,0,0,0,0,0),
-	'Force'				=> (1,1,-1,0,0,0,0,0),
+	'Dose'				=> (2,0,-2,0,0,0,0,0),
+	'Energy'			=> (2,1,-2,0,0,0,0,0),
+	'Force'				=> (1,1,-2,0,0,0,0,0),
 	'Frequency'			=> (0,0,-1,0,0,0,0,0),
-	'Illuminance'		=> (1,0,0,0,0,0,1,0),
-	'Impulse'			=> (1,1,0,0,0,0,0,0),
-	'Inductance'		=> (1,1,-1,-1,0,0,0,0),
-	'Luminous-Flux'		=> (0,0,0,0,0,0,1,1),
-	'Magnetic-Field'	=> (0,1,-1,-1,0,0,0,0),
-	'Magnetic-Flux'		=> (1,1,-1,-1,0,0,0,0),
-	'Moment-of-Inertia'	=> (1,1,0,0,0,0,0,0),
+	'Illuminance'		=> (-2,0,0,0,0,0,1,0),
+	'Impulse'			=> (1,1,-1,0,0,0,0,0),
+	'Inductance'		=> (2,1,-2,-2,0,0,0,0),
+	'Luminous-Flux'		=> (0,0,0,0,0,0,1,2),
+	'Magnetic-Field'	=> (0,1,-2,-1,0,0,0,0),
+	'Magnetic-Flux'		=> (2,1,-2,-1,0,0,0,0),
+	'Moment-of-Inertia'	=> (2,1,0,0,0,0,0,0),
 	'Momentum'			=> (1,1,-1,0,0,0,0,0),
-	'Potential'			=> (1,1,-1,-1,0,0,0,0),
-	'Power'				=> (1,1,-1,0,0,0,0,0),
-	'Pressure'			=> (0,1,-1,0,0,0,0,0),
+	'Potential'			=> (2,1,-3,-1,0,0,0,0),
+	'Power'				=> (2,1,-3,0,0,0,0,0),
+	'Pressure'			=> (-1,1,-2,0,0,0,0,0),
 	'Radioactivity'		=> (0,0,-1,0,0,0,0,0),
-	'Resistance'		=> (1,1,-1,-1,0,0,0,0),
-	'Solid-Angle'		=> (0,0,0,0,0,0,0,1),
+	'Resistance'		=> (2,1,-3,-2,0,0,0,0),
+	'Solid-Angle'		=> (0,0,0,0,0,0,0,2),
 	'Speed'				=> (1,0,-1,0,0,0,0,0),
 	'Torque'			=> (2,1,-1,0,0,0,0,0),
 	'Volume'			=> (3,0,0,0,0,0,0,0),
