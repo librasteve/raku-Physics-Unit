@@ -2,19 +2,17 @@ unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>;
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 #snagging
-#-odd type mop up
-#-list-of-names should be a key only hash to avoid dupes
-#-anyway defn-to-names has same info (except where externally defined in which case GU2)
-#-remove protoype / SetType logic?
 #-new test 02...
 #-new test 03... GetPrototype
 #-clean up UnitActions code
-#`[ to Measure
-495     'Luminous-Flux'      => 'lumen',
-496     'Illuminance'        => 'lux',
-497     'Radioactivity'      => 'becquerel',
-4_99     'Catalytic-Activity' => 'kat',
-##check - not _
+
+#`[ 
+##add class to Measure
+'Luminous-Flux'      => 'lumen',
+'Illuminance'        => 'lux',
+'Radioactivity'      => 'becquerel',
+'Catalytic-Activity' => 'kat',
+##check sp - not _
 'Magnetic-Flux'      => 'weber',
 'Magnetic-Field'     => 'tesla',
 #]
@@ -30,12 +28,12 @@ my Str   @BaseNames;
 
 my @list-of-names;          #all known Unit object names
 my %defn-to-names;          #defn => [names] of stock Units
-my %unit-by-name;           #name => Unit objects (when instantiated)
+my %unit-by-name;           #name => Unit object (when instantiated)
 my %prefix-by-name;         #name => Prefix objects
 my %type-to-protoname;      #type => prototype name
-my %type-to-prototype;      #type => prototype Unit
+my %type-to-prototype;      #type => prototype Unit object (when instantiated)
 my %type-to-dims;			#type => dims vector
-my %odd-type-by-name;       #mop up remaining odd ambiguous types
+my %odd-type-by-name;       #mop up a few exceptional types
 
 #Power synonyms
 my %pwr-preword   = ( square  => 2, sq => 2, cubic => 3, );   
@@ -170,6 +168,11 @@ class Unit is export {
 				if %p.value eq $n {
 					$!type = %p.key;	
 					%type-to-prototype{$!type} = self;
+				}
+			}
+			for %odd-type-by-name -> %p {
+				if %p.key eq $n {
+					$!type = %p.value;	
 				}
 			}
 		}
@@ -535,7 +538,7 @@ sub InitBaseUnit( @_ ) {
 		$u.dmix{$u.name} = 1;
 
         $u.type: $type;
-		%protoname-to-type{$u.name} = $type;
+		%type-to-protoname{$type} = $u.name;
 		%type-to-prototype{$type} = $u;
 
         say "Initialized Base Unit $names[0]" if $db;
@@ -724,7 +727,7 @@ InitTypeDims (
 	'Catalytic-Activity'=> (0,0,-1,0,0,1,0,0),
 );
 InitOddTypes (
-    #mop up any odd ambiguous types
+    #mop up a few exceptional types
     'eV'    => 'Energy',
     'MeV'   => 'Energy',
     'GeV'   => 'Energy',
@@ -736,19 +739,6 @@ InitOddTypes (
     'kWh'   => 'Energy',
     'ft-lb' => 'Torque',
 );
-#`[[888
-#mop up remaining ambiguous types
-GetUnit('eV').type:    'Energy';
-GetUnit('MeV').type:   'Energy';
-GetUnit('GeV').type:   'Energy';
-GetUnit('TeV').type:   'Energy';
-GetUnit('cal').type:   'Energy';
-GetUnit('kcal').type:  'Energy';
-GetUnit('btu').type:   'Energy';
-GetUnit('erg').type:   'Energy';
-GetUnit('kWh').type:   'Energy';
-GetUnit('ft-lb').type: 'Torque';
-#]]
 InitUnit (
 	# Dimensionless
 	['one', 'unity'],							'1',
