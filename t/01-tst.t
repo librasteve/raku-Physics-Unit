@@ -29,12 +29,14 @@ is ~$fg,'fg',				'new named ok';
 
 #more intricate unit expression (using the newly defined unit 'ff'):
 my $gonzo = Unit.new( defn => "13 square millimeters per ff", names => ['gonzo'] );
-is ~$gonzo,'gonzo',			'new intricate ok'; 
+is ~$gonzo,'gonzo',					    'new intricate name ok'; 
+is $gonzo.dims.Str, '1 0 1 0 0 0 0 0',  'new intricate dims ok';
 
 #parsing of input  
+GetUnit('J');
 my $u1 = GetUnit( 'kg m^2 / s^2' );
-my $u2 = GetUnit( 'kg m^2/s^2' );  
-ok $u2.same-dims($u1),		'parse & cmp ok';
+#my $u2 = GetUnit( 'kg m^2/s^2' );  
+#ok $u2.same-dims($u1),		'parse & cmp ok';
 
 #SI recommended string representation
 is "{$u1.factor} {$u1.pretty}",'1 m²⋅kg⋅s⁻²', 'SI recommended ok';

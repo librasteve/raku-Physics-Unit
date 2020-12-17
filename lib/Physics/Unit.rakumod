@@ -21,12 +21,14 @@ unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>;
 my $db = 0;           #debug 
 
 ##### Constants and Data Maps ######
-constant \preload  = 0;     #Preload Derived Units (ie. debug / slow)
-constant \locale   = "imp"; #Imperial="imp"; US="us' FIXME v2 make tag
-constant \NumBases = 8; 
-my Str   @BaseNames;
+constant \locale = "imp";		#Imperial="imp"; US="us' FIXME v2 make tag (en_US, en_UK)
+constant \preload-all = 0;		#Preload All Units ie. for debug (precomp load 1.6s or ~60s)
+constant \preload-derived = 0;	#Preload Derived Units ie. for synonyms (precomp load 1.6s or 7s)
 
-my @list-of-names;          #all known Unit object names
+constant \NumBases = 8; 
+my Str @BaseNames;			#SI Base Unit names
+my Str @AllNames;           #all known Unit names
+
 my %defn-to-names;          #defn => [names] of stock Units
 my %unit-by-name;           #name => Unit object (when instantiated)
 my %prefix-by-name;         #name => Prefix objects
@@ -158,7 +160,7 @@ class Unit is export {
             }   
         }
         @.names.push: $.defn unless @.names;
-        @list-of-names.push: |@.names;
+        @AllNames.push: |@.names;
 
         say "SetNames: {@.names}" if $db;
     }
@@ -257,7 +259,7 @@ class Unit is export {
 
 ######## Subroutines ########
 sub ListUnits is export {		
-	return @list-of-names
+	return @AllNames
 }
 sub ListTypes is export {
     return sort keys %type-to-prototype
@@ -279,12 +281,12 @@ sub GetPrototype( Str $type ) is export {
 sub GetUnit( $u ) is export {
     #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
     if $u ~~ Unit {
-		say "GU1 from $u" if $db;
+	say "GU1 from $u" if $db;
         return $u
     }   
 
     #2 if name or prefix already instantiated
-		say "GU2 from $u" if $db;
+	say "GU2 from $u" if $db;
 
     for %unit-by-name.kv   -> $k,$v { 
 		return $v if $k eq $u 
@@ -294,7 +296,7 @@ sub GetUnit( $u ) is export {
 	}
 
     #3 if name in our defns, instantiate it 
-		say "GU3 from $u" if $db;
+	say "GU3 from $u" if $db;
 
 	for %defn-to-names -> %p {
 		if %p.value.grep($u) {
@@ -304,7 +306,7 @@ sub GetUnit( $u ) is export {
 	}   
 
     #4 if no match, instantiate from definition 
-		say "GU4 from $u" if $db;
+	say "GU4 from $u" if $db;
 
     my $nuo = Unit.new( defn => $u );
     return subst-shortest( $nuo ) // $nuo;
@@ -312,14 +314,15 @@ sub GetUnit( $u ) is export {
 sub subst-shortest( Unit $u ) { 
     #subtitutes shortest name if >1 unit name has same dimensions 
     # ... so that eg. 'J' beats 'kg m^2 / s^2'
+	# ... requires eg. 'J' to be instantiated first
 
-    my @same-by-name;
+    my @same-dims;
     for %unit-by-name.kv -> $k,$v { 
-        @same-by-name.push($k) if $v.same-dims($u) 
+        @same-dims.push($k) if $v.same-dims($u) 
     }   
-    if @same-by-name {   
-        my @same-by-size = @same-by-name.sort({$^a.chars cmp $^b.chars});
-        return %unit-by-name{@same-by-size[0]}  #shortest
+    if @same-dims {   
+        my @sort-by-size = @same-dims.sort({$^a.chars cmp $^b.chars});
+        return %unit-by-name{@sort-by-size[0]}  #shortest
     }   
 }
 sub disambiguate( @t ) {
@@ -344,9 +347,11 @@ sub naive-plural( $n ) {
 ######## Grammars ########
 sub CreateUnit( $defn is copy ) {
 
+	$defn .= trim;
+
 	#6.d faster regexes with Strings {<$str>} & slower with Arrays {<@arr>}
     #erase compound names from element name match candidates (to force generation of dmix)
-    my $unit-names       = @list-of-names.grep({! /<[\s*^./]>/}).join('|');
+    my $unit-names       = @AllNames.grep({! /<[\s*^./]>/}).join('|');
     my $prefix-names     = %prefix-by-name.keys.join('|');
     my $pwr-prewords     = %pwr-preword.keys.join('|');
     my $pwr-postwords    = %pwr-postword.keys.join('|');
@@ -356,13 +361,11 @@ sub CreateUnit( $defn is copy ) {
     $unit-names       ~~ s:g/ ( <-[a..z A..Z 0..9 \|]> ) / '$0' /;
     $pwr-superscripts ~~ s:g/ ( <-[a..z A..Z 0..9 \|]> ) / '$0' /;
 
-	$defn .= trim;
-
     ##use Grammar::Tracer;
     grammar UnitGrammar {
         token TOP         { ^  \s* <numerator=.compound>
                               [\s* <divider> \s* <denominator=.compound>]?
-                              [\s*    '+'    \s* <offset>  ]? \s* $ } #'+' is hardwired
+                              [\s*    '+'    \s* <offset>  ]? \s* $ } #offset '+' is hardwired
         token divider     { '/' || 'per' }
         token compound    { <element>+ % <sep> }
         token sep         { [ '*' || '.' || ' *' || ' .' || ' ' ] }
@@ -396,7 +399,7 @@ sub CreateUnit( $defn is copy ) {
 			my $de = $<denominator>.made;
 			$nu.share($de) if $de;
 			make $nu;
-#say "in top...", $/.made if $db;
+##say "in top...", $/.made;
 		}
 
 		#| accumulates element Units using times
@@ -406,7 +409,7 @@ sub CreateUnit( $defn is copy ) {
 				$acc.times($x);
 			}
 			make $acc;
-#say "in comp, acc made..."; say $/.made;
+##say "in comp, acc made..."; say $/.made;
 		}
 
 		#| makes a list of element units from factor, offset, prefix and name
@@ -416,7 +419,7 @@ sub CreateUnit( $defn is copy ) {
 			my $ee = $<pnp-before><prefix-name>.made<defn> || 
 					 $<pnp-after><prefix-name>.made<defn>;
 			my $dd = $<pnp-before><pwr-before>.made || 
-					 $<pnp-after><pwr-after>.made   // 1;
+					 $<pnp-after>.made  || 1;
 			if $nn { 
 				$nn.raise($dd, $ee);
 				make $nn;
@@ -474,13 +477,13 @@ sub CreateUnit( $defn is copy ) {
         method pwr-before($/)	{
 			my $dp=%pwr-preword{$/.Str};
 			make $dp;
-##say "in pnp-before..."; say $/.made;
+##say "in pwr-before..."; say $/.made;
 		}
 
 		method pnp-after($/)	{
-			my $nn = $<pwr-postwd>.made || 
-					 $<pwr-supers>.made ||
-					 $<pwr-normal>.made;
+			my $nn = $<pwr-after><pwr-postwd><pwr-digits> ||
+					 $<pwr-after><pwr-supers><pwr-digits> ||
+					 $<pwr-after><pwr-normal><pwr-digits>;
 			make $nn;
 ##say "in pnp-after..."; say $/.made;
 		}
@@ -545,7 +548,7 @@ sub InitBaseUnit( @_ ) {
     }
 }
 sub InitDerivedUnit( @_ ) { 
-    if preload {
+    if preload-derived {
         for @_ -> $names, $defn {
             Unit.new( defn => $defn, names => [|$names] );
         }   
@@ -569,7 +572,7 @@ sub InitOddTypes( @_ ) {
     }   
 }
 sub InitUnit( @_ ) is export {
-	if preload {
+	if preload-all {
 		for @_ -> $names, $defn {
             Unit.new( defn => $defn, names => [|$names] );
 		}
@@ -585,7 +588,7 @@ sub InitUnit( @_ ) is export {
 					@newbies.push: $p; 
 				}   
 			}   
-			@list-of-names.push: |@newbies;
+			@AllNames.push: |@newbies;
 			%defn-to-names{$defn} = [@newbies];
 		}   
 	}
