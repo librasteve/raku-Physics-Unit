@@ -6,6 +6,7 @@ use Physics::Unit;
 
 my $a1 = Unit.new( defn => '5 radians per second', names => ['radians per second'] ); say "$a1";
 #my $a2 = Unit.new( defn => '2 ft', names => ['2f'] ); say ~$a2; say $a2.type;
+#die;
 
 # Define your own unit named "ff" (named args)
 my $ff = Unit.new( defn => 'furlong / fortnight', names => ['ff'] );

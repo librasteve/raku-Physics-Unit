@@ -3,11 +3,11 @@ unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>;
 
 #snagging
 #-odd type mop up
-#-rereview data map names (ie protoname should be type-to-protoname & type-to-protounit
 #-list-of-names should be a key only hash to avoid dupes
 #-anyway defn-to-names has same info (except where externally defined in which case GU2)
 #-remove protoype / SetType logic?
 #-new test 02...
+#-new test 03... GetPrototype
 #-clean up UnitActions code
 #`[ to Measure
 495     'Luminous-Flux'      => 'lumen',
@@ -29,12 +29,12 @@ constant \NumBases = 8;
 my Str   @BaseNames;
 
 my @list-of-names;          #all known Unit object names
-my %defn-to-names;          #map defn => [names] of stock Units
-my %unit-by-name;           #map name => Unit objects (when instantiated)
-my %prefix-by-name;         #map name => Prefix objects
-my %protoname-to-type;      #map name of prototype Unit => Type
-my %type-to-prototype;      #map Type name to a Unit object that exemplifies the type 
-my %type-to-dims;			#map Type name to dims vector
+my %defn-to-names;          #defn => [names] of stock Units
+my %unit-by-name;           #name => Unit objects (when instantiated)
+my %prefix-by-name;         #name => Prefix objects
+my %type-to-protoname;      #type => prototype name
+my %type-to-prototype;      #type => prototype Unit
+my %type-to-dims;			#type => dims vector
 my %odd-type-by-name;       #mop up remaining odd ambiguous types
 
 #Power synonyms
@@ -50,7 +50,7 @@ my %pwr-superscript = (
 ######## Classes & Roles ########
 class Unit is export {
     has Real $!factor = 1;
-    has Real $!offset = 0;				#i.e. for K <=> °C
+    has Real $!offset = 0;				#ie. for K <=> °C
     has Str  $!defn   = '';
     has Str  $!type;
     has Str  @.names  is rw = [];
@@ -166,11 +166,13 @@ class Unit is export {
     }
     method SetType( $t? ) { 
 		for @.names -> $n {                 #set up this unit as a prototype
-			if my $p = %protoname-to-type{$n} {
-				$!type = $p;	
-				%type-to-prototype{$!type} = self;
+			for %type-to-protoname -> %p {
+				if %p.value eq $n {
+					$!type = %p.key;	
+					%type-to-prototype{$!type} = self;
+				}
 			}
-		}   
+		}
 
         say "SetType: $.type" if $db;
     }   
@@ -265,8 +267,8 @@ sub GetPrototype( Str $type ) is export {
 	if my $pt = %type-to-prototype{$type} {
 		return $pt;
 	} else {
-		for %protoname-to-type -> %p {
-			return GetUnit(%p.key) if %p.value eq $type;
+		for %type-to-protoname -> %p {
+			return GetUnit(%p.value) if %p.key eq $type;
 		}
 	}	
 }
@@ -550,7 +552,7 @@ sub InitDerivedUnit( @_ ) {
 }
 sub InitTypes( @_ )  {
     for @_ -> %p {
-        %protoname-to-type{%p.value} = %p.key; #ie. reversed
+        %type-to-protoname{%p.key} = %p.value;
     }   
 }
 sub InitTypeDims( @_ ) {
@@ -677,8 +679,8 @@ InitTypes (
     'Conductance'        => 'siemens',
     'Capacitance'        => 'farad',
     'Inductance'         => 'henry',
-    'Magnetic-Flux'      => 'weber',
     'Magnetic-Field'     => 'tesla',
+    'Magnetic-Flux'      => 'weber',
     'Luminous-Flux'      => 'lumen',
     'Illuminance'        => 'lux',
     'Radioactivity'      => 'becquerel',
@@ -688,39 +690,38 @@ InitTypes (
 InitTypeDims (
 	#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
 	#                      (L,M,T,I,Θ,N,J,A)  [A=Angle]
-
-	'Acceleration'		=> (1,0,-2,0,0,0,0,0),
-	'Angle'				=> (0,0,0,0,0,0,0,1),
-	'Angular-Momentum'	=> (2,1,-1,0,0,0,0,0),
-	'Angular-Speed'		=> (0,0,-1,0,0,0,0,0),
-	'Area'				=> (2,0,0,0,0,0,0,0),
-	'Capacitance'		=> (-2,-1,4,2,0,0,0,0),
-	'Catalytic-Activity'=> (0,0,-1,0,0,1,0,0),
-	'Charge'			=> (0,0,1,1,0,0,0,0),
-	'Conductance'		=> (-2,-1,3,2,0,0,0,0),
-	'Density'			=> (-3,1,0,0,0,0,0,0),
 	'Dimensionless'		=> (0,0,0,0,0,0,0,0),
-	'Dose'				=> (2,0,-2,0,0,0,0,0),
-	'Energy'			=> (2,1,-2,0,0,0,0,0),
-	'Force'				=> (1,1,-2,0,0,0,0,0),
+	'Angle'				=> (0,0,0,0,0,0,0,1),
+	'Angular-Speed'		=> (0,0,-1,0,0,0,0,1),
+	'Solid-Angle'		=> (0,0,0,0,0,0,0,2),
 	'Frequency'			=> (0,0,-1,0,0,0,0,0),
-	'Illuminance'		=> (-2,0,0,0,0,0,1,0),
+	'Area'				=> (2,0,0,0,0,0,0,0),
+	'Volume'			=> (3,0,0,0,0,0,0,0),
+	'Speed'				=> (1,0,-1,0,0,0,0,0),
+	'Acceleration'		=> (1,0,-2,0,0,0,0,0),
+	'Momentum'			=> (1,1,-1,0,0,0,0,0),
+	'Force'				=> (1,1,-2,0,0,0,0,0),
+	'Torque'			=> (2,1,-1,0,0,0,0,0),
 	'Impulse'			=> (1,1,-1,0,0,0,0,0),
+	'Moment-of-Inertia'	=> (2,1,0,0,0,0,0,0),
+	'Angular-Momentum'	=> (2,1,-1,0,0,0,0,0),
+	'Pressure'			=> (-1,1,-2,0,0,0,0,0),
+	'Density'			=> (-3,1,0,0,0,0,0,0),
+	'Energy'			=> (2,1,-2,0,0,0,0,0),
+	'Power'				=> (2,1,-3,0,0,0,0,0),
+	'Charge'			=> (0,0,1,1,0,0,0,0),
+	'Potential'			=> (2,1,-3,-1,0,0,0,0),
+	'Resistance'		=> (2,1,-3,-2,0,0,0,0),
+	'Conductance'		=> (-2,-1,3,2,0,0,0,0),
+	'Capacitance'		=> (-2,-1,4,2,0,0,0,0),
 	'Inductance'		=> (2,1,-2,-2,0,0,0,0),
-	'Luminous-Flux'		=> (0,0,0,0,0,0,1,2),
 	'Magnetic-Field'	=> (0,1,-2,-1,0,0,0,0),
 	'Magnetic-Flux'		=> (2,1,-2,-1,0,0,0,0),
-	'Moment-of-Inertia'	=> (2,1,0,0,0,0,0,0),
-	'Momentum'			=> (1,1,-1,0,0,0,0,0),
-	'Potential'			=> (2,1,-3,-1,0,0,0,0),
-	'Power'				=> (2,1,-3,0,0,0,0,0),
-	'Pressure'			=> (-1,1,-2,0,0,0,0,0),
+	'Luminous-Flux'		=> (0,0,0,0,0,0,1,2),
+	'Illuminance'		=> (-2,0,0,0,0,0,1,0),
 	'Radioactivity'		=> (0,0,-1,0,0,0,0,0),
-	'Resistance'		=> (2,1,-3,-2,0,0,0,0),
-	'Solid-Angle'		=> (0,0,0,0,0,0,0,2),
-	'Speed'				=> (1,0,-1,0,0,0,0,0),
-	'Torque'			=> (2,1,-1,0,0,0,0,0),
-	'Volume'			=> (3,0,0,0,0,0,0,0),
+	'Dose'				=> (2,0,-2,0,0,0,0,0),
+	'Catalytic-Activity'=> (0,0,-1,0,0,1,0,0),
 );
 InitOddTypes (
     #mop up any odd ambiguous types
