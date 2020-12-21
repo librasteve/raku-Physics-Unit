@@ -2,8 +2,7 @@ unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>;
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 #snagging
-#-new test 02...
-#-new test 03... GetPrototype
+#-hook up to Measure test
 #-clean up UnitActions code
 
 #`[ 
@@ -22,14 +21,14 @@ my $db = 0;           #debug
 
 ##### Constants and Data Maps ######
 constant \locale = "imp";		#Imperial="imp"; US="us' FIXME v2 make tag (en_US, en_UK)
-constant \preload-all = 0;		#Preload All Units ie. for debug (precomp load 1.6s or ~60s)
 constant \preload-derived = 0;	#Preload Derived Units ie. for synonyms (precomp load 1.6s or 7s)
+constant \preload-all = 0;		#Preload All Units ie. for debug (precomp load 1.6s or ~60s)
 
 constant \NumBases = 8; 
 my Str @BaseNames;			#SI Base Unit names
 my Str @AllNames;           #all known Unit names
 
-my %defn-to-names;          #defn => [names] of stock Units
+my %defn-by-name;           #name => defn Str (values may be duplicates eg. 1 Hz)
 my %unit-by-name;           #name => Unit object (when instantiated)
 my %prefix-by-name;         #name => Prefix objects
 my %type-to-protoname;      #type => prototype name
@@ -298,9 +297,9 @@ sub GetUnit( $u ) is export {
     #3 if name in our defns, instantiate it 
 	say "GU3 from $u" if $db;
 
-	for %defn-to-names -> %p {
-		if %p.value.grep($u) {
-			my $nuo = Unit.new( defn => %p.key, names => %p.value );  
+	for %defn-by-name -> %p {
+		if %p.key.grep($u) {
+			my $nuo = Unit.new( defn => %p.value, names => [%p.key] );  
 			return $nuo;
 		}   
 	}   
@@ -346,7 +345,6 @@ sub naive-plural( $n ) {
 
 ######## Grammars ########
 sub CreateUnit( $defn is copy ) {
-
 	$defn .= trim;
 
 	#6.d faster regexes with Strings {<$str>} & slower with Arrays {<@arr>}
@@ -572,6 +570,7 @@ sub InitOddTypes( @_ ) {
     }   
 }
 sub InitUnit( @_ ) is export {
+say @_;
 	if preload-all {
 		for @_ -> $names, $defn {
             Unit.new( defn => $defn, names => [|$names] );
@@ -589,7 +588,9 @@ sub InitUnit( @_ ) is export {
 				}   
 			}   
 			@AllNames.push: |@newbies;
-			%defn-to-names{$defn} = [@newbies];
+			for @newbies -> $newby {
+				%defn-by-name{$newby} = $defn;
+			}
 		}   
 	}
 }

@@ -3,10 +3,11 @@
 #TESTALL$ prove6 ./t      [from root]
 use lib '../lib';
 use Test;
-#plan 12; 
+plan 20; 
 
 use Physics::Unit;
 
+#derived-unit-names
 my @d-u-n;
 
 sub InitDerivedUnit( @_ ) {
@@ -41,7 +42,7 @@ InitDerivedUnit (
     #SI coherent Derived Units that include units with special names - TBD [see url]
 );
 
-my @type-set = <
+my @unit-types = <
 Solid-Angle
 Frequency
 Force
@@ -65,7 +66,7 @@ Catalytic-Activity
 >;
 
 for 0..^@d-u-n -> $i {
-	is GetUnit(@d-u-n[$i]).type, "{@type-set[$i]}", "{@d-u-n[$i]} => {@type-set[$i]}";
+	is GetUnit(@d-u-n[$i]).type, @unit-types[$i], "{@d-u-n[$i]} => {@unit-types[$i]}";
 }
 
-done-testing
+#done-testing
