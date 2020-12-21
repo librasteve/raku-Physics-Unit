@@ -68,7 +68,8 @@ class Unit is export {
 
     multi method type($t)   { $!type = $t.Str }
     multi method type(:$just1) {    
-		#1 type has been explicitly set ... rarely used to avoid ambiguous state
+
+		#1 type has been explicitly set ... rarely used eg. to avoid ambiguous state
         return $!type   if $!type;
 
 		#2 we are a prefix
@@ -235,14 +236,14 @@ class Unit is export {
     method multiply( Unit $r --> Unit ) {
 		my $l = self.clone;
 		my $x = $l.times( $r );
-		my $t = $x.type( just1 => 1 );		#occasionally can be > one type
-		return %type-to-prototype{$t};
+		my $t = $x.type( :just1 );		#occasionally can be > one type
+		return GetPrototype( $t );
     }
     method divide( Unit $r ) {
 		my $l = self.clone;
 		my $x = $l.share( $r );
-		my $t = $x.type( just1 => 1 );		#occasionally can be > one type
-		return %type-to-prototype{$t}
+		my $t = $x.type( :just1 );		#occasionally can be > one type
+		return GetPrototype( $t );
     }
 	method root-extract( Int $n where 1 <= $n <= 4 ) {
         #only when all dims divisible by root
@@ -252,7 +253,7 @@ class Unit is export {
 		$l.type: '';
 		$l.dims = $l.dims.map({($_/$n).Int});
 		for $l.dmix.kv -> $k,$v { $l.dmix{$k} = $v/$n }
-		return %type-to-prototype{$l.type}
+		return GetPrototype( $l.type( :just1 ) );
 	}
 }
 
@@ -261,13 +262,12 @@ sub ListUnits is export {
 	return @AllNames
 }
 sub ListTypes is export {
-    return sort keys %type-to-prototype
+    return sort keys %type-to-protoname
 }
 sub ListBases is export {
     return @BaseNames
 }
 sub GetPrototype( Str $type ) is export {
-#FIXME needs testing -- Measure calls for rebase (ie convert to base==proto type)
 	if my $pt = %type-to-prototype{$type} {
 		return $pt;
 	} else {
@@ -328,9 +328,12 @@ sub disambiguate( @t ) {
 	#bias rules to help when multiple types are found
 	my %dh = %(
 		<Energy>      => <Energy Torque>,
-		<Frequency>   => <Angular-Speed Frequency>,
+		<Frequency>   => <Frequency Radioactivity>,
+		##<Frequency>   => <Angular-Speed Frequency Radioactivity>, #FIXME refer below 
 	);
-	for %dh.kv -> $k,$v { return $k if @t.sort eq $v.sort } 
+	for %dh.kv -> $k,$v { 
+		return $k if @t.sort eq $v.sort 
+	}
 }
 sub naive-plural( $n ) { 
     #naive plurals - append 's' unless...
@@ -570,7 +573,6 @@ sub InitOddTypes( @_ ) {
     }   
 }
 sub InitUnit( @_ ) is export {
-say @_;
 	if preload-all {
 		for @_ -> $names, $defn {
             Unit.new( defn => $defn, names => [|$names] );
@@ -698,8 +700,15 @@ InitTypeDims (
 	#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
 	#                      (L,M,T,I,Θ,N,J,A)  [A=Angle]
 	'Dimensionless'		=> (0,0,0,0,0,0,0,0),
+	'Length'			=> (1,0,0,0,0,0,0,0),
+	'Mass'				=> (0,1,0,0,0,0,0,0),
+	'Time'				=> (0,0,1,0,0,0,0,0),
+	'Current'			=> (0,0,0,1,0,0,0,0),
+	'Temperature'		=> (0,0,0,0,1,0,0,0),
+	'Substance'			=> (0,0,0,0,0,1,0,0),
+	'Luminosity'		=> (0,0,0,0,0,0,1,0),
 	'Angle'				=> (0,0,0,0,0,0,0,1),
-	'Angular-Speed'		=> (0,0,-1,0,0,0,0,1),
+	'Angular-Speed'		=> (0,0,-1,0,0,0,0,1),  #FIXME maybe A=0 (see also disam)
 	'Solid-Angle'		=> (0,0,0,0,0,0,0,2),
 	'Frequency'			=> (0,0,-1,0,0,0,0,0),
 	'Area'				=> (2,0,0,0,0,0,0,0),
@@ -940,8 +949,8 @@ InitUnit (
 	['°F', 'Fahrenheit'],                       '5/9 * K + 459.67',
 
 	# Dose
-	['rad'],           'gray / 100',
-	['rem'],           'sievert / 100',
+	['rad'],									'gray / 100',
+	['rem'],									'sievert / 100',
 );
 
 if $db {

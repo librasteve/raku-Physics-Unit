@@ -3,7 +3,7 @@
 #TESTALL$ prove6 ./t      [from root]
 use lib '../lib';
 use Test;
-plan 20; 
+plan 21; 
 
 use Physics::Unit;
 
@@ -31,7 +31,7 @@ InitDerivedUnit (
     ['Wb', 'weber'],                        'kg m^2 / A s^2',
     ['T',  'tesla'],                        'kg / A s^2',
     ['H',  'henry'],                        'kg m^2 / A^2 s^2',
-    #['°C', 'celsius', 'Centigrade'],        'K + 273.15',   #Temperature
+    ['°C', 'celsius', 'Centigrade'],        'K + 273.15',   #Temperature
     ['lm', 'lumen'],                        'cd sr',
     ['lx', 'lux'],                          'm^-2 cd',
     ['Bq', 'becquerel'],                    '1 Hz',
@@ -57,6 +57,7 @@ Conductance
 Magnetic-Flux
 Magnetic-Field
 Inductance
+Temperature
 Luminous-Flux
 Illuminance
 Radioactivity
