@@ -107,6 +107,15 @@ class Unit is export {
         return $n
     }
 
+	#| Not a preset type, eg m-1, then manually make NewType
+	method NewType( Str $type-name ) {
+		for @.names -> $name {
+			%type-to-protoname{$type-name} = $name;
+		}
+		%type-to-prototype{$type-name} = self;
+		%type-to-dims{$type-name} = self.dims;
+	}
+
     ### output methods ###
     method Str { self.name }
 
@@ -232,7 +241,7 @@ class Unit is export {
         return 1
 	}
 
-    ### mathematical Measure methods ###
+	### Units part of Measure operations ###
     method multiply( Unit $r --> Unit ) {
 		my $l = self.clone;
 		my $x = $l.times( $r );
@@ -276,7 +285,6 @@ sub GetPrototype( Str $type ) is export {
 		}
 	}	
 }
-
 sub GetUnit( $u ) is export {
     #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
     if $u ~~ Unit {
