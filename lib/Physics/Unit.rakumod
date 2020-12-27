@@ -2,35 +2,24 @@ unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>;
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 #snagging
-#-hook up to Measure test
 #-clean up UnitActions code
-
-#`[ 
-##add class to Measure
-'Luminous-Flux'      => 'lumen',
-'Illuminance'        => 'lux',
-'Radioactivity'      => 'becquerel',
-'Catalytic-Activity' => 'kat',
-##check sp - not _
-'Magnetic-Flux'      => 'weber',
-'Magnetic-Field'     => 'tesla',
-#]
-
+#-generic Action debug
+#-dereturn
 
 my $db = 0;           #debug 
 
 ##### Constants and Data Maps ######
 constant \locale = "imp";		#Imperial="imp"; US="us' FIXME v2 make tag (en_US, en_UK)
-constant \preload-derived = 0;	#Preload Derived Units ie. for synonyms (precomp load 1.6s or 7s)
-constant \preload-all = 0;		#Preload All Units ie. for debug (precomp load 1.6s or ~60s)
+constant \preload = 0;		#Preload All Units ie. for debug (precomp load 1.6s or ~60s)
 
 constant \NumBases = 8; 
 my Str @BaseNames;			#SI Base Unit names
 my Str @AllNames;           #all known Unit names
 
 my %defn-by-name;           #name => defn Str (values may be duplicates eg. 1 Hz)
+my %syns-by-name;			#name => list of synonyms (predefined Units only, incl. plurals)
 my %unit-by-name;           #name => Unit object (when instantiated)
-my %prefix-by-name;         #name => Prefix objects
+my %prefix-by-name;         #name => Prefix object
 my %type-to-protoname;      #type => prototype name
 my %type-to-prototype;      #type => prototype Unit object (when instantiated)
 my %type-to-dims;			#type => dims vector
@@ -107,7 +96,7 @@ class Unit is export {
         return $n
     }
 
-	#| Not a preset type, eg m-1, then manually make NewType
+	#| Manually make NewType when no preset type, eg. m-1
 	method NewType( Str $type-name ) {
 		for @.names -> $name {
 			%type-to-protoname{$type-name} = $name;
@@ -123,6 +112,7 @@ class Unit is export {
     multi method name( Str $n ) { self.SetNames([$n]) }
 
     method canonical {
+		#reset to SI base names
         my ( $ds, @dim-str );
         for 0 ..^ NumBases -> $i {
             given @.dims[$i] {
@@ -134,7 +124,8 @@ class Unit is export {
         }
         return @dim-str.join('.')
     }
-    method pretty {               #following SI recommendation
+    method pretty {               
+		#following SI recommendation
         my %pwr-sup-rev = %pwr-superscript.kv.reverse;
         my ( $ds, @dim-str );
         for 0 ..^ NumBases -> $i {
@@ -156,31 +147,36 @@ class Unit is export {
     }
 
     ### behavioural methods ###
-    method SetNames( @_ is copy, :$noplural ) {
-        @.names = [];			#clears then sets
-        for @_ -> $n {
-            push @.names, $n;
-            %unit-by-name{$n} = self;
+    method SetNames( @new-names ) {
 
-            #naive plurals - append 's' unless...
-            if my $ns = naive-plural( $n ) { 
-                @.names.push: $ns;
-                %unit-by-name{$ns} = self;
-            }   
-        }
-        @.names.push: $.defn unless @.names;
+		if @new-names.so {
+			if %syns-by-name{@new-names[0]} -> $syns {
+				#predefined Unit, assign synonyms (incl. plurals)
+				@.names = |$syns;
+			} else {
+				#user defined Unit, assign name(s) provided
+				@.names = @new-names;
+			}
+		} else {
+			#otherwise, just assign defn
+			@.names = [$.defn];
+		}
+
+		@.names.map( { %unit-by-name{$_} = self } );
         @AllNames.push: |@.names;
 
         say "SetNames: {@.names}" if $db;
     }
     method SetType( $t? ) { 
-		for @.names -> $n {                 #set up this unit as a prototype
+		for @.names -> $n {                 
+			#set up this Unit as a prototype
 			for %type-to-protoname -> %p {
 				if %p.value eq $n {
 					$!type = %p.key;	
 					%type-to-prototype{$!type} = self;
 				}
 			}
+			#mop up any odd types
 			for %odd-type-by-name -> %p {
 				if %p.key eq $n {
 					$!type = %p.value;	
@@ -225,7 +221,9 @@ class Unit is export {
 		#raise a one-element unit ($e) to power of $d digits
         self.factor: self.factor ** $d;
         self.dims >>*=>> $d;
-		self.dmix{$e} = $d;
+
+		my $e-can = %syns-by-name{$e}[0];		#lookup the canonical name
+		self.dmix{$e-can} = $d;
         return self 
     }    
 
@@ -335,20 +333,21 @@ sub subst-shortest( Unit $u ) {
 sub disambiguate( @t ) {
 	#bias rules to help when multiple types are found
 	my %dh = %(
-		<Energy>      => <Energy Torque>,
-		<Frequency>   => <Frequency Radioactivity>,
-		##<Frequency>   => <Angular-Speed Frequency Radioactivity>, #FIXME refer below 
+		<Energy>			=> <Energy Torque>,
+		<Frequency>			=> <Frequency Radioactivity>,
+		<Momentum>			=> <Impulse Momentum>,
+		<Angular-Momentum>  => <Angular-Momentum Torque>,
 	);
 	for %dh.kv -> $k,$v { 
 		return $k if @t.sort eq $v.sort 
 	}
 }
 sub naive-plural( $n ) { 
-    #naive plurals - append 's' unless...
-    if     $n.chars > 2                 #...too short
-        && $n.comb.first(:end) ne 's'   #...already ends with 's' 
-        && $n.comb.first(:end) ne 'z'   #...already ends with 'z' 
-        && $n !~~ /<[\d\/^*]>/          #...contains a digit or a symbol
+    #naive plurals - append 's' ...
+    unless $n.chars <= 2                #...too short
+        || $n.comb.first(:end) eq 's'	#...already ends with 's' 
+        || $n.comb.first(:end) eq 'z'   #...already ends with 'z' 
+        || $n ~~ /<[\d\/^*]>/           #...contains a digit or a symbol
     {   
         return $n ~ 's';
     }   
@@ -406,7 +405,9 @@ sub CreateUnit( $defn is copy ) {
 		method TOP($/)			{ 
 			my $nu = $<numerator>.made;
 			my $de = $<denominator>.made;
+			my $os = $<offset>.made;
 			$nu.share($de) if $de;
+			$nu.offset: +$os if $os;
 			make $nu;
 ##say "in top...", $/.made;
 		}
@@ -421,6 +422,7 @@ sub CreateUnit( $defn is copy ) {
 ##say "in comp, acc made..."; say $/.made;
 		}
 
+
 		#| makes a list of element units from factor, offset, prefix and name
 		method element($/)		{ 
 			my $nn = $<pnp-before><prefix-name>.made<unit> || 
@@ -428,7 +430,7 @@ sub CreateUnit( $defn is copy ) {
 			my $ee = $<pnp-before><prefix-name>.made<defn> || 
 					 $<pnp-after><prefix-name>.made<defn>;
 			my $dd = $<pnp-before><pwr-before>.made || 
-					 $<pnp-after>.made  || 1;
+					 $<pnp-after>.made || 1;
 			if $nn { 
 				$nn.raise($dd, $ee);
 				make $nn;
@@ -436,10 +438,6 @@ sub CreateUnit( $defn is copy ) {
 			my $fu = $<factor>.made;
 			if $fu {
 				make $fu;
-			}
-			my $ou = $<factor>.made;
-			if $ou {
-				make $ou;
 			}
 ##say "in elem..."; say $/.made;
 		}
@@ -452,11 +450,9 @@ sub CreateUnit( $defn is copy ) {
 ##say "in factor..."; say $/.made;
 		}
 
-		#| make Unit from offset 
-        method offset($/)		{ 
-			my $ou = Unit.new();
-			$ou.offset($/.Real);
-			make $ou;
+		#| stores offset when found
+		method offset($/) {
+			make $<number>; 
 ##say "in offset..."; say $/.made;
 		}
 
@@ -490,23 +486,25 @@ sub CreateUnit( $defn is copy ) {
 		}
 
 		method pnp-after($/)	{
-			my $nn = $<pwr-after><pwr-postwd><pwr-digits> ||
-					 $<pwr-after><pwr-supers><pwr-digits> ||
-					 $<pwr-after><pwr-normal><pwr-digits>;
+			my $nn = $<pwr-after><pwr-postwd>.made ||
+					 $<pwr-after><pwr-supers>.made ||
+					 $<pwr-after><pwr-normal>.made;
 			make $nn;
 ##say "in pnp-after..."; say $/.made;
 		}
         method pwr-postwd($/)	{
-			my $dp=%pwr-postword{$/.Str};
+			my $dp=%pwr-postword{$/.Str}.Int;
 			make $dp;
 		}
         method pwr-supers($/)	{ 
-			my $dp=%pwr-superscript{$/.Str}; 
+			my $dp=%pwr-superscript{$/.Str}.Int; 
 			make $dp;
+##say "in pwr-supers..."; say $/.made;
 		}
         method pwr-normal($/)	{ 
 			my $dp=$<pwr-digits>.Int;
 			make $dp;
+##say "in pwr-normal..."; say $/.made;
 		}
     }
 
@@ -517,7 +515,7 @@ sub CreateUnit( $defn is copy ) {
         $mu.defn: $defn;
         return $mu;
     } else {
-        die "Couldn't parse defn Str $defn.";
+        die "Couldn't parse defn Str $defn";
     }
 }
 
@@ -537,12 +535,16 @@ sub InitPrefix( @_ ) {
 }
 sub InitBaseUnit( @_ ) {
     my $i = 0;
+
     for @_ -> %h {
         my ($type, $names) = %h.key, %h.value;
 
+		$names.map( { %syns-by-name{$_} = $names } );
         my $u = Unit.new;
+
         $u.SetNames: $names;    #auto decont to list
         $u.defn: $u.name;
+		@AllNames.push: $u.name;
         @BaseNames.push: $u.name;
 
         #dimension vector has zeros in all but one place
@@ -557,13 +559,7 @@ sub InitBaseUnit( @_ ) {
     }
 }
 sub InitDerivedUnit( @_ ) { 
-    if preload-derived {
-        for @_ -> $names, $defn {
-            Unit.new( defn => $defn, names => [|$names] );
-        }   
-    } else {
-        InitUnit( @_ )
-    }   
+	InitUnit( @_ )
 }
 sub InitTypes( @_ )  {
     for @_ -> %p {
@@ -581,27 +577,33 @@ sub InitOddTypes( @_ ) {
     }   
 }
 sub InitUnit( @_ ) is export {
-	if preload-all {
+
+	if not preload {									#load data maps only - instantiate Unit objects on demand 
+		#eg. ['N',  'newton'],           'kg m / s^2',
+		#      ^ ,   ^^^^^^ synonyms      ^^^^^^^^^^ defn
+		#	   ^
+		#	   canonical name
+
+		#| iterate over each unit line
+		for @_ -> $names, $defn {
+			my @synonyms = |$names;
+
+			#| for each name (ie. synonym)
+			for |$names -> $singular {
+				if naive-plural( $singular ) -> $plural {
+					@synonyms.push: $plural; 
+				}   
+			}
+			@AllNames.push: |@synonyms;
+			for @synonyms -> $name {
+				%defn-by-name{$name} = $defn;
+				%syns-by-name{$name} = @synonyms;
+			}
+		}
+	} else {											#slow for test - preloads Units defined below
 		for @_ -> $names, $defn {
             Unit.new( defn => $defn, names => [|$names] );
 		}
-	} else {
-		#eg. ['N',  'newton'],           'kg m / s^2',
-		#      ^ ,   ^^^^^^ names         ^^^^^^^^^^ defn
-
-		for @_ -> $names, $defn {
-			my @newbies;
-			for |$names -> $n {
-				@newbies.push: $n; 
-				if naive-plural( $n ) -> $p {
-					@newbies.push: $p; 
-				}   
-			}   
-			@AllNames.push: |@newbies;
-			for @newbies -> $newby {
-				%defn-by-name{$newby} = $defn;
-			}
-		}   
 	}
 }
 ######## Unit Data ########
@@ -634,14 +636,14 @@ InitPrefix (
 InitBaseUnit (
     #SI Base Units 
 	#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
-    'Length'      => ['m', 'metre', 'meter'],
-    'Mass'        => ['kg', 'kilogram'],
-    'Time'        => ['s', 'second', 'sec'],
-    'Current'     => ['A', 'amp', 'ampere', 'ampère'],  
-    'Temperature' => ['K', 'kelvin'],   
-    'Substance'   => ['mol', 'mole'],
-    'Luminosity'  => ['cd', 'candela', 'candle'],
-	'Angle'		  => ['radian'],		
+    'Length'      => ['m', 'metre', 'metres', 'meter', 'meters'],
+    'Mass'        => ['kg', 'kilogram', 'kilograms'],
+    'Time'        => ['s', 'sec', 'secs', 'second', 'seconds'],
+    'Current'     => ['A', 'amp', 'amps', 'ampere', 'amperes', 'ampère', 'ampères'],  
+    'Temperature' => ['K', 'kelvin', 'kelvins'],   
+    'Substance'   => ['mol', 'mols', 'mole', 'moles'],
+    'Luminosity'  => ['cd', 'candela', 'candelas', 'candle', 'candles'],
+	'Angle'		  => ['radian', 'radians'],		
 );
 InitDerivedUnit (
 	#SI Derived Units with special names & symbols
@@ -770,6 +772,7 @@ InitUnit (
 	['pi'],										'3.1415926535897932385', 
 
 	# Angle
+	#FIXME v2 add grad
 	['°', 'degree', 'deg', 'º'],                'pi radians / 180',
 	['ᵍ', 'gon'],                               'pi radians / 200',
 
