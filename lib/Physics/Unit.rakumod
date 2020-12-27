@@ -38,7 +38,7 @@ class Unit is export {
     has Str  $!type;
     has Str  @.names  is rw = [];
     has Int  @.dims   = 0 xx NumBases;
-	has MixHash $.dmix is rw = ∅.MixHash;
+    has MixHash $.dmix is rw = ∅.MixHash;
 
     ### accessor methods ###		    #use 'self.attr: 42' not 'self.attr = 42'
     multi method factor($f) { self.CheckChange; $!factor = $f } 
