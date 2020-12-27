@@ -1,15 +1,10 @@
 unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>; 
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
-#snagging
-#-clean up UnitActions code
-#-generic Action debug
-#-dereturn
-
 my $db = 0;           #debug 
 
 ##### Constants and Data Maps ######
-constant \locale = "imp";		#Imperial="imp"; US="us' FIXME v2 make tag (en_US, en_UK)
+constant \locale = "imp";	#Imperial="imp"; US="us' FIXME v2 make tag (en_US, en_UK)
 constant \preload = 0;		#Preload All Units ie. for debug (precomp load 1.6s or ~60s)
 
 constant \NumBases = 8; 
@@ -150,9 +145,9 @@ class Unit is export {
     method SetNames( @new-names ) {
 
 		if @new-names.so {
-			if %syns-by-name{@new-names[0]} -> $syns {
+			if %syns-by-name{@new-names[0]} -> @syns {
 				#predefined Unit, assign synonyms (incl. plurals)
-				@.names = |$syns;
+				@.names = @syns;
 			} else {
 				#user defined Unit, assign name(s) provided
 				@.names = @new-names;
@@ -383,7 +378,7 @@ sub CreateUnit( $defn is copy ) {
         token offset      { <number> }
         token number      { \S+ <?{ defined +"$/" }> } #get chars, assert coerce to Real via +
 
-        token pnp-before  { <pwr-before>  \s+? <prefix-name> } #pnp=="prefix-name-power" combo
+        token pnp-before  { <pwr-before>  \s+? <prefix-name> } #pnp==prefix-name-power
         token pnp-after   { <prefix-name> \s*? <pwr-after>?  }
 
         token prefix-name { <prefix>? \s*? <name> }
@@ -401,7 +396,10 @@ sub CreateUnit( $defn is copy ) {
     }
 
     class UnitActions   {
-		#| from key value pair example https://docs.raku.org/language/grammars#Action_objects
+		##say "in xxx...", $/.made;  #<== handy debug line, paste just after make
+
+		#| assemble result from numerator and denominator (+offset) 
+		#| viz. key value example https://docs.raku.org/language/grammars#Action_objects
 		method TOP($/)			{ 
 			my $nu = $<numerator>.made;
 			my $de = $<denominator>.made;
@@ -409,102 +407,77 @@ sub CreateUnit( $defn is copy ) {
 			$nu.share($de) if $de;
 			$nu.offset: +$os if $os;
 			make $nu;
-##say "in top...", $/.made;
 		}
 
 		#| accumulates element Units using times
 		method compound($/)		{ 
-			my $acc = Unit.new();
+			my $acc = Unit.new;
 			for $<element>>>.made -> $x {
 				$acc.times($x);
 			}
 			make $acc;
-##say "in comp, acc made..."; say $/.made;
 		}
 
-
-		#| makes a list of element units from factor, offset, prefix and name
+		#| makes a list of element units (either factor or prefix-name-power)
 		method element($/)		{ 
-			my $nn = $<pnp-before><prefix-name>.made<unit> || 
-					 $<pnp-after><prefix-name>.made<unit>;
-			my $ee = $<pnp-before><prefix-name>.made<defn> || 
-					 $<pnp-after><prefix-name>.made<defn>;
-			my $dd = $<pnp-before><pwr-before>.made || 
-					 $<pnp-after>.made || 1;
-			if $nn { 
-				$nn.raise($dd, $ee);
-				make $nn;
+			my ( $unit, $defn, $pwr );
+
+			if $unit = $<factor>.made {
+				make $unit;
+			} else {
+				$unit = $<pnp-before><prefix-name>.made<unit> || 
+						$<pnp-after><prefix-name>.made<unit>;
+				$defn = $<pnp-before><prefix-name>.made<defn> || 
+						$<pnp-after><prefix-name>.made<defn>;
+				$pwr  = $<pnp-before><pwr-before>.made || 
+						$<pnp-after>.made || 1;
+				make $unit.raise($pwr, $defn);
 			}
-			my $fu = $<factor>.made;
-			if $fu {
-				make $fu;
-			}
-##say "in elem..."; say $/.made;
 		}
 
-		#| make Unit from factor
+		#| handle factor and offset matches
         method factor($/)		{ 
-			my $fu = Unit.new();
-			$fu.times($/.Real);
-			make $fu;
-##say "in factor..."; say $/.made;
+			make Unit.new.times($/.Real);
 		}
-
-		#| stores offset when found
 		method offset($/) {
 			make $<number>; 
-##say "in offset..."; say $/.made;
 		}
 
+		#| make both unit and defn from prefix-name matches
         method prefix-name($/)	{ 
-			my $en = $<name>.made<defn>;
-			my $nn = $<name>.made<unit>;
-			my $pn = $<prefix>.made<unit>;
-			$nn.times($pn) if $pn;
-			make %( defn => $en, unit => $nn );
-##say "in prefix-name..."; say $/.made;
+			my $unit = $<name>.made<unit>;
+			my $defn = $<name>.made<defn>;
+			my $pfix = $<prefix>.made<unit>;
+			$unit.times($pfix) if $pfix;
+			make %( defn => $defn, unit => $unit );
 		}
-
         method prefix($/)		{ 
-			my $pf=GetUnit($/.Str).clone;
-			make %( unit => $pf );
-##say "in prefix..."; say $/.made;
+			make %( unit => GetUnit($/.Str).clone );
 		}
-
         method name($/)			{ 
-			my $en=$/.Str; 
-			my $nn=GetUnit($en).clone; 
-			$nn.dmix=∅.MixHash;
-			make %( defn => $en, unit => $nn );
-##say "in name..."; say $/.made;
+			my $defn=$/.Str; 
+			my $unit=GetUnit($defn).clone; 
+			$unit.dmix=∅.MixHash;
+			make %( defn => $defn, unit => $unit );
 		}
 
+		#| extract (signed) power digits from various grammar options
         method pwr-before($/)	{
-			my $dp=%pwr-preword{$/.Str};
-			make $dp;
-##say "in pwr-before..."; say $/.made;
+			make %pwr-preword{$/.Str};
 		}
-
 		method pnp-after($/)	{
-			my $nn = $<pwr-after><pwr-postwd>.made ||
-					 $<pwr-after><pwr-supers>.made ||
-					 $<pwr-after><pwr-normal>.made;
-			make $nn;
-##say "in pnp-after..."; say $/.made;
+			make $<pwr-after><pwr-postwd>.made ||
+				 $<pwr-after><pwr-supers>.made ||
+				 $<pwr-after><pwr-normal>.made;
 		}
         method pwr-postwd($/)	{
-			my $dp=%pwr-postword{$/.Str}.Int;
-			make $dp;
+			make %pwr-postword{$/.Str}.Int;
 		}
         method pwr-supers($/)	{ 
-			my $dp=%pwr-superscript{$/.Str}.Int; 
-			make $dp;
-##say "in pwr-supers..."; say $/.made;
+			make %pwr-superscript{$/.Str}.Int; 
 		}
         method pwr-normal($/)	{ 
-			my $dp=$<pwr-digits>.Int;
-			make $dp;
-##say "in pwr-normal..."; say $/.made;
+			make $<pwr-digits>.Int;
 		}
     }
 
@@ -539,7 +512,7 @@ sub InitBaseUnit( @_ ) {
     for @_ -> %h {
         my ($type, $names) = %h.key, %h.value;
 
-		$names.map( { %syns-by-name{$_} = $names } );
+		$names.map( { %syns-by-name{$_} = |$names } );
         my $u = Unit.new;
 
         $u.SetNames: $names;    #auto decont to list

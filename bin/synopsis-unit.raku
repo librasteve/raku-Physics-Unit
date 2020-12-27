@@ -4,11 +4,7 @@ use Physics::Unit;
 
 #SYNOPSIS
 
-my $a1 = Unit.new( defn => '5 radians per second', names => ['radians per second'] ); say "$a1";
-#my $a2 = Unit.new( defn => '2 ft', names => ['2f'] ); say ~$a2; say $a2.type;
-#die;
-
-# Define your own unit named "ff" (named args)
+# Define your own unit named "ff" 
 my $ff = Unit.new( defn => 'furlong / fortnight', names => ['ff'] );
 say "$ff";
 say $ff.type;
@@ -16,13 +12,10 @@ say $ff.canonical;
 say $ff.pretty;
 say $ff.raku;
 
-# New Unit by reference to an existing one
+# New Unit by renaming an existing one
 my $fh = $ff.new( <fh fi> );
 
-# New Unit (positional args)
-my $fg = Unit.new( defn => 'furlong / fortnight', names => ['fg'] );
-
-# More intricate unit expression (using the newly defined unit 'ff'):
+# Flexible unit expression (here using the newly defined Unit 'ff'):
 my $gonzo = Unit.new( defn => "13 square millimeters per ff", names => ['gonzo'] );
 
 # Parsing of input  
@@ -33,14 +26,12 @@ say "compare $u1, $u2... " ~ $u2.same-dims($u1);
 
 # SI recommended string representation
 say "{$u2.factor} {$u2.pretty}";
-
 # SI derived unit representation
 say "{$u2.factor} {$u2.canonical}";
-
 # SI derived unit representation
 say "{$u2.factor} {$u2.name}";
 
-#put ListUnits();
+put ListUnits();
 
 #`[[
 ##### Principles & Behaviours ######
