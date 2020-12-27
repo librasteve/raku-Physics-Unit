@@ -1,4 +1,4 @@
-unit module Physics::Unit:ver<0.0.4>:auth<Steve Roe (p6steve@furnival.net)>; 
+unit module Physics::Unit:ver<1.1.0>:auth<Steve Roe (p6steve@furnival.net)>; 
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 my $db = 0;           #debug 
