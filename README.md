@@ -8,8 +8,7 @@ A set of stock SI, Imperial and US Unit objects for raku that are employed by Ph
 See also Physics::UnitAffix for support of SI Prefixes.
 
 # Instructions
-zef install --verbose https://github.com/p6steve/raku-Physics-Unit.git
-
+zef install --verbose Physics::Unit
 and, conversely, zef uninstall Physics::Unit
 
 # Synopsis - Physics::Unit
