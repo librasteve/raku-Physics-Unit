@@ -350,11 +350,11 @@ sub naive-plural( $n ) {
 
 ######## Grammars ########
 sub CreateUnit( $defn is copy ) {
-	$defn .= trim;
-
 	#6.d faster regexes with Strings {<$str>} & slower with Arrays {<@arr>}
-    #erase compound names from element name match candidates (to force generation of dmix)
+
+    #erase compound names from element unit-name match candidates (to force generation of dmix)
     my $unit-names       = @AllNames.grep({! /<[\s*^./]>/}).join('|');
+
     my $prefix-names     = %prefix-by-name.keys.join('|');
     my $pwr-prewords     = %pwr-preword.keys.join('|');
     my $pwr-postwords    = %pwr-postword.keys.join('|');
@@ -368,10 +368,10 @@ sub CreateUnit( $defn is copy ) {
     grammar UnitGrammar {
         token TOP         { ^  \s* <numerator=.compound>
                               [\s* <divider> \s* <denominator=.compound>]?
-                              [\s*    '+'    \s* <offset>  ]? \s* $ } #offset '+' is hardwired
+                              [\s*    '+'    \s* <offset>  ]? \s* $		}		#offset '+' is hardwired
         token divider     { '/' || 'per' }
         token compound    { <element>+ % <sep> }
-        token sep         { [ '*' || '.' || ' *' || ' .' || ' ' ] }
+        token sep         { [ '*' || '.' || ' *' || ' .' || ' ' || '⋅' ] }
         token element     { <factor> || <pnp-before> || <pnp-after> }
 
         token factor      { <number> }
@@ -390,7 +390,7 @@ sub CreateUnit( $defn is copy ) {
         token pwr-postwd  { <$pwr-postwords>    }
         token pwr-supers  { <$pwr-superscripts> }
 
-        token pwr-normal  { <pwr-symbol> \s*? <pwr-digits> }
+        token pwr-normal  { <pwr-symbol>? \s*? <pwr-digits> }
         token pwr-digits  { <[-+]>? <[1..4]> }
         token pwr-symbol  { '**' || '^' }
     }
@@ -398,8 +398,7 @@ sub CreateUnit( $defn is copy ) {
     class UnitActions   {
 		##say "in xxx...", $/.made;  #<== handy debug line, paste just after make
 
-		#| assemble result from numerator and denominator (+offset) 
-		#| viz. key value example https://docs.raku.org/language/grammars#Action_objects
+		#| assemble result with math operations from numerator and denominator (&offset) 
 		method TOP($/)			{ 
 			my $nu = $<numerator>.made;
 			my $de = $<denominator>.made;
@@ -481,7 +480,9 @@ sub CreateUnit( $defn is copy ) {
 		}
     }
 
+	$defn .= trim;
     my $match = UnitGrammar.parse( $defn, :actions(UnitActions) );
+
     if $match.so {
 		say "Made: $match\t= ", $match.made if $db;
 		my $mu = $match.made;
