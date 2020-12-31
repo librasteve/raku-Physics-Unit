@@ -5,8 +5,6 @@ A set of stock SI, Imperial and US Unit objects for raku that are employed by Ph
 
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
-See also Physics::UnitAffix for support of SI Prefixes.
-
 # Instructions
 zef install --verbose Physics::Unit
 and, conversely, zef uninstall Physics::Unit
