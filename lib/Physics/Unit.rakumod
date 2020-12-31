@@ -4,6 +4,7 @@ unit module Physics::Unit:ver<1.1.0>:auth<Steve Roe (p6steve@furnival.net)>;
 my $db = 0;           #debug 
 
 ##### Constants and Data Maps ######
+
 constant \locale = "imp";	#Imperial="imp"; US="us' FIXME v2 make tag (en_US, en_UK)
 constant \preload = 0;		#Preload All Units ie. for debug (precomp load 1.6s or ~60s)
 
@@ -32,6 +33,7 @@ my %pwr-superscript = (
 );
 
 ######## Classes & Roles ########
+
 class Unit is export {
     has Real $!factor = 1;
     has Real $!offset = 0;				#ie. for K <=> °C
@@ -260,17 +262,19 @@ class Unit is export {
 }
 
 ######## Subroutines (Exported) ########
+
 sub ListUnits is export {		
 	return %defn-by-name.keys; 
 }
 sub ListTypes is export {
-    return sort keys %type-to-protoname
+    return sort keys %type-to-protoname;
 }
 sub ListBases is export {
-    return @BaseNames
+    return @BaseNames;
 }
-sub GetPrefixByCode is export {
-	return %prefix-by-code;
+sub GetAffixNames( Str $cn ) is export {
+	#eg. cm, centimetre
+	return $cn, %affix-by-name{$cn};
 }
 sub GetPrototype( Str $type ) is export {
 	if my $pt = %type-to-prototype{$type} {
@@ -317,6 +321,7 @@ sub GetUnit( $u ) is export {
 }
 
 ######## Subroutines (Internal) ########
+
 sub subst-shortest( Unit $u ) { 
     #subtitutes shortest name if >1 unit name has same dimensions 
     # ... so that eg. 'J' beats 'kg m^2 / s^2'
@@ -355,13 +360,16 @@ sub naive-plural( $n ) {
 }
 
 ######## Grammars ########
+
 sub CreateUnit( $defn is copy ) {
 	#6.d faster regexes with Strings {<$str>} & slower with Arrays {<@arr>}
 
-	#| preprocess affix units to extended defn -eg. cm to centimetre
+	$defn .= trim;
+
+	#| preprocess affix units to extended defn - eg. cm to centimetre
 	$defn = %affix-by-name{$defn} // $defn;
 
-    #| erase compound names from element unit-name match candidates (to force regen of dmix)
+    #| rm compound names from element unit-name match candidates (to force regen of dmix)
     my $unit-names       = %defn-by-name.keys.grep({! /<[\s*^./]>/}).join('|');
 
     my $prefix-names     = %prefix-by-name.keys.join('|');
@@ -377,7 +385,7 @@ sub CreateUnit( $defn is copy ) {
     grammar UnitGrammar {
         token TOP         { ^  \s* <numerator=.compound>
                               [\s* <divider> \s* <denominator=.compound>]?
-                              [\s*    '+'    \s* <offset>  ]? \s* $		}		#offset '+' is hardwired
+                              [\s* '+' \s* <offset>  ]? \s* $	}		#offset '+' hardwired
         token divider     { '/' || 'per' }
         token compound    { <element>+ % <sep> }
         token sep         { [ '*' || '.' || ' *' || ' .' || ' ' || '⋅' ] }
@@ -489,7 +497,6 @@ sub CreateUnit( $defn is copy ) {
 		}
     }
 
-	$defn .= trim;
     my $match = UnitGrammar.parse( $defn, :actions(UnitActions) );
 
     if $match.so {
@@ -503,6 +510,7 @@ sub CreateUnit( $defn is copy ) {
 }
 
 ######## Initialization ########
+
 sub InitPrefix( @_ ) {
     for @_ -> $name, $factor {
         my $u = Unit.new;
@@ -573,14 +581,15 @@ sub InitAffixUnit {
 	my %simple-names = %affix-by-name;		
 
 	for %simple-names.keys -> $n {
-		%affix-by-name{$n}:delete;						#delete simple names from data ma
+		#delete simple names from data map (these are real Units, no need to subst)
+		%affix-by-name{$n}:delete;						
 
 		for %prefix-by-code.keys -> $c {
-			my $combo = $c ~ $n;						#add combo keys and values
-			%affix-by-name{$combo} = %prefix-by-code{$c} ~ %simple-names{$n}; #extend codes & names
+			#add combo keys and values, then extend both codes & names
+			my $combo = $c ~ $n;
+			%affix-by-name{$combo} = %prefix-by-code{$c} ~ %simple-names{$n}; 
 		}
 	}
-##dd %affix-by-name;
 }
 sub InitTypes( @_ )  {
     for @_ -> %p {
@@ -632,6 +641,7 @@ sub InitUnit( @_ , :$derived ) is export {
 	}
 
 }
+
 ######## Unit Data ########
 
 InitPrefix (
@@ -848,10 +858,8 @@ InitUnit (
 	['rpm'],                                    'revolutions per minute',
 
 	# Length 
-#iamerejh - need to use extended names for simple names too --- ie km == kilometre(s), cm ==centimetre and so on
-#then need to fix microl... (if still broken) ^^^ prolly [1]
-	#['km'],				                        'kilometre', 
-	#['μ', 'micron'],                            '1e-6 m',
+	['km'],				                        'kilometre', 
+	['μ', 'micron'],                            '1e-6 m',
 	['å', 'angstrom'],                          '1e-10 m',
 	['au', 'astronomical-unit'],                '1.49598e11 m',
 	['ly', 'light-year'],                       '9.46e15 m',
