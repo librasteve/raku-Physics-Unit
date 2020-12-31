@@ -9,12 +9,13 @@ constant \preload = 0;		#Preload All Units ie. for debug (precomp load 1.6s or ~
 
 constant \NumBases = 8; 
 my Str @BaseNames;			#SI Base Unit names
-my Str @AllNames;           #all known Unit names
 
-my %defn-by-name;           #name => defn Str (values may be duplicates eg. 1 Hz)
+my %prefix-by-name;         #name => Prefix object
+my %prefix-by-code;         #code => Prefix name 
+my %defn-by-name;           #name => defn Str of known names incl. affix (values may be dupes)
 my %syns-by-name;			#name => list of synonyms (predefined Units only, incl. plurals)
 my %unit-by-name;           #name => Unit object (when instantiated)
-my %prefix-by-name;         #name => Prefix object
+my %affix-by-name;			#name => extended affix defn (eg. cm => 'centim') 
 my %type-to-protoname;      #type => prototype name
 my %type-to-prototype;      #type => prototype Unit object (when instantiated)
 my %type-to-dims;			#type => dims vector
@@ -156,9 +157,8 @@ class Unit is export {
 			#otherwise, just assign defn
 			@.names = [$.defn];
 		}
-
+		@.names.map( { %defn-by-name{$_} = self.defn } );
 		@.names.map( { %unit-by-name{$_} = self } );
-        @AllNames.push: |@.names;
 
         say "SetNames: {@.names}" if $db;
     }
@@ -259,15 +259,18 @@ class Unit is export {
 	}
 }
 
-######## Subroutines ########
+######## Subroutines (Exported) ########
 sub ListUnits is export {		
-	return @AllNames
+	return %defn-by-name.keys; 
 }
 sub ListTypes is export {
     return sort keys %type-to-protoname
 }
 sub ListBases is export {
     return @BaseNames
+}
+sub GetPrefixByCode is export {
+	return %prefix-by-code;
 }
 sub GetPrototype( Str $type ) is export {
 	if my $pt = %type-to-prototype{$type} {
@@ -279,9 +282,10 @@ sub GetPrototype( Str $type ) is export {
 	}	
 }
 sub GetUnit( $u ) is export {
+
     #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
-    if $u ~~ Unit {
 	say "GU1 from $u" if $db;
+    if $u ~~ Unit {
         return $u
     }   
 
@@ -311,6 +315,8 @@ sub GetUnit( $u ) is export {
     my $nuo = Unit.new( defn => $u );
     return subst-shortest( $nuo ) // $nuo;
 }
+
+######## Subroutines (Internal) ########
 sub subst-shortest( Unit $u ) { 
     #subtitutes shortest name if >1 unit name has same dimensions 
     # ... so that eg. 'J' beats 'kg m^2 / s^2'
@@ -352,8 +358,11 @@ sub naive-plural( $n ) {
 sub CreateUnit( $defn is copy ) {
 	#6.d faster regexes with Strings {<$str>} & slower with Arrays {<@arr>}
 
-    #erase compound names from element unit-name match candidates (to force generation of dmix)
-    my $unit-names       = @AllNames.grep({! /<[\s*^./]>/}).join('|');
+	#| preprocess affix units to extended defn -eg. cm to centimetre
+	$defn = %affix-by-name{$defn} // $defn;
+
+    #| erase compound names from element unit-name match candidates (to force regen of dmix)
+    my $unit-names       = %defn-by-name.keys.grep({! /<[\s*^./]>/}).join('|');
 
     my $prefix-names     = %prefix-by-name.keys.join('|');
     my $pwr-prewords     = %pwr-preword.keys.join('|');
@@ -507,19 +516,28 @@ sub InitPrefix( @_ ) {
         say "Initialized Prefix $name" if $db;
     }
 }
+sub InitPrefixCode( @_ ) {
+	@_.map( {%prefix-by-code{.key}=.value} );
+}
 sub InitBaseUnit( @_ ) {
     my $i = 0;
 
     for @_ -> %h {
         my ($type, $names) = %h.key, %h.value;
 
-		$names.map( { %syns-by-name{$_} = |$names } );
-        my $u = Unit.new;
+		my @synonyms = |$names;
 
-        $u.SetNames: $names;    #auto decont to list
+		#| for each name (ie. synonym)
+		for |$names -> $singular {
+			if naive-plural( $singular ) -> $plural {
+				@synonyms.push: $plural; 
+			}   
+		}
+		@synonyms.map( { %syns-by-name{$_} = |@synonyms } );
+
+        my $u = Unit.new;
+        $u.SetNames: @synonyms;    
         $u.defn: $u.name;
-		@AllNames.push: $u.name;
-        @BaseNames.push: $u.name;
 
         #dimension vector has zeros in all but one place
         $u.dims[$i++] = 1;
@@ -529,11 +547,40 @@ sub InitBaseUnit( @_ ) {
 		%type-to-protoname{$type} = $u.name;
 		%type-to-prototype{$type} = $u;
 
+        @BaseNames.push: $u.name;
+		%affix-by-name{$u.name} = @synonyms[1];			#extended name as value
+
         say "Initialized Base Unit $names[0]" if $db;
     }
 }
 sub InitDerivedUnit( @_ ) { 
-	InitUnit( @_ )
+	InitUnit( @_, :derived )
+}
+sub InitAffixUnit {
+	#replace kg with g 
+	%affix-by-name<kg>:delete;
+	%affix-by-name<g> = 'gram';
+	
+	#delete non-declining singletons 
+	%affix-by-name<°>:delete;
+	%affix-by-name<°C>:delete;
+	%affix-by-name<radian>:delete;
+	%affix-by-name<steradian>:delete;
+
+	#pour in 'l' ie. ml, cl, etc quite common
+	%affix-by-name<l> = 'litre';
+
+	my %simple-names = %affix-by-name;		
+
+	for %simple-names.keys -> $n {
+		%affix-by-name{$n}:delete;						#delete simple names from data ma
+
+		for %prefix-by-code.keys -> $c {
+			my $combo = $c ~ $n;						#add combo keys and values
+			%affix-by-name{$combo} = %prefix-by-code{$c} ~ %simple-names{$n}; #extend codes & names
+		}
+	}
+##dd %affix-by-name;
 }
 sub InitTypes( @_ )  {
     for @_ -> %p {
@@ -550,13 +597,14 @@ sub InitOddTypes( @_ ) {
         %odd-type-by-name{%p.key} = %p.value;
     }   
 }
-sub InitUnit( @_ ) is export {
+sub InitUnit( @_ , :$derived ) is export {
+	#eg. ['N',  'newton'],           'kg m / s^2',
+	#      ^ ,   ^^^^^^ synonyms      ^^^^^^^^^^ defn
+	#	   ^
+	#	   canonical name
 
-	if not preload {									#load data maps only - instantiate Unit objects on demand 
-		#eg. ['N',  'newton'],           'kg m / s^2',
-		#      ^ ,   ^^^^^^ synonyms      ^^^^^^^^^^ defn
-		#	   ^
-		#	   canonical name
+	if not preload {				
+		#load data map hashes only - instantiate Unit objects on demand 
 
 		#| iterate over each unit line
 		for @_ -> $names, $defn {
@@ -568,17 +616,21 @@ sub InitUnit( @_ ) is export {
 					@synonyms.push: $plural; 
 				}   
 			}
-			@AllNames.push: |@synonyms;
 			for @synonyms -> $name {
 				%defn-by-name{$name} = $defn;
 				%syns-by-name{$name} = @synonyms;
 			}
+			if $derived {
+				%affix-by-name{@synonyms[0]} = @synonyms[1]; 
+			}
 		}
-	} else {											#slow for test - preloads Units defined below
+	} else {						
+		#instantiate all Units right away (slow)
 		for @_ -> $names, $defn {
             Unit.new( defn => $defn, names => [|$names] );
 		}
 	}
+
 }
 ######## Unit Data ########
 
@@ -607,17 +659,42 @@ InitPrefix (
     'zepto',   0.000000000000000000001,
     'yocto',   0.000000000000000000000001,
 );
+InitPrefixCode (
+    #SI Prefix code
+    da => 'deka',
+    #'deca', ignore this spelling alterative
+    h => 'hecto',
+    k => 'kilo',
+    M => 'mega',
+    G => 'giga',
+    T => 'tera',
+    P => 'peta',
+    E => 'exa',
+    Z => 'zetta',
+    Y => 'yotta',
+    d => 'deci',
+    c => 'centi',
+    m => 'milli',
+    μ => 'micro',
+    n => 'nano',
+    p => 'pico',
+    f => 'femto',
+    a => 'atto',
+    z => 'zepto',
+    y => 'yocto',
+);
 InitBaseUnit (
     #SI Base Units 
 	#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
-    'Length'      => ['m', 'metre', 'metres', 'meter', 'meters'],
-    'Mass'        => ['kg', 'kilogram', 'kilograms'],
-    'Time'        => ['s', 'sec', 'secs', 'second', 'seconds'],
-    'Current'     => ['A', 'amp', 'amps', 'ampere', 'amperes', 'ampère', 'ampères'],  
-    'Temperature' => ['K', 'kelvin', 'kelvins'],   
-    'Substance'   => ['mol', 'mols', 'mole', 'moles'],
-    'Luminosity'  => ['cd', 'candela', 'candelas', 'candle', 'candles'],
-	'Angle'		  => ['radian', 'radians'],		
+	##FIXME revert to algorithmic plurals
+    'Length'      => ['m', 'metre', 'meter',],
+    'Mass'        => ['kg', 'kilogram',],
+    'Time'        => ['s', 'sec', 'second',],
+    'Current'     => ['A', 'amp', 'ampere', 'ampère',],  
+    'Temperature' => ['K', 'kelvin',],   
+    'Substance'   => ['mol', 'mole',],
+    'Luminosity'  => ['cd', 'candela', 'candle',],
+	'Angle'		  => ['radian',],		
 );
 InitDerivedUnit (
 	#SI Derived Units with special names & symbols
@@ -642,9 +719,9 @@ InitDerivedUnit (
 	['Gy', 'gray'],                         'J / kg',
 	['Sv', 'sievert'],                      'J / kg',
 	['kat', 'katal'],                       'mol s^-1',
-	#SI coherent Derived Units in terms of base units - TBD [see url]
-	#SI coherent Derived Units that include units with special names - TBD [see url]
 );
+InitAffixUnit;
+	#Load SI Prefix code / Unit combos to data map hashes for postfix operators 
 InitTypes (
 	#sets name of prototype unit
     'Dimensionless'      => 'unity',
@@ -771,8 +848,10 @@ InitUnit (
 	['rpm'],                                    'revolutions per minute',
 
 	# Length 
-	['km'],				                        'kilometre',
-	['μ', 'micron'],                            '1e-6 m',
+#iamerejh - need to use extended names for simple names too --- ie km == kilometre(s), cm ==centimetre and so on
+#then need to fix microl... (if still broken) ^^^ prolly [1]
+	#['km'],				                        'kilometre', 
+	#['μ', 'micron'],                            '1e-6 m',
 	['å', 'angstrom'],                          '1e-10 m',
 	['au', 'astronomical-unit'],                '1.49598e11 m',
 	['ly', 'light-year'],                       '9.46e15 m',
