@@ -12,7 +12,8 @@ constant \NumBases = 8;
 my Str @BaseNames;			#SI Base Unit names
 
 my %prefix-by-name;         #name => Prefix object
-my %prefix-by-code;         #code => Prefix name 
+my %prefix-by-code;         #code => Prefix name
+my %prefix-to-factor;       #name => Prefix factor
 my %defn-by-name;           #name => defn Str of known names incl. affix (values may be dupes)
 my %syns-by-name;			#name => list of synonyms (predefined Units only, incl. plurals)
 my %unit-by-name;           #name => Unit object (when instantiated)
