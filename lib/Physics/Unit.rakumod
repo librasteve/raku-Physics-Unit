@@ -272,6 +272,9 @@ sub ListTypes is export {
 sub ListBases is export {
     return @BaseNames;
 }
+sub GetPrefixToFactor is export {
+	return %prefix-to-factor;
+}
 sub GetAffixByName is export {
 	return %affix-by-name;
 }
