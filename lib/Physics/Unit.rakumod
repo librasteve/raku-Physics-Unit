@@ -523,6 +523,7 @@ sub InitPrefix( @_ ) {
         $u.type:       'prefix';
 
         %prefix-by-name{$name} = $u;
+		%prefix-to-factor{$name} = $factor;
 
         say "Initialized Prefix $name" if $db;
     }
