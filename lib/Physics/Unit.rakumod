@@ -272,9 +272,8 @@ sub ListTypes is export {
 sub ListBases is export {
     return @BaseNames;
 }
-sub GetAffixNames( Str $cn ) is export {
-	#eg. cm, centimetre
-	return $cn, %affix-by-name{$cn};
+sub GetAffixByName is export {
+	return %affix-by-name;
 }
 sub GetPrototype( Str $type ) is export {
 	if my $pt = %type-to-prototype{$type} {
@@ -565,6 +564,7 @@ sub InitDerivedUnit( @_ ) {
 	InitUnit( @_, :derived )
 }
 sub InitAffixUnit {
+	# so far %affix-by-name has been initialized with base and derived unit names
 	#replace kg with g 
 	%affix-by-name<kg>:delete;
 	%affix-by-name<g> = 'gram';
@@ -579,10 +579,8 @@ sub InitAffixUnit {
 	%affix-by-name<l> = 'litre';
 
 	my %simple-names = %affix-by-name;		
-
 	for %simple-names.keys -> $n {
-		#delete simple names from data map (these are real Units, no need to subst)
-		%affix-by-name{$n}:delete;						
+		#delete simple names from data map (these are real Units, no need to substitute)
 
 		for %prefix-by-code.keys -> $c {
 			#add combo keys and values, then extend both codes & names
