@@ -25,10 +25,10 @@ my $gonzo = Unit.new( defn => "13 square millimeters per ff", names => ['gonzo']
 my $u1 = GetUnit( 'J' );
 my $u2 = GetUnit( 'kg m^2 / s^2' );
 my $u3 = GetUnit( 'kg m^2/s^2' ); 
-say $u3;
+say ~$u3;
 say "compare $u1, $u2... " ~ $u2.same-dims($u1);
 
-put ListUnits();
+put ListUnits().sort;
 
 #`[[
 ##### Principles & Behaviours ######
