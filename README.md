@@ -7,7 +7,9 @@ A set of stock SI, Imperial and US Unit objects for raku that are employed by Ph
 
 # Instructions
 zef install Physics::Unit
+
 and, conversely, zef uninstall Physics::Unit
+
 _for latest zef install https://github.com/p6steve/raku-Physics-Unit.git_
 
 # Synopsis - Physics::Unit
