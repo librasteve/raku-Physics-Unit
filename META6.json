@@ -3,7 +3,7 @@
     "name" : "Physics::Unit",
     "auth" : "zef:p6steve",
     "api" : "1",
-    "version" : "1.1.3",
+    "version" : "1.1.4",
     "description" : "Some support for physical units.",
     "authors" : [ "p6steve" ],
     "license" : "Artistic-2.0",
