@@ -1,27 +1,27 @@
 unit module Physics::Unit:ver<1.1.5>:auth<Steve Roe (p6steve@furnival.net)>;
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
-my $db = 0;           #debug
+my $db = 0;               #debug
 
 ##### Constants and Data Maps ######
 
-constant \locale = "imp";	#Imperial="imp"; US="us' FIXME v2 make tag (en_US, en_UK)
+constant \locale = "imp";	#Imperial="imp"; US="us' FIXME v2 make export tag (en_US, en_UK)
 constant \preload = 0;		#Preload All Units ie. for debug (precomp load 1.6s or ~60s)
 
 constant \NumBases = 8;
-my Str @BaseNames;			#SI Base Unit names
+my Str @BaseNames;			  #SI Base Unit names
 
-my %prefix-by-name;         #name => Prefix object
-my %prefix-by-code;         #code => Prefix name
-my %prefix-to-factor;       #name => Prefix factor
-my %defn-by-name;           #name => defn Str of known names incl. affix (values may be dupes)
-my %syns-by-name;			      #name => list of synonyms (predefined Units only, incl. plurals)
-my %unit-by-name;           #name => Unit object (when instantiated)
-my %affix-by-name;			    #name => extended affix defn (eg. cm => 'centim')
-my %type-to-protoname;      #type => prototype name
-my %type-to-prototype;      #type => prototype Unit object (when instantiated)
-my %type-to-dims;			      #type => dims vector
-my %odd-type-by-name;       #mop up a few exceptional types
+my %prefix-by-name;       #name => Prefix object
+my %prefix-by-code;       #code => Prefix name
+my %prefix-to-factor;     #name => Prefix factor
+my %defn-by-name;         #name => defn Str of known names incl. affix (values may be dupes)
+my %syns-by-name; 	      #name => list of synonyms (predefined Units only, incl. plurals)
+my %unit-by-name;         #name => Unit object (when instantiated)
+my %affix-by-name;			  #name => extended affix defn (eg. cm => 'centim')
+my %type-to-protoname;    #type => prototype name
+my %type-to-prototype;    #type => prototype Unit object (when instantiated)
+my %type-to-dims;			    #type => dims vector
+my %odd-type-by-name;     #mop up a few exceptional types
 
 #Power synonyms
 my %pwr-preword   = ( square  => 2, sq => 2, cubic => 3, );
