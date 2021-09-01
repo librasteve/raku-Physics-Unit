@@ -1,14 +1,14 @@
-unit module Physics::Unit:ver<1.1.5>:auth<Steve Roe (p6steve@furnival.net)>; 
+unit module Physics::Unit:ver<1.1.5>:auth<Steve Roe (p6steve@furnival.net)>;
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
-my $db = 0;           #debug 
+my $db = 0;           #debug
 
 ##### Constants and Data Maps ######
 
 constant \locale = "imp";	#Imperial="imp"; US="us' FIXME v2 make tag (en_US, en_UK)
 constant \preload = 0;		#Preload All Units ie. for debug (precomp load 1.6s or ~60s)
 
-constant \NumBases = 8; 
+constant \NumBases = 8;
 my Str @BaseNames;			#SI Base Unit names
 
 my %prefix-by-name;         #name => Prefix object
@@ -17,20 +17,20 @@ my %prefix-to-factor;       #name => Prefix factor
 my %defn-by-name;           #name => defn Str of known names incl. affix (values may be dupes)
 my %syns-by-name;			#name => list of synonyms (predefined Units only, incl. plurals)
 my %unit-by-name;           #name => Unit object (when instantiated)
-my %affix-by-name;			#name => extended affix defn (eg. cm => 'centim') 
+my %affix-by-name;			#name => extended affix defn (eg. cm => 'centim')
 my %type-to-protoname;      #type => prototype name
 my %type-to-prototype;      #type => prototype Unit object (when instantiated)
 my %type-to-dims;			#type => dims vector
 my %odd-type-by-name;       #mop up a few exceptional types
 
 #Power synonyms
-my %pwr-preword   = ( square  => 2, sq => 2, cubic => 3, );   
-my %pwr-postword  = ( squared => 2,          cubed => 3, );   
+my %pwr-preword   = ( square  => 2, sq => 2, cubic => 3, );
+my %pwr-postword  = ( squared => 2,          cubed => 3, );
 
-#Power superscripts ie. x¹ x² x³ x⁴ x⁻¹ x⁻² x⁻³ x⁻⁴  
-my %pwr-superscript = (  
-     '¹' =>  1,  '²' =>  2,  '³' =>  3,  '⁴' =>  4,   
-    '⁻¹' => -1, '⁻²' => -2, '⁻³' => -3, '⁻⁴' => -4,  
+#Power superscripts ie. x¹ x² x³ x⁴ x⁻¹ x⁻² x⁻³ x⁻⁴
+my %pwr-superscript = (
+     '¹' =>  1,  '²' =>  2,  '³' =>  3,  '⁴' =>  4,
+    '⁻¹' => -1, '⁻²' => -2, '⁻³' => -3, '⁻⁴' => -4,
 );
 
 ######## Classes & Roles ########
@@ -45,17 +45,17 @@ class Unit is export {
     has MixHash $.dmix is rw = ∅.MixHash;
 
     ### accessor methods ###		    #use 'self.attr: 42' not 'self.attr = 42'
-    multi method factor($f) { self.CheckChange; $!factor = $f } 
+    multi method factor($f) { self.CheckChange; $!factor = $f }
     multi method factor     { $!factor }
 
-    multi method offset($o) { self.CheckChange; $!offset = $o } 
+    multi method offset($o) { self.CheckChange; $!offset = $o }
     multi method offset     { $!offset }
 
     multi method defn($d)   { $!defn = $d.Str }
     multi method defn       { $!defn }
 
     multi method type($t)   { $!type = $t.Str }
-    multi method type(:$just1) {    
+    multi method type(:$just1) {
 
 		#1 type has been explicitly set ... rarely used eg. to avoid ambiguous state
         return $!type   if $!type;
@@ -72,11 +72,11 @@ class Unit is export {
 		if @d == 1 { return @d[0] }
 		if $just1  { return disambiguate(@d) }
 		if @d > 1  { return @d.sort }
-    }    
+    }
 
     ### new & clone methods ###
 
-    #new by named arguments 
+    #new by named arguments
     multi method new( :$defn!, :@names ) {
         my $n = CreateUnit( $defn );
         $n.SetNames: @names;
@@ -123,7 +123,7 @@ class Unit is export {
         }
         return @dim-str.join('.')
     }
-    method pretty {               
+    method pretty {
 		#following SI recommendation
         my %pwr-sup-rev = %pwr-superscript.kv.reverse;
         my ( $ds, @dim-str );
@@ -165,25 +165,25 @@ class Unit is export {
 
         say "SetNames: {@.names}" if $db;
     }
-    method SetType( $t? ) { 
-		for @.names -> $n {                 
+    method SetType( $t? ) {
+		for @.names -> $n {
 			#set up this Unit as a prototype
 			for %type-to-protoname -> %p {
 				if %p.value eq $n {
-					$!type = %p.key;	
+					$!type = %p.key;
 					%type-to-prototype{$!type} = self;
 				}
 			}
 			#mop up any odd types
 			for %odd-type-by-name -> %p {
 				if %p.key eq $n {
-					$!type = %p.value;	
+					$!type = %p.value;
 				}
 			}
 		}
 
         say "SetType: $.type" if $db;
-    }   
+    }
     method CheckChange {
         warn "You're not allowed to change named units!" if self.name;
     }
@@ -192,29 +192,29 @@ class Unit is export {
     multi method times( Real $t ) {
         self.factor: self.factor * $t;
 		return self
-    }    
+    }
     multi method times( Unit $t ) {
         self.factor: self.factor * $t.factor;
         self.dims >>+=<< $t.dims;
 		self.dmix = ( self.dmix (+) $t.dmix ).MixHash;
 		self.type: '';
-        return self 
-    }  
+        return self
+    }
     method invert {
         self.factor: 1 / self.factor;
         self.dims = -<< self.dims;
-		self.dmix = ( ∅ (-) self.dmix ).MixHash; 
-        return self 
-    }    
+		self.dmix = ( ∅ (-) self.dmix ).MixHash;
+        return self
+    }
     multi method share( Real $d ) {
         self.factor: self.factor / $d;
 		return self
-    }    
+    }
     multi method share( Unit $d ) {
         my $u = GetUnit($d).clone;
         self.times: $u.invert;
-        return self 
-    }    
+        return self
+    }
     method raise( $d, $e ) {
 		#raise a one-element unit ($e) to power of $d digits
         self.factor: self.factor ** $d;
@@ -222,8 +222,8 @@ class Unit is export {
 
 		my $e-can = %syns-by-name{$e}[0];		#lookup the canonical name
 		self.dmix{$e-can} = $d;
-        return self 
-    }    
+        return self
+    }
 
 	#### convert & compare methods ####
     method same-dims( Unit $u ) {
@@ -264,8 +264,8 @@ class Unit is export {
 
 ######## Subroutines (Exported) ########
 
-sub ListUnits is export {		
-	return %defn-by-name.keys; 
+sub ListUnits is export {
+	return %defn-by-name.keys;
 }
 sub ListTypes is export {
     return sort keys %type-to-protoname;
@@ -286,38 +286,38 @@ sub GetPrototype( Str $type ) is export {
 		for %type-to-protoname -> %p {
 			return GetUnit(%p.value) if %p.key eq $type;
 		}
-	}	
+	}
 }
 sub GetUnit( $u ) is export {
 
-    #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
-	say "GU1 from $u" if $db;
+    #1 if Unit, eg. from Measure.new( ... unit => $u ), just return i
+    say "GU1 from $u" if $db;
     if $u ~~ Unit {
-        return $u
-    }   
+      return $u
+    }
 
     #2 if name or prefix already instantiated
-	say "GU2 from $u" if $db;
+    say "GU2 from $u" if $db;
 
-    for %unit-by-name.kv   -> $k,$v { 
-		return $v if $k eq $u 
-	} 
-    for %prefix-by-name.kv -> $k,$v { 
-		return $v if $k eq $u 
-	}
+    for %unit-by-name.kv   -> $k,$v {
+      return $v if $k eq $u
+    }
+    for %prefix-by-name.kv -> $k,$v {
+      return $v if $k eq $u
+    }
 
-    #3 if name in our defns, instantiate it 
-	say "GU3 from $u" if $db;
+    #3 if name in our defns, instantiate it
+    say "GU3 from $u" if $db;
 
-	for %defn-by-name -> %p {
-		if %p.key.grep($u) {
-			my $nuo = Unit.new( defn => %p.value, names => [%p.key] );  
-			return $nuo;
-		}   
-	}   
+    for %defn-by-name -> %p {
+      if %p.key.grep($u) {
+        my $nuo = Unit.new( defn => %p.value, names => [%p.key] );
+        return $nuo;
+      }
+    }
 
-    #4 if no match, instantiate from definition 
-	say "GU4 from $u" if $db;
+    #4 if no match, instantiate from definition
+    say "GU4 from $u" if $db;
 
     my $nuo = Unit.new( defn => $u );
     return subst-shortest( $nuo ) // $nuo;
@@ -325,19 +325,19 @@ sub GetUnit( $u ) is export {
 
 ######## Subroutines (Internal) ########
 
-sub subst-shortest( Unit $u ) { 
-    #subtitutes shortest name if >1 unit name has same dimensions 
+sub subst-shortest( Unit $u ) {
+    #subtitutes shortest name if >1 unit name has same dimensions
     # ... so that eg. 'J' beats 'kg m^2 / s^2'
 	# ... requires eg. 'J' to be instantiated first
 
     my @same-dims;
-    for %unit-by-name.kv -> $k,$v { 
-        @same-dims.push($k) if $v.same-dims($u) 
-    }   
-    if @same-dims {   
-        my @sort-by-size = @same-dims.sort({$^a.chars cmp $^b.chars});
-        return %unit-by-name{@sort-by-size[0]}  #shortest
-    }   
+    for %unit-by-name.kv -> $k,$v {
+      @same-dims.push($k) if $v.same-dims($u)
+    }
+    if @same-dims {
+      my @sort-by-size = @same-dims.sort({$^a.chars cmp $^b.chars});
+      return %unit-by-name{@sort-by-size[0]}  #shortest
+    }
 }
 sub disambiguate( @t ) {
 	#bias rules to help when multiple types are found
@@ -347,19 +347,19 @@ sub disambiguate( @t ) {
 		<Momentum>			=> <Impulse Momentum>,
 		<Angular-Momentum>  => <Angular-Momentum Torque>,
 	);
-	for %dh.kv -> $k,$v { 
-		return $k if @t.sort eq $v.sort 
+	for %dh.kv -> $k,$v {
+		return $k if @t.sort eq $v.sort
 	}
 }
-sub naive-plural( $n ) { 
+sub naive-plural( $n ) {
     #naive plurals - append 's' ...
     unless $n.chars <= 2                #...too short
-        || $n.comb.first(:end) eq 's'	#...already ends with 's' 
-        || $n.comb.first(:end) eq 'z'   #...already ends with 'z' 
+        || $n.comb.first(:end) eq 's'	#...already ends with 's'
+        || $n.comb.first(:end) eq 'z'   #...already ends with 'z'
         || $n ~~ /<[\d\/^*]>/           #...contains a digit or a symbol
-    {   
+    {
         return $n ~ 's';
-    }   
+    }
 }
 
 ######## Grammars ########
@@ -418,8 +418,8 @@ sub CreateUnit( $defn is copy ) {
     class UnitActions   {
 		##say "in xxx...", $/.made;  #<== handy debug line, paste just after make
 
-		#| assemble result with math operations from numerator and denominator (&offset) 
-		method TOP($/)			{ 
+		#| assemble result with math operations from numerator and denominator (&offset)
+		method TOP($/)			{
 			my $nu = $<numerator>.made;
 			my $de = $<denominator>.made;
 			my $os = $<offset>.made;
@@ -429,7 +429,7 @@ sub CreateUnit( $defn is copy ) {
 		}
 
 		#| accumulates element Units using times
-		method compound($/)		{ 
+		method compound($/)		{
 			my $acc = Unit.new;
 			for $<element>>>.made -> $x {
 				$acc.times($x);
@@ -438,44 +438,44 @@ sub CreateUnit( $defn is copy ) {
 		}
 
 		#| makes a list of element units (either factor or prefix-name-power)
-		method element($/)		{ 
+		method element($/)		{
 			my ( $unit, $defn, $pwr );
 
 			if $unit = $<factor>.made {
 				make $unit;
 			} else {
-				$unit = $<pnp-before><prefix-name>.made<unit> || 
+				$unit = $<pnp-before><prefix-name>.made<unit> ||
 						$<pnp-after><prefix-name>.made<unit>;
-				$defn = $<pnp-before><prefix-name>.made<defn> || 
+				$defn = $<pnp-before><prefix-name>.made<defn> ||
 						$<pnp-after><prefix-name>.made<defn>;
-				$pwr  = $<pnp-before><pwr-before>.made || 
+				$pwr  = $<pnp-before><pwr-before>.made ||
 						$<pnp-after>.made || 1;
 				make $unit.raise($pwr, $defn);
 			}
 		}
 
 		#| handle factor and offset matches
-        method factor($/)		{ 
+        method factor($/)		{
 			make Unit.new.times($/.Real);
 		}
 		method offset($/) {
-			make $<number>; 
+			make $<number>;
 		}
 
 		#| make both unit and defn from prefix-name matches
-        method prefix-name($/)	{ 
+        method prefix-name($/)	{
 			my $unit = $<name>.made<unit>;
 			my $defn = $<name>.made<defn>;
 			my $pfix = $<prefix>.made<unit>;
 			$unit.times($pfix) if $pfix;
 			make %( defn => $defn, unit => $unit );
 		}
-        method prefix($/)		{ 
+        method prefix($/)		{
 			make %( unit => GetUnit($/.Str).clone );
 		}
-        method name($/)			{ 
-			my $defn=$/.Str; 
-			my $unit=GetUnit($defn).clone; 
+        method name($/)			{
+			my $defn=$/.Str;
+			my $unit=GetUnit($defn).clone;
 			$unit.dmix=∅.MixHash;
 			make %( defn => $defn, unit => $unit );
 		}
@@ -492,10 +492,10 @@ sub CreateUnit( $defn is copy ) {
         method pwr-postwd($/)	{
 			make %pwr-postword{$/.Str}.Int;
 		}
-        method pwr-supers($/)	{ 
-			make %pwr-superscript{$/.Str}.Int; 
+        method pwr-supers($/)	{
+			make %pwr-superscript{$/.Str}.Int;
 		}
-        method pwr-normal($/)	{ 
+        method pwr-normal($/)	{
 			make $<pwr-digits>.Int;
 		}
     }
@@ -542,13 +542,13 @@ sub InitBaseUnit( @_ ) {
 		#| for each name (ie. synonym)
 		for |$names -> $singular {
 			if naive-plural( $singular ) -> $plural {
-				@synonyms.push: $plural; 
-			}   
+				@synonyms.push: $plural;
+			}
 		}
 		@synonyms.map( { %syns-by-name{$_} = |@synonyms } );
 
         my $u = Unit.new;
-        $u.SetNames: @synonyms;    
+        $u.SetNames: @synonyms;
         $u.defn: $u.name;
 
         #dimension vector has zeros in all but one place
@@ -565,16 +565,16 @@ sub InitBaseUnit( @_ ) {
         say "Initialized Base Unit $names[0]" if $db;
     }
 }
-sub InitDerivedUnit( @_ ) { 
+sub InitDerivedUnit( @_ ) {
 	InitUnit( @_, :derived )
 }
 sub InitAffixUnit {
 	# so far %affix-by-name has been initialized with base and derived unit names
-	#replace kg with g 
+	#replace kg with g
 	%affix-by-name<kg>:delete;
 	%affix-by-name<g> = 'gram';
-	
-	#delete non-declining singletons 
+
+	#delete non-declining singletons
 	%affix-by-name<°>:delete;
 	%affix-by-name<°C>:delete;
 	%affix-by-name<radian>:delete;
@@ -583,31 +583,31 @@ sub InitAffixUnit {
 	#pour in 'l' ie. ml, cl, etc quite common
 	%affix-by-name<l> = 'litre';
 
-	my %simple-names = %affix-by-name;		
+	my %simple-names = %affix-by-name;
 	for %simple-names.keys -> $n {
 		#delete simple names from data map (these are real Units, no need to substitute)
 
 		for %prefix-by-code.keys -> $c {
 			#add combo keys and values, then extend both codes & names
 			my $combo = $c ~ $n;
-			%affix-by-name{$combo} = %prefix-by-code{$c} ~ %simple-names{$n}; 
+			%affix-by-name{$combo} = %prefix-by-code{$c} ~ %simple-names{$n};
 		}
 	}
 }
 sub InitTypes( @_ )  {
     for @_ -> %p {
         %type-to-protoname{%p.key} = %p.value;
-    }   
+    }
 }
 sub InitTypeDims( @_ ) {
     for @_ -> %p {
 		%type-to-dims{%p.key} = %p.value;
 	}
 }
-sub InitOddTypes( @_ ) { 
+sub InitOddTypes( @_ ) {
     for @_ -> %p {
         %odd-type-by-name{%p.key} = %p.value;
-    }   
+    }
 }
 sub InitUnit( @_ , :$derived ) is export {
 	#eg. ['N',  'newton'],           'kg m / s^2',
@@ -615,8 +615,8 @@ sub InitUnit( @_ , :$derived ) is export {
 	#	   ^
 	#	   canonical name
 
-	if not preload {				
-		#load data map hashes only - instantiate Unit objects on demand 
+	if not preload {
+		#load data map hashes only - instantiate Unit objects on demand
 
 		#| iterate over each unit line
 		for @_ -> $names, $defn {
@@ -625,18 +625,18 @@ sub InitUnit( @_ , :$derived ) is export {
 			#| for each name (ie. synonym)
 			for |$names -> $singular {
 				if naive-plural( $singular ) -> $plural {
-					@synonyms.push: $plural; 
-				}   
+					@synonyms.push: $plural;
+				}
 			}
 			for @synonyms -> $name {
 				%defn-by-name{$name} = $defn;
 				%syns-by-name{$name} = @synonyms;
 			}
 			if $derived {
-				%affix-by-name{@synonyms[0]} = @synonyms[1]; 
+				%affix-by-name{@synonyms[0]} = @synonyms[1];
 			}
 		}
-	} else {						
+	} else {
 		#instantiate all Units right away (slow)
 		for @_ -> $names, $defn {
             Unit.new( defn => $defn, names => [|$names] );
@@ -650,7 +650,7 @@ sub InitUnit( @_ , :$derived ) is export {
 InitPrefix (
     #SI Prefixes
     #avoid 1e2 format to encourage Rats
-    'deka',    10, 
+    'deka',    10,
     'deca',    10,
     'hecto',   100,
     'kilo',    1000,
@@ -697,17 +697,17 @@ InitPrefixCode (
     y => 'yocto',
 );
 InitBaseUnit (
-    #SI Base Units 
+    #SI Base Units
 	#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
 	##FIXME revert to algorithmic plurals
     'Length'      => ['m', 'metre', 'meter',],
     'Mass'        => ['kg', 'kilogram',],
     'Time'        => ['s', 'sec', 'second',],
-    'Current'     => ['A', 'amp', 'ampere', 'ampère',],  
-    'Temperature' => ['K', 'kelvin',],   
+    'Current'     => ['A', 'amp', 'ampere', 'ampère',],
+    'Temperature' => ['K', 'kelvin',],
     'Substance'   => ['mol', 'mole',],
     'Luminosity'  => ['cd', 'candela', 'candle',],
-	'Angle'		  => ['radian',],		
+	'Angle'		  => ['radian',],
 );
 InitDerivedUnit (
 	#SI Derived Units with special names & symbols
@@ -734,7 +734,7 @@ InitDerivedUnit (
 	['kat', 'katal'],                       'mol s^-1',
 );
 InitAffixUnit;
-	#Load SI Prefix code / Unit combos to data map hashes for postfix operators 
+	#Load SI Prefix code / Unit combos to data map hashes for postfix operators
 InitTypes (
 	#sets name of prototype unit
     'Dimensionless'      => 'unity',
@@ -831,9 +831,9 @@ InitUnit (
 	['one', 'unity'],							'1',
 	['semi','demi','hemi'],						'1/2',
 	['%','percent'],							'1/100',
-	['ABV'],									'1',   
+	['ABV'],									'1',
 	#FIXME v2 try ['pi'], 'π', #extend Number regex
-	['pi'],										'3.1415926535897932385', 
+	['pi'],										'3.1415926535897932385',
 
 	# Angle
 	#FIXME v2 add grad
@@ -860,24 +860,24 @@ InitUnit (
 	['revolution'],                             '1',
 	['rpm'],                                    'revolutions per minute',
 
-	# Length 
-	['km'],				                        'kilometre', 
+	# Length
+	['km'],				                        'kilometre',
 	['μ', 'micron'],                            '1e-6 m',
 	['å', 'angstrom'],                          '1e-10 m',
 	['au', 'astronomical-unit'],                '1.49598e11 m',
 	['ly', 'light-year'],                       '9.46e15 m',
 	['parsec'],                                 '3.083e16 m',
-	['ft', 'foot', 'feet'],                     '0.3048 m',         
-	['in', 'inch'],                             'ft/12',           
-	['yard'],                                   '3 ft',            
-	['fathom'],                                 '2 yards',         
-	['rod', 'pole', 'perch'],                   '5.5 yards',       
-	['furlong'],                                '40 rods',         
-	['mile'],                                   '5280 ft',         
+	['ft', 'foot', 'feet'],                     '0.3048 m',
+	['in', 'inch'],                             'ft/12',
+	['yard'],                                   '3 ft',
+	['fathom'],                                 '2 yards',
+	['rod', 'pole', 'perch'],                   '5.5 yards',
+	['furlong'],                                '40 rods',
+	['mile'],                                   '5280 ft',
 	['nmile', 'nautical-mile'],                 '1852 m',
 	['ca', 'cable'],		                    '185.2 m',
-	['pica'],                                   'in/6',	#chosen defn not unique 
-	['point'],                                  'pica/12',         
+	['pica'],                                   'in/6',	#chosen defn not unique
+	['point'],                                  'pica/12',
 
 	# Area
 	['m^2', 'm2', 'm²'],                        'm^2',
@@ -888,7 +888,7 @@ InitUnit (
 
 	# Volume
 	['m^3', 'm3', 'm³'],                        'm^3',
-	['l', 'L', 'litre', 'liter'],               'm^3/1000',        
+	['l', 'L', 'litre', 'liter'],               'm^3/1000',
 	['cc'],		                                'cubic centimetre',
 	['bottle'],                                 '750 millilitre',
 	['fluidram'],                               '3.5516 millilitre',
@@ -928,27 +928,27 @@ InitUnit (
 
 	# Acceleration
 	['m/s^2'],                                  'm/s^2',
-	['g0', 'earth-gravity'],                    '9.80665 m/s^2',   
+	['g0', 'earth-gravity'],                    '9.80665 m/s^2',
 
 	# Mass
-	['g', 'gram', 'gm', 'gramme'],              'kg / 1000',       
+	['g', 'gram', 'gm', 'gramme'],              'kg / 1000',
 	['u', 'atomic-mass-unit'],                  '1.6605402e-27 kg',
-	['metric-ton', 'tonne'],                    '1000 kg',         
+	['metric-ton', 'tonne'],                    '1000 kg',
 	['grain'],                                  '0.0648 gm',
-	['lbm', 'pounds-mass'],                     '0.45359237 kg',   
-	['oz', 'ounce'],                            'lbm/16',          
-	['stone'],                                  '14 lbm',          
-	['hundredweight'],                          '100 lbm',        
-	['ton', 'short-ton'],                       '2000 lbm',       
-	['long-ton'],                               '2240 lbm',       
-	['slug'],                                   'lbm g0 s^2/ft',   
-	['dram'],                                   'ounce / 16',      
+	['lbm', 'pounds-mass'],                     '0.45359237 kg',
+	['oz', 'ounce'],                            'lbm/16',
+	['stone'],                                  '14 lbm',
+	['hundredweight'],                          '100 lbm',
+	['ton', 'short-ton'],                       '2000 lbm',
+	['long-ton'],                               '2240 lbm',
+	['slug'],                                   'lbm g0 s^2/ft',
+	['dram'],                                   'ounce / 16',
 	['troy-pound'],                             '0.373 kg',
 	['troy-ounce'],                             '31.103 gm',
 	['pennyweight'],                            '1.555 gm',
 	['scruple'],                                '1.296 gm',
 	['carat', 'karat'],                         '200 milligram',
-	['j-point'],                                '2 carat',        
+	['j-point'],                                '2 carat',
 
 	# Moment-of-Inertia
 	['kg m^2'],                                 'kg m^2',
@@ -961,11 +961,11 @@ InitUnit (
 	['kg m^2/s'],                               'kg m^2 / s',
 
 	# Force
-	['lb', 'lbs', 'pound', 'pound-force'],      'slug foot / s^2', 
+	['lb', 'lbs', 'pound', 'pound-force'],      'slug foot / s^2',
 	['ounce-force'],                            'pound-force / 16',
-	['dyne'],                                   'gm centimetre / s^2',     
-	['gram-force'],                             'gm g0',           
-	['kgf'],                                    'kilo gram-force', 
+	['dyne'],                                   'gm centimetre / s^2',
+	['gram-force'],                             'gm g0',
+	['kgf'],                                    'kilo gram-force',
 
 	# Torque
 	['Nm', 'newton-metre'],                     'N m',
@@ -979,11 +979,11 @@ InitUnit (
 	['bar'],                                    '1e5 pascal',
 	['torr'],                                   '133.322368 pascal',  #(101325 / 760)
 	['psi'],                                    'pounds per inch^2',
-	['atm', 'atmosphere'],                      '101325 pascal',            
+	['atm', 'atmosphere'],                      '101325 pascal',
 
 	# Density
 	['kg/m^3'],                                 'kg / m^3',
-	['°proof'],                                 '923 kg / m^3',       
+	['°proof'],                                 '923 kg / m^3',
 	#UK metric https://en.wikipedia.org/wiki/Alcohol_proof (US version is just 2x ABV)
 
 	# Energy
@@ -991,8 +991,8 @@ InitUnit (
 	['MeV'],                                    'mega electron-volt',
 	['GeV'],                                    'giga electron-volt',
 	['TeV'],                                    'tera electron-volt',
-	['cal', 'calorie'],                         '4.184 joules', 
-	['kcal'],                                   'kilocalories',  
+	['cal', 'calorie'],                         '4.184 joules',
+	['kcal'],                                   'kilocalories',
 	['btu', 'british-thermal-unit'],            '1055.056 joule',
 	['therm'],                                  '1.0e5 btu',
 	['erg'],                                    '1.0e-7 joule',
@@ -1020,7 +1020,7 @@ InitUnit (
 	['gauss'],                                  '1e-4 tesla',
 
 	# Temperature
-	['°R', 'Rankine'],                          '5/9 * K',    
+	['°R', 'Rankine'],                          '5/9 * K',
 	['°F', 'Fahrenheit'],                       '5/9 * K + 459.67',
 
 	# Dose
