@@ -57,21 +57,21 @@ class Unit is export {
     multi method type($t)   { $!type = $t.Str }
     multi method type(:$just1) {
 
-		#1 type has been explicitly set ... rarely used eg. to avoid ambiguous state
-        return $!type   if $!type;
+		  #1 type has been explicitly set ... rarely used eg. to avoid ambiguous state
+      return $!type   if $!type;
 
-		#2 we are a prefix
-        return 'prefix' if %prefix-by-name{self.name};
+		  #2 we are a prefix
+      return 'prefix' if %prefix-by-name{self.name};
 
-		#3 by looking up dims
-		my @d;
-		for %type-to-dims.keys -> $k {
-			push @d, $k if self.dims cmp %type-to-dims{$k} ~~ Same;
-		}
-		if @d == 0 { return '' }
-		if @d == 1 { return @d[0] }
-		if $just1  { return disambiguate(@d) }
-		if @d > 1  { return @d.sort }
+      #3 by looking up dims
+      my @d;
+      for %type-to-dims.keys -> $k {
+        push @d, $k if self.dims cmp %type-to-dims{$k} ~~ Same;
+      }
+      if @d == 0 { return '' }
+      if @d == 1 { return @d[0] }
+      if $just1  { return disambiguate(@d) }
+      if @d > 1  { return @d.sort }
     }
 
     ### new & clone methods ###
