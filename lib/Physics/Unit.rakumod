@@ -147,42 +147,41 @@ class Unit is export {
 
     ### behavioural methods ###
     method SetNames( @new-names ) {
+      if @new-names.so {
+        if %syns-by-name{@new-names[0]} -> @syns {
+          #predefined Unit, assign synonyms (incl. plurals)
+          @.names = @syns;
+        } else {
+          #user defined Unit, assign name(s) provided
+          @.names = @new-names;
+        }
+      } else {
+        #otherwise, just assign defn
+        @.names = [$.defn];
+      }
+      @.names.map( { %defn-by-name{$_} = self.defn } );
+      @.names.map( { %unit-by-name{$_} = self } );
 
-		if @new-names.so {
-			if %syns-by-name{@new-names[0]} -> @syns {
-				#predefined Unit, assign synonyms (incl. plurals)
-				@.names = @syns;
-			} else {
-				#user defined Unit, assign name(s) provided
-				@.names = @new-names;
-			}
-		} else {
-			#otherwise, just assign defn
-			@.names = [$.defn];
-		}
-		@.names.map( { %defn-by-name{$_} = self.defn } );
-		@.names.map( { %unit-by-name{$_} = self } );
-
-        say "SetNames: {@.names}" if $db;
+      say "SetNames: {@.names}" if $db;
     }
     method SetType( $t? ) {
-		for @.names -> $n {
-			#set up this Unit as a prototype
-			for %type-to-protoname -> %p {
-				if %p.value eq $n {
-					$!type = %p.key;
-					%type-to-prototype{$!type} = self;
-				}
-			}
-			#mop up any odd types
-			for %odd-type-by-name -> %p {
-				if %p.key eq $n {
-					$!type = %p.value;
-				}
-			}
-		}
+      for @.names -> $n {
+        #set up this Unit as a prototype
+        for %type-to-protoname -> %p {
+          if %p.value eq $n {
+            $!type = %p.key;
+            %type-to-prototype{$!type} = self;
+          }
+        }
+        #mop up any odd types
+        for %odd-type-by-name -> %p {
+          if %p.key eq $n {
+            $!type = %p.value;
+          }
+        }
+      }
 
-        say "SetType: $.type" if $db;
+      say "SetType: $.type" if $db;
     }
     method CheckChange {
         warn "You're not allowed to change named units!" if self.name;
@@ -328,7 +327,7 @@ sub GetUnit( $u ) is export {
 sub subst-shortest( Unit $u ) {
     #subtitutes shortest name if >1 unit name has same dimensions
     # ... so that eg. 'J' beats 'kg m^2 / s^2'
-	# ... requires eg. 'J' to be instantiated first
+    # ... requires eg. 'J' to be instantiated first
 
     my @same-dims;
     for %unit-by-name.kv -> $k,$v {
@@ -354,7 +353,7 @@ sub disambiguate( @t ) {
 sub naive-plural( $n ) {
     #naive plurals - append 's' ...
     unless $n.chars <= 2                #...too short
-        || $n.comb.first(:end) eq 's'	#...already ends with 's'
+        || $n.comb.first(:end) eq 's'	  #...already ends with 's'
         || $n.comb.first(:end) eq 'z'   #...already ends with 'z'
         || $n ~~ /<[\d\/^*]>/           #...contains a digit or a symbol
     {
