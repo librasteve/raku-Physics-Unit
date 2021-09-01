@@ -189,25 +189,25 @@ class Unit is export {
 
     ### mathematical mutating Module methods ###
     multi method times( Real $t ) {
-        self.factor: self.factor * $t;
-		return self
+      self.factor: self.factor * $t;
+      return self
     }
     multi method times( Unit $t ) {
-        self.factor: self.factor * $t.factor;
-        self.dims >>+=<< $t.dims;
-		self.dmix = ( self.dmix (+) $t.dmix ).MixHash;
-		self.type: '';
-        return self
+      self.factor: self.factor * $t.factor;
+      self.dims >>+=<< $t.dims;
+      self.dmix = ( self.dmix (+) $t.dmix ).MixHash;
+      self.type: '';
+      return self
     }
     method invert {
-        self.factor: 1 / self.factor;
-        self.dims = -<< self.dims;
-		self.dmix = ( ∅ (-) self.dmix ).MixHash;
-        return self
+      self.factor: 1 / self.factor;
+      self.dims = -<< self.dims;
+      self.dmix = ( ∅ (-) self.dmix ).MixHash;
+      return self
     }
     multi method share( Real $d ) {
-        self.factor: self.factor / $d;
-		return self
+      self.factor: self.factor / $d;
+      return self
     }
     multi method share( Unit $d ) {
         my $u = GetUnit($d).clone;
@@ -220,7 +220,7 @@ class Unit is export {
         self.dims >>*=>> $d;
 
 		my $e-can = %syns-by-name{$e}[0];		#lookup the canonical name
-		self.dmix{$e-can} = $d;
+		    self.dmix{$e-can} = $d;
         return self
     }
 
@@ -238,19 +238,19 @@ class Unit is export {
 
 	### Units part of Measure operations ###
     method multiply( Unit $r --> Unit ) {
-		my $l = self.clone;
-		my $x = $l.times( $r );
-		my $t = $x.type( :just1 );		#occasionally can be > one type
-		return GetPrototype( $t );
+      my $l = self.clone;
+      my $x = $l.times( $r );
+      my $t = $x.type( :just1 );		#occasionally can be > one type
+      return GetPrototype( $t );
     }
     method divide( Unit $r ) {
-		my $l = self.clone;
-		my $x = $l.share( $r );
-		my $t = $x.type( :just1 );		#occasionally can be > one type
+      my $l = self.clone;
+      my $x = $l.share( $r );
+      my $t = $x.type( :just1 );		#occasionally can be > one type
 		return GetPrototype( $t );
     }
 	method root-extract( Int $n where 1 <= $n <= 4 ) {
-        #only when all dims divisible by root
+    #only when all dims divisible by root
 		my $l = self.clone;
 		die "rebase failed" unless $l.factor == 1;
 		$l.defn: '';
