@@ -6,7 +6,7 @@ my $db = 0;               #debug
 ##### Constants and Data Maps ######
 
 constant \locale = "imp";	#Imperial="imp"; US="us' FIXME v2 make export tag (en_US, en_UK)
-constant \preload = 0;		#Preload All Units ie. for debug (precomp load 1.6s or ~60s)
+constant \preload = 0;		#Preload All Units ie. for debug (precomp load 1.6s otherwise ~60s)
 
 constant \NumBases = 8;
 my Str @BaseNames;			  #SI Base Unit names
@@ -36,64 +36,64 @@ my %pwr-superscript = (
 ######## Classes & Roles ########
 
 class Unit is export {
-    has Real $!factor = 1;
-    has Real $!offset = 0;				#ie. for K <=> °C
-    has Str  $!defn   = '';
-    has Str  $!type;
-    has Str  @.names  is rw = [];
-    has Int  @.dims   = 0 xx NumBases;
-    has MixHash $.dmix is rw = ∅.MixHash;
+  has Real $!factor = 1;
+  has Real $!offset = 0;				#ie. for K <=> °C
+  has Str  $!defn   = '';
+  has Str  $!type;
+  has Str  @.names  is rw = [];
+  has Int  @.dims   = 0 xx NumBases;
+  has MixHash $.dmix is rw = ∅.MixHash;
 
-    ### accessor methods ###		    #use 'self.attr: 42' not 'self.attr = 42'
-    multi method factor($f) { self.CheckChange; $!factor = $f }
-    multi method factor     { $!factor }
+  ### accessor methods ###		    #use 'self.attr: 42' not 'self.attr = 42'
+  multi method factor($f) { self.CheckChange; $!factor = $f }
+  multi method factor     { $!factor }
 
-    multi method offset($o) { self.CheckChange; $!offset = $o }
-    multi method offset     { $!offset }
+  multi method offset($o) { self.CheckChange; $!offset = $o }
+  multi method offset     { $!offset }
 
-    multi method defn($d)   { $!defn = $d.Str }
-    multi method defn       { $!defn }
+  multi method defn($d)   { $!defn = $d.Str }
+  multi method defn       { $!defn }
 
-    multi method type($t)   { $!type = $t.Str }
-    multi method type(:$just1) {
+  multi method type($t)   { $!type = $t.Str }
+  multi method type(:$just1) {
 
-		  #1 type has been explicitly set ... rarely used eg. to avoid ambiguous state
-      return $!type   if $!type;
+    #1 type has been explicitly set ... rarely used eg. to avoid ambiguous state
+    return $!type   if $!type;
 
-		  #2 we are a prefix
-      return 'prefix' if %prefix-by-name{self.name};
+    #2 we are a prefix
+    return 'prefix' if %prefix-by-name{self.name};
 
-      #3 by looking up dims
-      my @d;
-      for %type-to-dims.keys -> $k {
-        push @d, $k if self.dims cmp %type-to-dims{$k} ~~ Same;
-      }
-      if @d == 0 { return '' }
-      if @d == 1 { return @d[0] }
-      if $just1  { return disambiguate(@d) }
-      if @d > 1  { return @d.sort }
+    #3 by looking up dims
+    my @d;
+    for %type-to-dims.keys -> $k {
+      push @d, $k if self.dims cmp %type-to-dims{$k} ~~ Same;
     }
+    if @d == 0 { return '' }
+    if @d == 1 { return @d[0] }
+    if $just1  { return disambiguate(@d) }
+    if @d > 1  { return @d.sort }
+  }
 
-    ### new & clone methods ###
+  ### new & clone methods ###
 
-    #new by named arguments
-    multi method new( :$defn!, :@names ) {
-      my $n = CreateUnit( $defn );
-      $n.SetNames: @names;
-      $n.SetType();
-      return $n
-    }
+  #new by named arguments
+  multi method new( :$defn!, :@names ) {
+    my $n = CreateUnit( $defn );
+    $n.SetNames: @names;
+    $n.SetType();
+    return $n
+  }
 
-    #new by deep cloning an existing Unit
-    method clone {
-      nextwith :names([]), :type(''), :dims(@.dims.clone), :dmix($.dmix.clone)
-    }
-    multi method new( Unit:D $u: @names ) {
-      my $n = $u.clone;
-      $n.SetNames: @names;
-      $n.SetType();
-      return $n
-    }
+  #new by deep cloning an existing Unit
+  method clone {
+    nextwith :names([]), :type(''), :dims(@.dims.clone), :dmix($.dmix.clone)
+  }
+  multi method new( Unit:D $u: @names ) {
+    my $n = $u.clone;
+    $n.SetNames: @names;
+    $n.SetType();
+    return $n
+  }
 
 	#| Manually make NewType when no preset type, eg. m-1
 	method NewType( Str $type-name ) {
@@ -736,38 +736,38 @@ InitAffixUnit;
 	#Load SI Prefix code / Unit combos to data map hashes for postfix operators
 InitTypes (
 	#sets name of prototype unit
-    'Dimensionless'      => 'unity',
-    'Angle'              => 'radian',
-    'Angular-Speed'		   => 'radians per second',
-    'Solid-Angle'        => 'steradian',
-    'Frequency'          => 'hertz',
-    'Area'               => 'm^2',
-    'Volume'             => 'm^3',
-    'Speed'              => 'm/s',
-    'Acceleration'       => 'm/s^2',
-    'Momentum'           => 'kg m/s',
-    'Force'              => 'newton',
-    'Torque'             => 'Nm',
-    'Impulse'            => 'Ns',
-    'Moment-of-Inertia'  => 'kg m^2',
-    'Angular-Momentum'   => 'kg m^2/s',
-    'Pressure'           => 'pascal',
-    'Density'			       => 'kg/m^3',
-    'Energy'             => 'joule',
-    'Power'              => 'watt',
-    'Charge'             => 'coulomb',
-    'Potential'			     => 'volt',
-    'Resistance'         => 'ohm',
-    'Conductance'        => 'siemens',
-    'Capacitance'        => 'farad',
-    'Inductance'         => 'henry',
-    'Magnetic-Field'     => 'tesla',
-    'Magnetic-Flux'      => 'weber',
-    'Luminous-Flux'      => 'lumen',
-    'Illuminance'        => 'lux',
-    'Radioactivity'      => 'becquerel',
-    'Dose'               => 'gray',
-    'Catalytic-Activity' => 'kat',
+  'Dimensionless'      => 'unity',
+  'Angle'              => 'radian',
+  'Angular-Speed'		   => 'radians per second',
+  'Solid-Angle'        => 'steradian',
+  'Frequency'          => 'hertz',
+  'Area'               => 'm^2',
+  'Volume'             => 'm^3',
+  'Speed'              => 'm/s',
+  'Acceleration'       => 'm/s^2',
+  'Momentum'           => 'kg m/s',
+  'Force'              => 'newton',
+  'Torque'             => 'Nm',
+  'Impulse'            => 'Ns',
+  'Moment-of-Inertia'  => 'kg m^2',
+  'Angular-Momentum'   => 'kg m^2/s',
+  'Pressure'           => 'pascal',
+  'Density'			       => 'kg/m^3',
+  'Energy'             => 'joule',
+  'Power'              => 'watt',
+  'Charge'             => 'coulomb',
+  'Potential'			     => 'volt',
+  'Resistance'         => 'ohm',
+  'Conductance'        => 'siemens',
+  'Capacitance'        => 'farad',
+  'Inductance'         => 'henry',
+  'Magnetic-Field'     => 'tesla',
+  'Magnetic-Flux'      => 'weber',
+  'Luminous-Flux'      => 'lumen',
+  'Illuminance'        => 'lux',
+  'Radioactivity'      => 'becquerel',
+  'Dose'               => 'gray',
+  'Catalytic-Activity' => 'kat',
 );
 InitTypeDims (
 	#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
