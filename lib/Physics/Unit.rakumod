@@ -247,7 +247,7 @@ class Unit is export {
       my $l = self.clone;
       my $x = $l.share( $r );
       my $t = $x.type( :just1 );		#occasionally can be > one type
-		return GetPrototype( $t );
+		  return GetPrototype( $t );
     }
 	method root-extract( Int $n where 1 <= $n <= 4 ) {
     #only when all dims divisible by root
@@ -827,7 +827,7 @@ InitOddTypes (
 );
 InitUnit (
 	# Dimensionless
-	['①','(1)','one', 'unity'],							  '1',
+	['①','(1)','one','unity'],							  '1',  #U-2460 CIRCLED DIGIT ONE
 	['semi','demi','hemi'],						          '1/2',
 	['%','percent'],							              '1/100',
 	['ABV'],									                  '1',
