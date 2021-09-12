@@ -706,7 +706,7 @@ InitBaseUnit (
   'Temperature' => ['K', 'kelvin',],
   'Substance'   => ['mol', 'mole',],
   'Luminosity'  => ['cd', 'candela', 'candle',],
-	'Angle'		  => ['radian',],
+	'Angle'		    => ['radian',],
 );
 InitDerivedUnit (
 	#SI Derived Units with special names & symbols
@@ -730,7 +730,7 @@ InitDerivedUnit (
 	['Bq', 'becquerel'],                    '1 Hz',
 	['Gy', 'gray'],                         'J / kg',
 	['Sv', 'sievert'],                      'J / kg',
-	['kat', 'katal'],                       'mol s^-1',
+	['kat','katal'],                        'mol s^-1',
 );
 InitAffixUnit;
 	#Load SI Prefix code / Unit combos to data map hashes for postfix operators
@@ -827,7 +827,7 @@ InitOddTypes (
 );
 InitUnit (
 	# Dimensionless
-	['one', 'unity'],							              '1',
+	['①','(1)','one', 'unity'],							  '1',
 	['semi','demi','hemi'],						          '1/2',
 	['%','percent'],							              '1/100',
 	['ABV'],									                  '1',
