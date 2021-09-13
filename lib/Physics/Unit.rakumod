@@ -417,86 +417,86 @@ sub CreateUnit( $defn is copy ) {
     class UnitActions   {
 		##say "in xxx...", $/.made;  #<== handy debug line, paste just after make
 
-		#| assemble result with math operations from numerator and denominator (&offset)
-		method TOP($/)			{
-			my $nu = $<numerator>.made;
-			my $de = $<denominator>.made;
-			my $os = $<offset>.made;
-			$nu.share($de) if $de;
-			$nu.offset: +$os if $os;
-			make $nu;
-		}
+      #| assemble result with math operations from numerator and denominator (&offset)
+      method TOP($/)			{
+        my $nu = $<numerator>.made;
+        my $de = $<denominator>.made;
+        my $os = $<offset>.made;
+        $nu.share($de) if $de;
+        $nu.offset: +$os if $os;
+        make $nu;
+      }
 
-		#| accumulates element Units using times
-		method compound($/)		{
-			my $acc = Unit.new;
-			for $<element>>>.made -> $x {
-				$acc.times($x);
-			}
-			make $acc;
-		}
+      #| accumulates element Units using times
+      method compound($/)		{
+        my $acc = Unit.new;
+        for $<element>>>.made -> $x {
+          $acc.times($x);
+        }
+        make $acc;
+      }
 
-		#| makes a list of element units (either factor or prefix-name-power)
-		method element($/)		{
-			my ( $unit, $defn, $pwr );
+      #| makes a list of element units (either factor or prefix-name-power)
+      method element($/)		{
+        my ( $unit, $defn, $pwr );
 
-			if $unit = $<factor>.made {
-				make $unit;
-			} else {
-				$unit = $<pnp-before><prefix-name>.made<unit> ||
-						$<pnp-after><prefix-name>.made<unit>;
-				$defn = $<pnp-before><prefix-name>.made<defn> ||
-						$<pnp-after><prefix-name>.made<defn>;
-				$pwr  = $<pnp-before><pwr-before>.made ||
-						$<pnp-after>.made || 1;
-				make $unit.raise($pwr, $defn);
-			}
-		}
+        if $unit = $<factor>.made {
+          make $unit;
+        } else {
+          $unit = $<pnp-before><prefix-name>.made<unit> ||
+              $<pnp-after><prefix-name>.made<unit>;
+          $defn = $<pnp-before><prefix-name>.made<defn> ||
+              $<pnp-after><prefix-name>.made<defn>;
+          $pwr  = $<pnp-before><pwr-before>.made ||
+              $<pnp-after>.made || 1;
+          make $unit.raise($pwr, $defn);
+        }
+      }
 
-		#| handle factor and offset matches
-        method factor($/)		{
-			make Unit.new.times($/.Real);
-		}
-		method offset($/) {
-			make $<number>;
-		}
+      #| handle factor and offset matches
+          method factor($/)		{
+        make Unit.new.times($/.Real);
+      }
+      method offset($/) {
+        make $<number>;
+      }
 
-		#| make both unit and defn from prefix-name matches
-    method prefix-name($/)	{
-			my $unit = $<name>.made<unit>;
-			my $defn = $<name>.made<defn>;
-			my $pfix = $<prefix>.made<unit>;
-			$unit.times($pfix) if $pfix;
-			make %( defn => $defn, unit => $unit );
-		}
-    method prefix($/)		{
-			make %( unit => GetUnit($/.Str).clone );
-		}
-    method name($/)			{
-			my $defn=$/.Str;
-			my $unit=GetUnit($defn).clone;
-			$unit.dmix=∅.MixHash;
-			make %( defn => $defn, unit => $unit );
-		}
+      #| make both unit and defn from prefix-name matches
+      method prefix-name($/)	{
+        my $unit = $<name>.made<unit>;
+        my $defn = $<name>.made<defn>;
+        my $pfix = $<prefix>.made<unit>;
+        $unit.times($pfix) if $pfix;
+        make %( defn => $defn, unit => $unit );
+      }
+      method prefix($/)		{
+        make %( unit => GetUnit($/.Str).clone );
+      }
+      method name($/)			{
+        my $defn=$/.Str;
+        my $unit=GetUnit($defn).clone;
+        $unit.dmix=∅.MixHash;
+        make %( defn => $defn, unit => $unit );
+      }
 
-		#| extract (signed) power digits from various grammar options
-    method pwr-before($/)	{
-			make %pwr-preword{$/.Str};
-		}
-		method pnp-after($/)	{
-			make $<pwr-after><pwr-postwd>.made ||
-       $<pwr-after><pwr-supers>.made ||
-       $<pwr-after><pwr-normal>.made;
-		}
-    method pwr-postwd($/)	{
-			make %pwr-postword{$/.Str}.Int;
-		}
-    method pwr-supers($/)	{
-			make %pwr-superscript{$/.Str}.Int;
-		}
-    method pwr-normal($/)	{
-			make $<pwr-digits>.Int;
-		}
+      #| extract (signed) power digits from various grammar options
+      method pwr-before($/)	{
+        make %pwr-preword{$/.Str};
+      }
+      method pnp-after($/)	{
+        make $<pwr-after><pwr-postwd>.made ||
+         $<pwr-after><pwr-supers>.made ||
+         $<pwr-after><pwr-normal>.made;
+      }
+      method pwr-postwd($/)	{
+        make %pwr-postword{$/.Str}.Int;
+      }
+      method pwr-supers($/)	{
+        make %pwr-superscript{$/.Str}.Int;
+      }
+      method pwr-normal($/)	{
+        make $<pwr-digits>.Int;
+      }
     }
 
     my $match = UnitGrammar.parse( $defn, :actions(UnitActions) );

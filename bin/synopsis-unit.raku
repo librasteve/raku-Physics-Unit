@@ -1,10 +1,10 @@
-#!/usr/bin/env raku 
+#!/usr/bin/env raku
 use lib '../lib';
 use Physics::Unit;
 
 #SYNOPSIS
 
-# Define your own unit named "ff" 
+# Define your own unit named "ff"
 my $ff = Unit.new( defn => 'furlong / fortnight', names => ['ff'] );
 say "$ff";						# 'ff' ... string context gives unit name
 say $ff.type;					# Speed inferred from defn
@@ -21,10 +21,10 @@ my $fh = $ff.new( <fh fi> );
 # Flexible unit expression (here using the newly defined Unit 'ff'):
 my $gonzo = Unit.new( defn => "13 square millimeters per ff", names => ['gonzo'] );
 
-# Parsing of input  
+# Parsing of input
 my $u1 = GetUnit( 'J' );
 my $u2 = GetUnit( 'kg m^2 / s^2' );
-my $u3 = GetUnit( 'kg m^2/s^2' ); 
+my $u3 = GetUnit( 'kg m^2/s^2' );
 say ~$u3;
 say "compare $u1, $u2... " ~ $u2.same-dims($u1);
 
@@ -37,18 +37,18 @@ a. Definition can be shared with several unit names - thus J and Nm can remain d
 b. GetUnit first tries name match, then calls CreateUnit to try definition match
 c. Matching names is exact; definitions is loose
 d. Defn matches dimension Mix (shallow) - thus 'kg m^2 / s^2' and 'N m' do remain distinct
-e. Long strings (eg. 'kg m^2/s^2') auto reduce to SI derived units (eg. 'J') [if Unit already instaniated] 
+e. Long strings (eg. 'kg m^2/s^2') auto reduce to SI derived units (eg. 'J') [if Unit already instaniated]
 f. Override with Unit.new(defn=>'kg m^2/s^2', names=>['kg m^2/s^2']);
- 
+
 Behaviours
-GetUnit('J');           #stock unit name=>'J'.., type=>Energy, defn=>'kg m^2 / s^2' 
-GetUnit('kg m^2/s^2');  #same  unit name=>'J'.., type=>Energy, defn=>'kg m^2 / s^2' 
-GetUnit('kg m^2 / s^2');#same  unit name=>'J'.., type=>Energy, defn=>'kg m^2 / s^2' 
+GetUnit('J');           #stock unit name=>'J'.., type=>Energy, defn=>'kg m^2 / s^2'
+GetUnit('kg m^2/s^2');  #same  unit name=>'J'.., type=>Energy, defn=>'kg m^2 / s^2'
+GetUnit('kg m^2 / s^2');#same  unit name=>'J'.., type=>Energy, defn=>'kg m^2 / s^2'
 GetUnit('Nm');          #stock unit name=>'Nm',  type=>Torque, defn=>'N m'
 GetUnit('N m');         #same  unit name=>'Nm',  type=>Torque, defn=>'N m'
     Unit.new(defn=>'kg m^2/s^2', names=>['kg m^2/s^2']);
 GetUnit('kg m^2/s^2');  #new unit name=>''kg m^2/s^2', type=>Energy,Torque, defn=>'kg m^2/s^2'
-    .type('Energy');    #This establishes the type=>Energy once and for all 
+    .type('Energy');    #This establishes the type=>Energy once and for all
 GetUnit('kg m^2/s^2');  #same unit name=>'kg m^2/s^2', type=>Energy, defn='kg m^2/s^2'
 #]]
 
