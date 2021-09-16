@@ -150,10 +150,10 @@ class Unit is export {
   method SetNames( @new-names ) {
     if @new-names.so {
       if %syns-by-name{@new-names[0]} -> @syns {
-        #predefined Unit, assign synonyms (incl. plurals)
+        #predefined Unit, assign synonyms
         @.names = @syns;
       } else {
-        #user defined Unit, assign name(s) provided
+        #user defined Unit, assign names provided
         @.names = @new-names;
       }
     } else {
@@ -163,7 +163,6 @@ class Unit is export {
           @.names = @$v;
         }
       }
-
       #otherwise, just assign defn
       @.names = [$.defn] unless @.names;
     }
