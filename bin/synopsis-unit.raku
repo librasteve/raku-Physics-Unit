@@ -28,7 +28,7 @@ my $u3 = GetUnit( 'kg m^2/s^2' );
 say ~$u3;
 say "compare $u1, $u2... " ~ $u2.same-dims($u1);
 
-put ListUnits().sort;
+say ListUnits().sort;
 
 #`[[
 ##### Principles & Behaviours ######

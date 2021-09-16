@@ -15,9 +15,10 @@ my %prefix-by-name;       #name => Prefix object
 my %prefix-by-code;       #code => Prefix name
 my %prefix-to-factor;     #name => Prefix factor
 my %defn-by-name;         #name => defn Str of known names incl. affix (values may be dupes)
-my %syns-by-name; 	      #name => list of synonyms (predefined Units only, incl. plurals)
-my %unit-by-name;         #name => Unit object (when instantiated)
-my %affix-by-name;			  #name => extended affix defn (eg. cm => 'centim')
+my %syns-by-name; 	      #name => list of synonyms (excl. user defined, incl. plurals)
+my %unit-by-name;         #name => Unit object cache (when instantiated)
+my %affix-by-name;			  #name => extended affix defn (eg. cm => 'centimetre') to decongest Grammar namespace
+my %affix-syns-by-name;   #name => list of synonyms for every affix [n, nano] X~ [m, metre, meter, metres, meters]
 my %type-to-protoname;    #type => prototype name
 my %type-to-prototype;    #type => prototype Unit object (when instantiated)
 my %type-to-dims;			    #type => dims vector
@@ -104,132 +105,139 @@ class Unit is export {
 		%type-to-dims{$type-name} = self.dims;
 	}
 
-    ### output methods ###
-    method Str { self.name }
+  ### output methods ###
+  method Str { self.name }
 
-    multi method name()         { @!names[0] || '' }
-    multi method name( Str $n ) { self.SetNames([$n]) }
+  multi method name()         { @!names[0] || '' }
+  multi method name( Str $n ) { self.SetNames([$n]) }
 
-    method canonical {
-		#reset to SI base names
-      my ( $ds, @dim-str );
-      for 0 ..^ NumBases -> $i {
-        given @.dims[$i] {
+  method canonical {
+  #reset to SI base names
+    my ( $ds, @dim-str );
+    for 0 ..^ NumBases -> $i {
+      given @.dims[$i] {
+        when 0  { $ds = '' }
+        when 1  { $ds = "@BaseNames[$i]" }
+        default { $ds = "@BaseNames[$i]$_" }
+      }
+      @dim-str.push: $ds if $ds;
+    }
+    return @dim-str.join('.')
+  }
+  method pretty {
+  #following SI recommendation
+    my %pwr-sup-rev = %pwr-superscript.kv.reverse;
+    my ( $ds, @dim-str );
+    for 0 ..^ NumBases -> $i {
+      given @.dims[$i] {
           when 0  { $ds = '' }
           when 1  { $ds = "@BaseNames[$i]" }
-          default { $ds = "@BaseNames[$i]$_" }
-        }
-        @dim-str.push: $ds if $ds;
+          default { $ds = "@BaseNames[$i]%pwr-sup-rev{$_}" }
       }
-      return @dim-str.join('.')
+      @dim-str.push: $ds if $ds;
     }
-    method pretty {
-		#following SI recommendation
-      my %pwr-sup-rev = %pwr-superscript.kv.reverse;
-      my ( $ds, @dim-str );
-      for 0 ..^ NumBases -> $i {
-        given @.dims[$i] {
-            when 0  { $ds = '' }
-            when 1  { $ds = "@BaseNames[$i]" }
-            default { $ds = "@BaseNames[$i]%pwr-sup-rev{$_}" }
-        }
-        @dim-str.push: $ds if $ds;
-      }
-      return @dim-str.join('⋅')
-    }
-    method raku {
-		my $t-str = self.type;
-      return qq:to/END/;
-        Unit.new( factor => $.factor, offset => $.offset, defn => '$.defn', type => $t-str,
-		    dims => [{@.dims.join(',')}], dmix => {$.dmix.raku}, names => [{@.names.map( ->$n {"'$n'"}).join(',')}] );
-      END
-    }
+    return @dim-str.join('⋅')
+  }
+  method raku {
+  my $t-str = self.type;
+    return qq:to/END/;
+      Unit.new( factor => $.factor, offset => $.offset, defn => '$.defn', type => $t-str,
+      dims => [{@.dims.join(',')}], dmix => {$.dmix.raku}, names => [{@.names.map( ->$n {"'$n'"}).join(',')}] );
+    END
+  }
 
-    ### behavioural methods ###
-    method SetNames( @new-names ) {
-      if @new-names.so {
-        if %syns-by-name{@new-names[0]} -> @syns {
-          #predefined Unit, assign synonyms (incl. plurals)
-          @.names = @syns;
-        } else {
-          #user defined Unit, assign name(s) provided
-          @.names = @new-names;
-        }
+  ### behavioural methods ###
+  method SetNames( @new-names ) {
+    if @new-names.so {
+      if %syns-by-name{@new-names[0]} -> @syns {
+        #predefined Unit, assign synonyms (incl. plurals)
+        @.names = @syns;
       } else {
-        #otherwise, just assign defn
-        @.names = [$.defn];
+        #user defined Unit, assign name(s) provided
+        @.names = @new-names;
       }
-      @.names.map( { %defn-by-name{$_} = self.defn } );
-      @.names.map( { %unit-by-name{$_} = self } );
-
-      say "SetNames: {@.names}" if $db;
-    }
-    method SetType( $t? ) {
-      for @.names -> $n {
-        #set up this Unit as a prototype
-        for %type-to-protoname -> %p {
-          if %p.value eq $n {
-            $!type = %p.key;
-            %type-to-prototype{$!type} = self;
-          }
-        }
-        #mop up any odd types
-        for %odd-type-by-name -> %p {
-          if %p.key eq $n {
-            $!type = %p.value;
-          }
+    } else {
+      #lookup defn in the affix synonyms
+      for %affix-syns-by-name.kv -> $k, $v {
+        if $v.grep($.defn) {
+          @.names = @$v;
         }
       }
 
-      say "SetType: $.type" if $db;
+      #otherwise, just assign defn
+      @.names = [$.defn] unless @.names;
     }
-    method CheckChange {
-        warn "You're not allowed to change named units!" if self.name;
+    @.names.map( { %defn-by-name{$_} = self.defn } );
+    @.names.map( { %unit-by-name{$_} = self } );
+
+    say "SetNames: {@.names}" if $db;
+  }
+  method SetType( $t? ) {
+    for @.names -> $n {
+      #set up this Unit as a prototype
+      for %type-to-protoname -> %p {
+        if %p.value eq $n {
+          $!type = %p.key;
+          %type-to-prototype{$!type} = self;
+        }
+      }
+      #mop up any odd types
+      for %odd-type-by-name -> %p {
+        if %p.key eq $n {
+          $!type = %p.value;
+        }
+      }
     }
 
-    ### mathematical mutating Module methods ###
-    multi method times( Real $t ) {
-      self.factor: self.factor * $t;
-      return self
-    }
-    multi method times( Unit $t ) {
-      self.factor: self.factor * $t.factor;
-      self.dims >>+=<< $t.dims;
-      self.dmix = ( self.dmix (+) $t.dmix ).MixHash;
-      self.type: '';
-      return self
-    }
-    method invert {
-      self.factor: 1 / self.factor;
-      self.dims = -<< self.dims;
-      self.dmix = ( ∅ (-) self.dmix ).MixHash;
-      return self
-    }
-    multi method share( Real $d ) {
-      self.factor: self.factor / $d;
-      return self
-    }
-    multi method share( Unit $d ) {
-      my $u = GetUnit($d).clone;
-      self.times: $u.invert;
-      return self
-    }
-    method raise( $d, $e ) {
-		#raise a one-element unit ($e) to power of $d digits
-      self.factor: self.factor ** $d;
-      self.dims >>*=>> $d;
+    say "SetType: $.type" if $db;
+  }
+  method CheckChange {
+      warn "You're not allowed to change named units!" if self.name;
+  }
 
-		my $e-can = %syns-by-name{$e}[0];		#lookup the canonical name
-      self.dmix{$e-can} = $d;
-      return self
-    }
+  ### mathematical mutating Module methods ###
+  multi method times( Real $t ) {
+    self.factor: self.factor * $t;
+    return self
+  }
+  multi method times( Unit $t ) {
+    self.factor: self.factor * $t.factor;
+    self.dims >>+=<< $t.dims;
+    self.dmix = ( self.dmix (+) $t.dmix ).MixHash;
+    self.type: '';
+    return self
+  }
+  method invert {
+    self.factor: 1 / self.factor;
+    self.dims = -<< self.dims;
+    self.dmix = ( ∅ (-) self.dmix ).MixHash;
+    return self
+  }
+  multi method share( Real $d ) {
+    self.factor: self.factor / $d;
+    return self
+  }
+  multi method share( Unit $d ) {
+    my $u = GetUnit($d).clone;
+    self.times: $u.invert;
+    return self
+  }
+  method raise( $d, $e ) {
+  #raise a one-element unit ($e) to power of $d digits
+    self.factor: self.factor ** $d;
+    self.dims >>*=>> $d;
 
-	#### convert & compare methods ####
-    method same-dims( Unit $u ) {
-      return 0 unless $u.dmix eqv self.dmix;
-      return 0 unless $u.factor == self.factor;
-      return 1
-    }
+  my $e-can = %syns-by-name{$e}[0];		#lookup the canonical name
+    self.dmix{$e-can} = $d;
+    return self
+  }
+
+#### convert & compare methods ####
+  method same-dims( Unit $u ) {
+    return 0 unless $u.dmix eqv self.dmix;
+    return 0 unless $u.factor == self.factor;
+    return 1
+  }
 	method same-unit( Unit $u ) {
 		return 0 unless $u.dims eqv self.dims;
       return 0 unless $u.factor == self.factor;
@@ -275,8 +283,14 @@ sub ListBases is export {
 sub GetPrefixToFactor is export {
 	return %prefix-to-factor;
 }
+sub GetSynsByName is export {
+  return %syns-by-name;
+}
 sub GetAffixByName is export {
 	return %affix-by-name;
+}
+sub GetAffixSynsByName is export {
+  return %affix-syns-by-name;
 }
 sub GetPrototype( Str $type ) is export {
 	if my $pt = %type-to-prototype{$type} {
@@ -289,7 +303,7 @@ sub GetPrototype( Str $type ) is export {
 }
 sub GetUnit( $u ) is export {
 
-  #1 if Unit, eg. from Measure.new( ... unit => $u ), just return i
+  #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
   say "GU1 from $u" if $db;
   if $u ~~ Unit {
     return $u
@@ -315,7 +329,7 @@ sub GetUnit( $u ) is export {
     }
   }
 
-  #4 if no match, instantiate from definition
+  #4 if no match, instantiate new Unit object from definition
   say "GU4 from $u" if $db;
 
   my $nuo = Unit.new( defn => $u );
@@ -454,7 +468,7 @@ sub CreateUnit( $defn is copy ) {
       }
 
       #| handle factor and offset matches
-          method factor($/)		{
+      method factor($/)		{
         make Unit.new.times($/.Real);
       }
       method offset($/) {
@@ -485,8 +499,8 @@ sub CreateUnit( $defn is copy ) {
       }
       method pnp-after($/)	{
         make $<pwr-after><pwr-postwd>.made ||
-         $<pwr-after><pwr-supers>.made ||
-         $<pwr-after><pwr-normal>.made;
+             $<pwr-after><pwr-supers>.made ||
+             $<pwr-after><pwr-normal>.made;
       }
       method pwr-postwd($/)	{
         make %pwr-postword{$/.Str}.Int;
@@ -502,10 +516,11 @@ sub CreateUnit( $defn is copy ) {
     my $match = UnitGrammar.parse( $defn, :actions(UnitActions) );
 
     if $match.so {
-		say "Made: $match\t= ", $match.made if $db;
-		my $mu = $match.made;
-      $mu.defn: $defn;
-      return $mu;
+		  say "Made: $match\t= ", $match.made if $db;
+
+		  my $made-unit = $match.made;
+      $made-unit.defn: $defn;
+      return $made-unit;
     } else {
       die "Couldn't parse defn Str $defn";
     }
@@ -560,6 +575,7 @@ sub InitBaseUnit( @_ ) {
 
     @BaseNames.push: $u.name;
     %affix-by-name{$u.name} = @synonyms[1];			#extended name as value
+    %affix-syns-by-name{$u.name} = @synonyms;   #all synonyms as value
 
     say "Initialized Base Unit $names[0]" if $db;
   }
@@ -569,27 +585,44 @@ sub InitDerivedUnit( @_ ) {
 }
 sub InitAffixUnit {
 	# so far %affix-by-name has been initialized with base and derived unit names
-	#replace kg with g
+
+	# replace kg with g
 	%affix-by-name<kg>:delete;
+  %affix-syns-by-name<kg>:delete;
 	%affix-by-name<g> = 'gram';
+  %affix-syns-by-name<g> = <g gram grams gramme grammes>;
 
-	#delete non-declining singletons
-	%affix-by-name<°>:delete;
+	# delete non-declining singletons
+	#%affix-by-name<°>:delete;   (Angle does not make it to %affix-by-name)
 	%affix-by-name<°C>:delete;
+	%affix-syns-by-name<°C>:delete;
 	%affix-by-name<radian>:delete;
+	%affix-syns-by-name<radian>:delete;
 	%affix-by-name<steradian>:delete;
+	%affix-syns-by-name<steradian>:delete;
 
-	#pour in 'l' ie. ml, cl, etc quite common
+	# pour in 'l' ie. ml, cl, etc quite common
 	%affix-by-name<l> = 'litre';
+	%affix-syns-by-name<l> = <l L litre litres liter liters>;
 
+  # now %affix0by-name has the right simple-names
+  # so now can copy these across and us them to spin up all the combos
 	my %simple-names = %affix-by-name;
-	for %simple-names.keys -> $n {
-		#delete simple names from data map (these are real Units, no need to substitute)
 
-		for %prefix-by-code.keys -> $c {
-			#add combo keys and values, then extend both codes & names
-			my $combo = $c ~ $n;
-			%affix-by-name{$combo} = %prefix-by-code{$c} ~ %simple-names{$n};
+	for %simple-names.keys -> $n {
+		for %prefix-by-code.kv -> $c, $p {
+
+			# combine short keys and values, then extend both codes & names to decongest namespace
+			my $combo = $c ~ $n;                                                #eg. 'ml' (used by custom Postfix op)
+			%affix-by-name{$combo} = %prefix-by-code{$c} ~ %simple-names{$n};   #eg. 'millilitres' (used by Grammar)
+
+      # set up synonym list for population of Unit object name
+      my $syns = %affix-syns-by-name{$n};
+      $syns = [ $p X~ @$syns ];   # using @$ to prevent ~ from stringifying the whole array
+      $syns.shift;                # drop eg. 'millil'
+      $syns.unshift: $combo;      # insert eg. 'ml'
+
+      %affix-syns-by-name{$combo} = $syns;
 		}
 	}
 }
@@ -610,9 +643,9 @@ sub InitOddTypes( @_ ) {
 }
 sub InitUnit( @_ , :$derived ) is export {
 	#eg. ['N',  'newton'],           'kg m / s^2',
-	#      ^ ,   ^^^^^^ synonyms      ^^^^^^^^^^ defn
-	#	   ^
-	#	   canonical name
+	#      |     ^^^^^^ synonyms      ^^^^^^^^^^ defn
+	#	     |
+	#	     > canonical name
 
 	if not preload {
 		#load data map hashes only - instantiate Unit objects on demand
@@ -633,6 +666,7 @@ sub InitUnit( @_ , :$derived ) is export {
 			}
 			if $derived {
 				%affix-by-name{@synonyms[0]} = @synonyms[1];
+        %affix-syns-by-name{@synonyms[0]} = @synonyms;
 			}
 		}
 	} else {
