@@ -14,7 +14,7 @@
   "build-depends": [],
   "test-depends": [],
   "provides": {
-    "Physics::Unit": "lib/Physics/Unit.rakumod"
+    "Physics::Unit": "lib/Physics/Unit.pm6"
   },
   "resources": [],
   "license": "Artistic-2.0",
