@@ -591,14 +591,15 @@ sub InitAffixUnit {
 	%affix-by-name<g> = 'gram';
   %affix-syns-by-name<g> = <g gram grams gramme grammes>;
 
-	# delete non-declining singletons
+	# delete non-declining singletons from %affix-by-name so that they do not generate unwanted postfixes
+  # leave them in %affix-syns-by-name as we will want the syns for the singletons in do-postfix
 	#%affix-by-name<°>:delete;   (Angle does not make it to %affix-by-name)
 	%affix-by-name<°C>:delete;
-	%affix-syns-by-name<°C>:delete;
 	%affix-by-name<radian>:delete;
-	%affix-syns-by-name<radian>:delete;
 	%affix-by-name<steradian>:delete;
-	%affix-syns-by-name<steradian>:delete;
+
+  # Angle does not make it to %affix-syns-by-name ?!
+  %affix-syns-by-name<°> = <° degree degrees deg degs º>;
 
 	# pour in 'l' ie. ml, cl, etc quite common
 	%affix-by-name<l> = 'litre';
