@@ -605,7 +605,7 @@ sub InitAffixUnit {
 	%affix-by-name<l> = 'litre';
 	%affix-syns-by-name<l> = <l L litre litres liter liters>;
 
-  # now %affix0by-name has the right simple-names
+  # now %affix-by-name has the right simple-names
   # so now can copy these across and us them to spin up all the combos
 	my %simple-names = %affix-by-name;
 
