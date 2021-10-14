@@ -702,8 +702,8 @@ InitPrefix (
   'pico',    0.000000000001,
   'femto',   0.000000000000001,
   'atto',    0.000000000000000001,
-  'zepto',   0.000000000000000000001,
-  'yocto',   0.000000000000000000000001,
+  'zepto',   1e-21,
+  'yocto',   1e-24,
 );
 InitPrefixCode (
   #SI Prefix code
