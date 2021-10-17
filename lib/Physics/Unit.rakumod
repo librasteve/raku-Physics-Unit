@@ -106,7 +106,8 @@ class Unit is export {
 	}
 
   ### output methods ###
-  method Str { self.name }
+  method Str  { self.name }
+  method gist { self.Str }
 
   multi method name()         { @!names[0] || '' }
   multi method name( Str $n ) { self.SetNames([$n]) }
@@ -824,7 +825,7 @@ InitTypeDims (
 	'Acceleration'		  => (1,0,-2,0,0,0,0,0),
 	'Momentum'			    => (1,1,-1,0,0,0,0,0),
 	'Force'				      => (1,1,-2,0,0,0,0,0),
-	'Torque'			      => (2,1,-1,0,0,0,0,0),
+	'Torque'			      => (2,1,-2,0,0,0,0,0),
 	'Impulse'			      => (1,1,-1,0,0,0,0,0),
 	'Moment-of-Inertia'	=> (2,1,0,0,0,0,0,0),
 	'Angular-Momentum'	=> (2,1,-1,0,0,0,0,0),
