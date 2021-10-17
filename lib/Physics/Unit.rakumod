@@ -312,8 +312,8 @@ sub GetUnit( $u ) is export {
   #2 if name or prefix already instantiated
   say "GU2 from $u" if $db;
 
-  return %unit-by-name{$u} if %unit-by-name{$u}.defined;
-  return %unit-by-prefix{$u} if %unit-by-prefix{$u}.defined;
+  return %unit-by-name{$u}   if %unit-by-name{$u}.defined;
+  return %prefix-by-name{$u} if %prefix-by-name{$u}.defined;
 
   #3 if name in our defns, instantiate it
   say "GU3 from $u" if $db;
