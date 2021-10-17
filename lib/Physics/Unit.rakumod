@@ -312,12 +312,8 @@ sub GetUnit( $u ) is export {
   #2 if name or prefix already instantiated
   say "GU2 from $u" if $db;
 
-  for %unit-by-name.kv   -> $k,$v {
-    return $v if $k eq $u
-  }
-  for %prefix-by-name.kv -> $k,$v {
-    return $v if $k eq $u
-  }
+  return %unit-by-name{$u} if %unit-by-name{$u}.defined;
+  return %unit-by-prefix{$u} if %unit-by-prefix{$u}.defined;
 
   #3 if name in our defns, instantiate it
   say "GU3 from $u" if $db;
