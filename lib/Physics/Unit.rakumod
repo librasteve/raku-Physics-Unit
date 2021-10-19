@@ -393,7 +393,7 @@ sub CreateUnit( $defn is copy ) {
     $unit-names       ~~ s:g/ ( <-[a..z A..Z 0..9 \|]> ) / '$0' /;
     $pwr-superscripts ~~ s:g/ ( <-[a..z A..Z 0..9 \|]> ) / '$0' /;
 
-    ##use Grammar::Tracer;
+    use Grammar::Tracer;
     grammar UnitGrammar {
       token TOP         { ^  \s* <numerator=.compound>
                             [\s* <divider> \s* <denominator=.compound>]?
@@ -892,6 +892,7 @@ InitUnit (
 
 	# Length
 	['km'],				                              'kilometre',
+	['fm'],				                              'femtometre',
 	['μ', 'micron'],                            '1e-6 m',
 	['å', 'angstrom'],                          '1e-10 m',
 	['au', 'astronomical-unit'],                '1.49598e11 m',
