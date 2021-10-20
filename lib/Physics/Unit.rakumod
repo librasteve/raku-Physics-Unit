@@ -858,7 +858,7 @@ InitOddTypes (
 );
 InitUnit (
 	# Dimensionless
-	['①','(1)','one','unity'],							  '1',  #U-2460 CIRCLED DIGIT ONE
+	['①','(1)','one','unity'],							    '1',  #U-2460 CIRCLED DIGIT ONE
 	['semi','demi','hemi'],						          '1/2',
 	['%','percent'],							              '1/100',
 	['ABV'],									                  '1',
@@ -892,7 +892,7 @@ InitUnit (
 
 	# Length
 	['km'],				                              'kilometre',
-	['fm'],				                              'femtometre',
+	['fm'],				                              'femtometre',   #for 'MeV.fm'
 	['μ', 'micron'],                            '1e-6 m',
 	['å', 'angstrom'],                          '1e-10 m',
 	['au', 'astronomical-unit'],                '1.49598e11 m',
@@ -1028,6 +1028,7 @@ InitUnit (
 	['therm'],                                  '1.0e5 btu',
 	['erg'],                                    '1.0e-7 joule',
 	['kWh'],                                    'kilowatt hour',
+	['Eₕ', 'E_h', 'Ha'],                        '4.3597447222071e-18 joule',    #Hartree energy
 
 	# Power
 	['us-horsepower', 'us-hp'],                 '550 foot pound-force / s',
@@ -1057,6 +1058,10 @@ InitUnit (
 	# Dose
 	['rad'],									                  'gray / 100',
 	['rem'],									                  'sievert / 100',
+
+	# Hartree Atomic Units (tbd?)
+	# viz. https://en.wikipedia.org/wiki/Hartree_atomic_units
+
 );
 
 if $db {
