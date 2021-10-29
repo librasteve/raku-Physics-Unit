@@ -4,12 +4,14 @@ use Physics::Unit;
 
 #SYNOPSIS
 
+GetUnit( 'mpg' ).type.say;
+
 # Define your own unit named "ff"
 my $ff = Unit.new( defn => 'furlong / fortnight', names => ['ff'] );
 say "$ff";						# 'ff' ... string context gives unit name
 say $ff.type;					# Speed inferred from defn
-say $ff.canonical;				# 'm.s-1' SI derived unit representation
-say $ff.pretty;					# 'm⋅s⁻¹' SI recommended string representation
+say $ff.canonical;		# 'm.s-1' SI derived unit representation
+say $ff.pretty;				# 'm⋅s⁻¹' SI recommended string representation
 say $ff.raku;					# or say $ff; or dd $ff; for object details
 
 #Unit.new( factor => 0.00016631, offset => 0, defn => 'furlong / fortnight', type => Speed,
@@ -28,7 +30,7 @@ my $u3 = GetUnit( 'kg m^2/s^2' );
 say ~$u3;
 say "compare $u1, $u2... " ~ $u2.same-dims($u1);
 
-say ListUnits().sort;
+put ListUnits().sort;
 
 #`[[
 ##### Principles & Behaviours ######

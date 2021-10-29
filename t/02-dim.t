@@ -1,9 +1,9 @@
 #!/usr/bin/env raku
-#t/01-tst.t 
+#t/01-tst.t
 #TESTALL$ prove6 ./t      [from root]
 use lib '../lib';
 use Test;
-plan 21; 
+plan 21;
 
 use Physics::Unit;
 
@@ -18,12 +18,12 @@ sub InitDerivedUnit( @_ ) {
 InitDerivedUnit (
     #SI Derived Units with special names & symbols
     ['sr', 'steradian'],                    'radian^2',
-    ['Hz', 'hertz'],                        '1 / s', 
+    ['Hz', 'hertz'],                        '1 / s',
     ['N',  'newton'],                       'kg m / s^2',
     ['Pa', 'pascal'],                       'N / m^2',
     ['J',  'joule'],                        'kg m^2 / s^2',
     ['W',  'watt'],                         'kg m^2 / s^3',
-    ['C',  'coulomb'],                      'A s', 
+    ['C',  'coulomb'],                      'A s',
     ['V',  'volt'],                         'kg m^2 / A s^3',
     ['F',  'farad'],                        'A^2 s^4 / kg m^2',
     ['Ω',  'ohm'],                          'kg m^2 / A^2 s^3',
@@ -43,7 +43,7 @@ InitDerivedUnit (
 );
 
 my @unit-types = <
-Solid-Angle
+SolidAngle
 Frequency
 Force
 Pressure
@@ -54,16 +54,16 @@ Potential
 Capacitance
 Resistance
 Conductance
-Magnetic-Flux
-Magnetic-Field
+MagneticFlux
+MagneticField
 Inductance
 Temperature
-Luminous-Flux
+LuminousFlux
 Illuminance
 Radioactivity
 Dose
 Dose
-Catalytic-Activity
+CatalyticActivity
 >;
 
 for 0..^@d-u-n -> $i {

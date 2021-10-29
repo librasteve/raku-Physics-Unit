@@ -41,7 +41,7 @@ class Unit is export {
   has Real $!offset = 0;				#ie. for K <=> °C
   has Str  $!defn   = '';
   has Str  $!type;
-  has Str  @.names  is rw = [];
+  has Str  @.names   is rw = [];
   has Int  @.dims   = 0 xx NumBases;
   has MixHash $.dmix is rw = ∅.MixHash;
 
@@ -71,7 +71,7 @@ class Unit is export {
     }
     if @d == 0 { return '' }
     if @d == 1 { return @d[0] }
-    if $just1  { return disambiguate(@d) }
+    if $just1  { return disambiguate(@d) }    #allomorph
     if @d > 1  { return @d.sort }
   }
 
@@ -223,50 +223,58 @@ class Unit is export {
     return self
   }
   method raise( $d, $e ) {
-  #raise a one-element unit ($e) to power of $d digits
+    #raise a one-element unit ($e) to power of $d digits
     self.factor: self.factor ** $d;
     self.dims >>*=>> $d;
 
-  my $e-can = %syns-by-name{$e}[0];		#lookup the canonical name
+    my $e-can = %syns-by-name{$e}[0];		#lookup the canonical name
     self.dmix{$e-can} = $d;
     return self
   }
 
-#### convert & compare methods ####
+  #### convert & compare methods ####
   method same-dims( Unit $u ) {
     return 0 unless $u.dmix eqv self.dmix;
     return 0 unless $u.factor == self.factor;
     return 1
   }
-	method same-unit( Unit $u ) {
-		return 0 unless $u.dims eqv self.dims;
-      return 0 unless $u.factor == self.factor;
-      return 1
-	}
+  method same-unit( Unit $u ) {
+    return 0 unless $u.dims eqv self.dims;
+    return 0 unless $u.factor == self.factor;
+    return 1
+  }
 
-	### Units part of Measure operations ###
-    method multiply( Unit $r --> Unit ) {
-      my $l = self.clone;
-      my $x = $l.times( $r );
-      my $t = $x.type( :just1 );		#occasionally can be > one type
-      return GetPrototype( $t );
-    }
-    method divide( Unit $r ) {
-      my $l = self.clone;
-      my $x = $l.share( $r );
-      my $t = $x.type( :just1 );		#occasionally can be > one type
-		  return GetPrototype( $t );
-    }
-	method root-extract( Int $n where 1 <= $n <= 4 ) {
+  ### Units part of Measure operations ###
+  method multiply( Unit $r ) {
+    my $l = self.clone;
+    my $x = $l.times( $r );
+    my $t = $x.type( :just1 );		    #occasionally can be > one type
+    my $p = GetPrototype( $t );
+    return( $t, $p )
+  }
+  method divide( Unit $r ) {
+    my $l = self.clone;
+    my $x = $l.share( $r );
+    my $t = $x.type( :just1 );		    #occasionally can be > one type
+    my $p = GetPrototype( $t );
+    return( $t, $p )
+  }
+  method root-extract( Int $n where 1 <= $n <= 4 ) {
     #only when all dims divisible by root
-		my $l = self.clone;
-		die "rebase failed" unless $l.factor == 1;
-		$l.defn: '';
-		$l.type: '';
-		$l.dims = $l.dims.map({($_/$n).Int});
-		for $l.dmix.kv -> $k,$v { $l.dmix{$k} = $v/$n }
-		return GetPrototype( $l.type( :just1 ) );
-	}
+    my $l = self.clone;
+    die "rebase failed" unless $l.factor == 1;
+    $l.defn: '';
+    $l.type: '';
+    $l.dims = $l.dims.map({($_/$n).Int});
+
+    for $l.dmix.kv -> $k,$v {
+      $l.dmix{$k} = $v/$n
+    }
+
+    my $t = $l.type( :just1 );		    #occasionally can be > one type
+    my $p = GetPrototype( $t );
+    return( $t, $p )
+  }
 }
 
 ######## Subroutines (Exported) ########
@@ -335,7 +343,7 @@ sub GetUnit( $u ) is export {
 ######## Subroutines (Internal) ########
 
 sub subst-shortest( Unit $u ) {
-  #subtitutes shortest name if >1 unit name has same dimensions
+  # substitutes shortest name if >1 unit name has same dimensions
   # ... so that eg. 'J' beats 'kg m^2 / s^2'
   # ... requires eg. 'J' to be instantiated first
 
@@ -348,24 +356,26 @@ sub subst-shortest( Unit $u ) {
     return %unit-by-name{@sort-by-size[0]}  #shortest
   }
 }
+
 sub disambiguate( @t ) {
 	#bias rules to help when multiple types are found
 	my %dh = %(
-		<Energy>			=> <Energy Torque>,
-		<Frequency>			=> <Frequency Radioactivity>,
-		<Momentum>			=> <Impulse Momentum>,
-		<Angular-Momentum>  => <Angular-Momentum Torque>,
+		<Energy>    => <Energy Torque>,
+		<Frequency> => <Frequency Radioactivity>,
+		<Momentum>  => <Momentum Impulse>,
+        <Area>      => <Area FuelConsumption>,
 	);
 	for %dh.kv -> $k,$v {
 		return $k if @t.sort eq $v.sort
 	}
 }
+
 sub naive-plural( $n ) {
   #naive plurals - append 's' ...
   unless $n.chars <= 2                #...too short
     || $n.comb.first(:end) eq 's'	  #...already ends with 's'
-    || $n.comb.first(:end) eq 'z'   #...already ends with 'z'
-    || $n ~~ /<[\d\/^*]>/           #...contains a digit or a symbol
+    || $n.comb.first(:end) eq 'z'     #...already ends with 'z'
+    || $n ~~ /<[\d\/^*]>/             #...contains a digit or a symbol
   {
     return $n ~ 's';
   }
@@ -703,41 +713,41 @@ InitPrefix (
   'yocto',   1e-24,
 );
 InitPrefixCode (
-  #SI Prefix code
-  da => 'deka',
-  #'deca', ignore this spelling alterative
-  h => 'hecto',
-  k => 'kilo',
-  M => 'mega',
-  G => 'giga',
-  T => 'tera',
-  P => 'peta',
-  E => 'exa',
-  Z => 'zetta',
-  Y => 'yotta',
-  d => 'deci',
-  c => 'centi',
-  m => 'milli',
-  μ => 'micro',
-  n => 'nano',
-  p => 'pico',
-  f => 'femto',
-  a => 'atto',
-  z => 'zepto',
-  y => 'yocto',
+    #SI Prefix code
+    da => 'deka',
+    #'deca', ignore this spelling alterative
+    h => 'hecto',
+    k => 'kilo',
+    M => 'mega',
+    G => 'giga',
+    T => 'tera',
+    P => 'peta',
+    E => 'exa',
+    Z => 'zetta',
+    Y => 'yotta',
+    d => 'deci',
+    c => 'centi',
+    m => 'milli',
+    μ => 'micro',
+    n => 'nano',
+    p => 'pico',
+    f => 'femto',
+    a => 'atto',
+    z => 'zepto',
+    y => 'yocto',
 );
 InitBaseUnit (
-  #SI Base Units
-	#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
-	##FIXME revert to algorithmic plurals
-  'Length'      => ['m', 'metre', 'meter',],
-  'Mass'        => ['kg', 'kilogram',],
-  'Time'        => ['s', 'sec', 'second',],
-  'Current'     => ['A', 'amp', 'ampere', 'ampère',],
-  'Temperature' => ['K', 'kelvin',],
-  'Substance'   => ['mol', 'mole',],
-  'Luminosity'  => ['cd', 'candela', 'candle',],
-	'Angle'		    => ['radian',],
+    #SI Base Units
+    #viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
+    ##FIXME revert to algorithmic plurals
+    'Length'      => ['m', 'metre', 'meter',],
+    'Mass'        => ['kg', 'kilogram',],
+    'Time'        => ['s', 'sec', 'second',],
+    'Current'     => ['A', 'amp', 'ampere', 'ampère',],
+    'Temperature' => ['K', 'kelvin',],
+    'Substance'   => ['mol', 'mole',],
+    'Luminosity'  => ['cd', 'candela', 'candle',],
+    'Angle'		  => ['radian',],
 );
 InitDerivedUnit (
 	#SI Derived Units with special names & symbols
@@ -767,94 +777,99 @@ InitAffixUnit;
 	#Load SI Prefix code / Unit combos to data map hashes for postfix operators
 InitTypes (
 	#sets name of prototype unit
-  'Dimensionless'      => 'unity',
-  'Angle'              => 'radian',
-  'Angular-Speed'		   => 'radians per second',
-  'Solid-Angle'        => 'steradian',
-  'Frequency'          => 'hertz',
-  'Area'               => 'm^2',
-  'Volume'             => 'm^3',
-  'Speed'              => 'm/s',
-  'Acceleration'       => 'm/s^2',
-  'Momentum'           => 'kg m/s',
-  'Force'              => 'newton',
-  'Torque'             => 'Nm',
-  'Impulse'            => 'Ns',
-  'Moment-of-Inertia'  => 'kg m^2',
-  'Angular-Momentum'   => 'kg m^2/s',
-  'Pressure'           => 'pascal',
-  'Density'			       => 'kg/m^3',
-  'Energy'             => 'joule',
-  'Power'              => 'watt',
-  'Charge'             => 'coulomb',
-  'Potential'			     => 'volt',
-  'Resistance'         => 'ohm',
-  'Conductance'        => 'siemens',
-  'Capacitance'        => 'farad',
-  'Inductance'         => 'henry',
-  'Magnetic-Field'     => 'tesla',
-  'Magnetic-Flux'      => 'weber',
-  'Luminous-Flux'      => 'lumen',
-  'Illuminance'        => 'lux',
-  'Radioactivity'      => 'becquerel',
-  'Dose'               => 'gray',
-  'Catalytic-Activity' => 'kat',
+    'Dimensionless'      => 'unity',
+    'Angle'              => 'radian',
+    'AngularSpeed'		 => 'radians per second',
+    'SolidAngle'         => 'steradian',
+    'Frequency'          => 'hertz',
+    'Area'               => 'm^2',
+    'Volume'             => 'm^3',
+    'Speed'              => 'm/s',
+    'Acceleration'       => 'm/s^2',
+    'Momentum'           => 'kg m/s',
+    'Force'              => 'newton',
+    'Torque'             => 'Nm',
+    'Impulse'            => 'Ns',
+    'MomentOfInertia'    => 'kg m^2',
+    'AngularMomentum'    => 'kg m^2/s',
+    'Pressure'           => 'pascal',
+    'Density'			 => 'kg/m^3',
+    'Energy'             => 'joule',
+    'Power'              => 'watt',
+    'Charge'             => 'coulomb',
+    'Potential'			 => 'volt',
+    'Resistance'         => 'ohm',
+    'Conductance'        => 'siemens',
+    'Capacitance'        => 'farad',
+    'Inductance'         => 'henry',
+    'MagneticField'      => 'tesla',
+    'MagneticFlux'       => 'weber',
+    'LuminousFlux'       => 'lumen',
+    'Illuminance'        => 'lux',
+    'Radioactivity'      => 'becquerel',
+    'Dose'               => 'gray',
+    'CatalyticActivity'  => 'kat',
+    'FuelConsumption'    => 'L/100km',
+    'FuelEfficiency'     => 'mpg',
+    'Area-FuelConsumption' => 'm^2',    #allomorphs
 );
 InitTypeDims (
 	#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
 	#                      (L,M,T,I,Θ,N,J,A)  [A=Angle]
-	'Dimensionless'     => (0,0,0,0,0,0,0,0),
-	'Length'			      => (1,0,0,0,0,0,0,0),
-	'Mass'				      => (0,1,0,0,0,0,0,0),
-	'Time'				      => (0,0,1,0,0,0,0,0),
-	'Current'			      => (0,0,0,1,0,0,0,0),
+	'Dimensionless'         => (0,0,0,0,0,0,0,0),
+	'Length'			    => (1,0,0,0,0,0,0,0),
+	'Mass'		            => (0,1,0,0,0,0,0,0),
+	'Time'				    => (0,0,1,0,0,0,0,0),
+	'Current'			    => (0,0,0,1,0,0,0,0),
 	'Temperature'		    => (0,0,0,0,1,0,0,0),
 	'Substance'			    => (0,0,0,0,0,1,0,0),
 	'Luminosity'		    => (0,0,0,0,0,0,1,0),
-	'Angle'				      => (0,0,0,0,0,0,0,1),
-	'Angular-Speed'		  => (0,0,-1,0,0,0,0,1),  #FIXME maybe A=0 (see also disam)
-	'Solid-Angle'		    => (0,0,0,0,0,0,0,2),
+	'Angle'			        => (0,0,0,0,0,0,0,1),
+	'AngularSpeed'		    => (0,0,-1,0,0,0,0,1),  #FIXME maybe A=0 (see also disambiguate)
+	'SolidAngle'		    => (0,0,0,0,0,0,0,2),
 	'Frequency'			    => (0,0,-1,0,0,0,0,0),
-	'Area'				      => (2,0,0,0,0,0,0,0),
-	'Volume'			      => (3,0,0,0,0,0,0,0),
-	'Speed'				      => (1,0,-1,0,0,0,0,0),
-	'Acceleration'		  => (1,0,-2,0,0,0,0,0),
+	'Area'				    => (2,0,0,0,0,0,0,0),
+	'Volume'			    => (3,0,0,0,0,0,0,0),
+	'Speed'				    => (1,0,-1,0,0,0,0,0),
+	'Acceleration'		    => (1,0,-2,0,0,0,0,0),
 	'Momentum'			    => (1,1,-1,0,0,0,0,0),
-	'Force'				      => (1,1,-2,0,0,0,0,0),
-	'Torque'			      => (2,1,-2,0,0,0,0,0),
-	'Impulse'			      => (1,1,-1,0,0,0,0,0),
-	'Moment-of-Inertia'	=> (2,1,0,0,0,0,0,0),
-	'Angular-Momentum'	=> (2,1,-1,0,0,0,0,0),
+	'Force'				    => (1,1,-2,0,0,0,0,0),
+	'Torque'			    => (2,1,-2,0,0,0,0,0),
+	'Impulse'			    => (1,1,-1,0,0,0,0,0),
+	'MomentOfInertia'	    => (2,1,0,0,0,0,0,0),
+	'AngularMomentum'	    => (2,1,-1,0,0,0,0,0),
 	'Pressure'			    => (-1,1,-2,0,0,0,0,0),
-	'Density'			      => (-3,1,0,0,0,0,0,0),
-	'Energy'			      => (2,1,-2,0,0,0,0,0),
-	'Power'				      => (2,1,-3,0,0,0,0,0),
-	'Charge'			      => (0,0,1,1,0,0,0,0),
+	'Density'			    => (-3,1,0,0,0,0,0,0),
+	'Energy'			    => (2,1,-2,0,0,0,0,0),
+	'Power'				    => (2,1,-3,0,0,0,0,0),
+	'Charge'			    => (0,0,1,1,0,0,0,0),
 	'Potential'			    => (2,1,-3,-1,0,0,0,0),
 	'Resistance'		    => (2,1,-3,-2,0,0,0,0),
 	'Conductance'		    => (-2,-1,3,2,0,0,0,0),
 	'Capacitance'		    => (-2,-1,4,2,0,0,0,0),
 	'Inductance'		    => (2,1,-2,-2,0,0,0,0),
-	'Magnetic-Field'	  => (0,1,-2,-1,0,0,0,0),
-	'Magnetic-Flux'		  => (2,1,-2,-1,0,0,0,0),
-	'Luminous-Flux'		  => (0,0,0,0,0,0,1,2),
+	'MagneticField'	        => (0,1,-2,-1,0,0,0,0),
+	'MagneticFlux'		    => (2,1,-2,-1,0,0,0,0),
+	'LuminousFlux'		    => (0,0,0,0,0,0,1,2),
 	'Illuminance'		    => (-2,0,0,0,0,0,1,0),
-	'Radioactivity'		  => (0,0,-1,0,0,0,0,0),
-	'Dose'				      => (2,0,-2,0,0,0,0,0),
-	'Catalytic-Activity'=> (0,0,-1,0,0,1,0,0),
+	'Radioactivity'		    => (0,0,-1,0,0,0,0,0),
+	'Dose'				    => (2,0,-2,0,0,0,0,0),
+	'CatalyticActivity'     => (0,0,-1,0,0,1,0,0),
+	'FuelConsumption'       => (2,0,0,0,0,0,0,0),
+	'FuelEfficiency'        => (-2,0,0,0,0,0,0,0),
 );
 InitOddTypes (
-  #mop up a few exceptional types
-  'eV'    => 'Energy',
-  'MeV'   => 'Energy',
-  'GeV'   => 'Energy',
-  'TeV'   => 'Energy',
-  'cal'   => 'Energy',
-  'kcal'  => 'Energy',
-  'btu'   => 'Energy',
-  'erg'   => 'Energy',
-  'kWh'   => 'Energy',
-  'ft-lb' => 'Torque',
+    #mop up a few exceptional types
+    'eV'      => 'Energy',
+    'MeV'     => 'Energy',
+    'GeV'     => 'Energy',
+    'TeV'     => 'Energy',
+    'cal'     => 'Energy',
+    'kcal'    => 'Energy',
+    'btu'     => 'Energy',
+    'erg'     => 'Energy',
+    'kWh'     => 'Energy',
+    'ft-lb'   => 'Torque',
 );
 InitUnit (
 	# Dimensionless
@@ -952,7 +967,7 @@ InitUnit (
 	['fps'],                                    'feet per second',
 	['knot'],                                   'nmile per hour',
 
-	# Angular-Speed
+	# AngularSpeed
 	['radians per second'],			                'Hz',  #the SI unit (radians=1)
 	['revs', 'revolutions per second'],         '2 pi * Hz',
 	['rpm'],							                      '60 revs',
@@ -981,14 +996,14 @@ InitUnit (
 	['carat', 'karat'],                         '200 milligram',
 	['j-point'],                                '2 carat',
 
-	# Moment-of-Inertia
+	# MomentOfInertia
 	['kg m^2'],                                 'kg m^2',
 
 	# Momentum
 	['kg m/s'],                                 'kg m/s',
 	['slug ft/s'],                              'slug feet/s',
 
-	# Angular-Momentum
+	# AngularMomentum
 	['kg m^2/s'],                               'kg m^2 / s',
 
 	# Force
@@ -1011,6 +1026,7 @@ InitUnit (
 	['torr'],                                   '133.322368 pascal',  #(101325 / 760)
 	['psi'],                                    'pounds per inch^2',
 	['atm', 'atmosphere'],                      '101325 pascal',
+	['mmHg'],                                   '133.322 pascal',
 
 	# Density
 	['kg/m^3'],                                 'kg / m^3',
@@ -1059,10 +1075,14 @@ InitUnit (
 	['rad'],									                  'gray / 100',
 	['rem'],									                  'sievert / 100',
 
-	# Hartree Atomic Units (tbd?)
-	# viz. https://en.wikipedia.org/wiki/Hartree_atomic_units
+	# FuelConsumption
+	['L/100km', 'l/100km'],                     'litre / 100000 m',
 
+	# FuelEfficiency
+	['mpg'],                                    'miles per gallon',
 );
+
+
 
 if $db {
 say "+++++++++++++++++++";
