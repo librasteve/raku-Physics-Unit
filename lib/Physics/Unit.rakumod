@@ -3,13 +3,21 @@ unit module Physics::Unit:ver<1.1.8>:auth<Steve Roe (p6steve@furnival.net)>;
 
 my $db = 0;               #debug
 
+#some units have the same dimensions, but are different types - these hints control type inference
+our %type-hints = %(
+    Area        => <Area FuelConsumption>,
+    Energy      => <Energy Torque>,
+    Momentum    => <Momentum Impulse>,
+    Frequency   => <Frequency Radioactivity>,
+);
+
 ##### Constants and Data Maps ######
 
 constant \locale = "imp";	#Imperial="imp"; US="us' FIXME v2 make export tag (en_US, en_UK)
 constant \preload = 0;		#Preload All Units ie. for debug (precomp load 1.6s otherwise ~60s)
 
 constant \NumBases = 8;
-my Str @BaseNames;			  #SI Base Unit names
+my Str @BaseNames;			#SI Base Unit names
 
 my %prefix-by-name;       #name => Prefix object
 my %prefix-by-code;       #code => Prefix name
@@ -17,18 +25,18 @@ my %prefix-to-factor;     #name => Prefix factor
 my %defn-by-name;         #name => defn Str of known names incl. affix (values may be dupes)
 my %syns-by-name; 	      #name => list of synonyms (excl. user defined, incl. plurals)
 my %unit-by-name;         #name => Unit object cache (when instantiated)
-my %affix-by-name;			  #name => extended affix defn (eg. cm => 'centimetre') to decongest Grammar namespace
+my %affix-by-name;        #name => extended affix defn (eg. cm => 'centimetre') to decongest Grammar namespace
 my %affix-syns-by-name;   #name => list of synonyms for every affix [n, nano] X~ [m, metre, meter, metres, meters]
 my %type-to-protoname;    #type => prototype name
 my %type-to-prototype;    #type => prototype Unit object (when instantiated)
-my %type-to-dims;			    #type => dims vector
+my %type-to-dims;		  #type => dims vector
 my %odd-type-by-name;     #mop up a few exceptional types
 
 #Power synonyms
-my %pwr-preword   = ( square  => 2, sq => 2, cubic => 3, );
-my %pwr-postword  = ( squared => 2,          cubed => 3, );
+my %pwr-preword   = ( square  => 2, sq => 2, cubic => 3, cu => 3 );
+my %pwr-postword  = ( squared => 2, cubed => 3, );
 
-#Power superscripts ie. x¹ x² x³ x⁴ x⁻¹ x⁻² x⁻³ x⁻⁴
+#Power superscripts eg. x¹ x² x³ x⁴ x⁻¹ x⁻² x⁻³ x⁻⁴
 my %pwr-superscript = (
      '¹' =>  1,  '²' =>  2,  '³' =>  3,  '⁴' =>  4,
     '⁻¹' => -1, '⁻²' => -2, '⁻³' => -3, '⁻⁴' => -4,
@@ -41,8 +49,8 @@ class Unit is export {
   has Real $!offset = 0;				#ie. for K <=> °C
   has Str  $!defn   = '';
   has Str  $!type;
-  has Str  @.names   is rw = [];
-  has Int  @.dims   = 0 xx NumBases;
+  has Str  @.names is rw = [];
+  has Int  @.dims = 0 xx NumBases;
   has MixHash $.dmix is rw = ∅.MixHash;
 
   ### accessor methods ###		    #use 'self.attr: 42' not 'self.attr = 42'
@@ -71,7 +79,7 @@ class Unit is export {
     }
     if @d == 0 { return '' }
     if @d == 1 { return @d[0] }
-    if $just1  { return disambiguate(@d) }    #allomorph
+    if $just1  { return type-hint(@d) }
     if @d > 1  { return @d.sort }
   }
 
@@ -357,15 +365,9 @@ sub subst-shortest( Unit $u ) {
   }
 }
 
-sub disambiguate( @t ) {
-	#bias rules to help when multiple types are found
-	my %dh = %(
-		<Energy>    => <Energy Torque>,
-		<Frequency> => <Frequency Radioactivity>,
-		<Momentum>  => <Momentum Impulse>,
-        <Area>      => <Area FuelConsumption>,
-	);
-	for %dh.kv -> $k,$v {
+sub type-hint(@t ) {
+	#type hints help when multiple types are found
+	for %type-hints.kv -> $k,$v {
 		return $k if @t.sort eq $v.sort
 	}
 }
@@ -809,13 +811,12 @@ InitTypes (
     'Radioactivity'      => 'becquerel',
     'Dose'               => 'gray',
     'CatalyticActivity'  => 'kat',
-    'FuelConsumption'    => 'L/100km',
-    'FuelEfficiency'     => 'mpg',
-    'Area-FuelConsumption' => 'm^2',    #allomorphs
+    'FuelConsumption'    => 'l/100km',
+    'FuelEfficiency'     => 'm/l',
 );
 InitTypeDims (
 	#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
-	#                      (L,M,T,I,Θ,N,J,A)  [A=Angle]
+	#                          (L,M,T,I,Θ,N,J,A)  [A=Angle]
 	'Dimensionless'         => (0,0,0,0,0,0,0,0),
 	'Length'			    => (1,0,0,0,0,0,0,0),
 	'Mass'		            => (0,1,0,0,0,0,0,0),
@@ -906,8 +907,8 @@ InitUnit (
 	['rpm'],                                    'revolutions per minute',
 
 	# Length
-	['km'],				                              'kilometre',
-	['fm'],				                              'femtometre',   #for 'MeV.fm'
+	['km'],				                        'kilometre',
+	['fm'],				                        'femtometre',   #for 'MeV.fm'
 	['μ', 'micron'],                            '1e-6 m',
 	['å', 'angstrom'],                          '1e-10 m',
 	['au', 'astronomical-unit'],                '1.49598e11 m',
@@ -921,7 +922,7 @@ InitUnit (
 	['furlong'],                                '40 rods',
 	['mile'],                                   '5280 ft',
 	['nmile', 'nautical-mile'],                 '1852 m',
-	['ca', 'cable'],		                        '185.2 m',
+	['ca', 'cable'],		                    '185.2 m',
 	['pica'],                                   'in/6',	#chosen defn not unique
 	['point'],                                  'pica/12',
 
@@ -935,7 +936,7 @@ InitUnit (
 	# Volume
 	['m^3', 'm3', 'm³'],                        'm^3',
 	['l', 'L', 'litre', 'liter'],               'm^3/1000',
-	['cc'],		                                  'cubic centimetre',
+	['cc'],		                                'cubic centimetre',
 	['bottle'],                                 '750 millilitre',
 	['fluidram'],                               '3.5516 millilitre',
 	['minim'],                                  '0.059194 millilitre',
@@ -943,16 +944,16 @@ InitUnit (
 	# setting Imperial (imp-) or US (us-) from \locale
 	['us-gallon'],                              '3.785411784 litre',
 	['imp-gallon'],                             '4.54609 litre',
-	['gallon'],									                "1 {locale}-gallon",
-	['firkin'],							                    '9 gallons',
-	['barrel'],							                    '36 gallons',
+	['gallon'],									"1 {locale}-gallon",
+	['firkin'],							        '9 gallons',
+	['barrel'],							        '36 gallons',
 	['quart'],                                  'gallon/4',
 	['peck'],                                   '8 quarts',
 	['bushel'],                                 '4 pecks',
 	['fifth'],                                  'us-gallon/5',
 	['us-pint'],                                'us-gallon/8',
 	['imp-pint'],                               'imp-gallon/8',
-	['pint'],									                  "1 {locale}-pint",
+	['pint'],									"1 {locale}-pint",
 	['cup'],                                    'us-pint/2',
 	['floz', 'fluid-ounce'],                    'cup/8',
 	['gill'],                                   '4 fluid-ounces',
@@ -960,7 +961,7 @@ InitUnit (
 	['teaspoon', 'tsp'],                        'tablespoon / 3',
 
 	# Speed
-	['m/s'],		                                'm/s',
+	['m/s'],		                            'm/s',
 	['mph'],                                    'miles per hour',
 	['kph'],                                    'kilometre per hour',
 	['kps'],                                    'kilometre per second',
@@ -968,9 +969,9 @@ InitUnit (
 	['knot'],                                   'nmile per hour',
 
 	# AngularSpeed
-	['radians per second'],			                'Hz',  #the SI unit (radians=1)
+	['radians per second'],			            'Hz',  #the SI unit (radians=1)
 	['revs', 'revolutions per second'],         '2 pi * Hz',
-	['rpm'],							                      '60 revs',
+	['rpm'],							        '60 revs',
 
 	# Acceleration
 	['m/s^2'],                                  'm/s^2',
@@ -1072,14 +1073,15 @@ InitUnit (
 	['°F', 'Fahrenheit'],                       '5/9 * K + 459.67',
 
 	# Dose
-	['rad'],									                  'gray / 100',
-	['rem'],									                  'sievert / 100',
+	['rad'],									'gray / 100',
+	['rem'],									'sievert / 100',
 
 	# FuelConsumption
-	['L/100km', 'l/100km'],                     'litre / 100000 m',
+	['l/100km'],                                'litre / 100000 m',
 
 	# FuelEfficiency
-	['mpg'],                                    'miles per gallon',
+	['m/l'],                                    'metre / m^3',
+	['mpg'],                                    'miles / gallon',
 );
 
 

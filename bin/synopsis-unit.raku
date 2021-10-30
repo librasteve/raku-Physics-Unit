@@ -4,15 +4,13 @@ use Physics::Unit;
 
 #SYNOPSIS
 
-GetUnit( 'mpg' ).type.say;
-
-# Define your own unit named "ff"
+# Define your own Unit named "ff"
 my $ff = Unit.new( defn => 'furlong / fortnight', names => ['ff'] );
-say "$ff";						# 'ff' ... string context gives unit name
-say $ff.type;					# Speed inferred from defn
+say "$ff";				# 'ff' ... string context gives unit name
+say $ff.type;			# 'Speed' inferred from defn
 say $ff.canonical;		# 'm.s-1' SI derived unit representation
-say $ff.pretty;				# 'm⋅s⁻¹' SI recommended string representation
-say $ff.raku;					# or say $ff; or dd $ff; for object details
+say $ff.pretty;			# 'm⋅s⁻¹' SI recommended string representation
+say $ff.raku;			#  or 'say $ff;' or 'dd $ff;' for details
 
 #Unit.new( factor => 0.00016631, offset => 0, defn => 'furlong / fortnight', type => Speed,
 #			  dims => [1,0,-1,0,0,0,0,0], dmix => ("fortnight"=>-1,"furlong"=>1).MixHash, names => ['ff'] );
