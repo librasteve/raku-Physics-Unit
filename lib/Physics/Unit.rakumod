@@ -3,7 +3,7 @@ unit module Physics::Unit:ver<1.1.8>:auth<Steve Roe (p6steve@furnival.net)>;
 
 my $db = 0;               #debug
 
-#some units have the same dimensions, but are different types - these hints control type inference
+#some units have the same dimensions but are different types - type hints steer type inference
 our %type-hints = %(
     Area        => <Area FuelConsumption>,
     Energy      => <Energy Torque>,
@@ -811,7 +811,7 @@ InitTypes (
     'Radioactivity'      => 'becquerel',
     'Dose'               => 'gray',
     'CatalyticActivity'  => 'kat',
-    'FuelConsumption'    => 'l/100km',
+    'FuelConsumption'    => 'm^3/m',
     'FuelEfficiency'     => 'm/l',
 );
 InitTypeDims (
@@ -1077,7 +1077,8 @@ InitUnit (
 	['rem'],									'sievert / 100',
 
 	# FuelConsumption
-	['l/100km'],                                'litre / 100000 m',
+	['m^3/m'],                                  'm^3 / metre',
+	['l/100km'],                                '0.1 litres /metre',
 
 	# FuelEfficiency
 	['m/l'],                                    'metre / m^3',
