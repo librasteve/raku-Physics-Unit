@@ -874,21 +874,19 @@ InitOddTypes (
 );
 InitUnit (
 	# Dimensionless
-	['①','(1)','one','unity'],							    '1',  #U-2460 CIRCLED DIGIT ONE
-	['semi','demi','hemi'],						          '1/2',
-	['%','percent'],							              '1/100',
-	['ABV'],									                  '1',
-	#FIXME v2 try ['pi'],                       'π', #extend Number regex
-	['pi'],										                  '3.1415926535897932385',
+	['①','(1)','one','unity'],                  '1',  #U-2460 CIRCLED DIGIT ONE
+	['semi','demi','hemi'],                     '1/2',
+	['%','percent'],                            '1/100',
+	['ABV'],                                    '1',
+	['pi'],                                     '3.1415926535897932385',
 
 	# Angle
-	#FIXME v2 add grad
 	['°', 'degree', 'deg', 'º'],                'pi radians / 180',
-	['ᵍ', 'gon'],                               'pi radians / 200',
+	['ᵍ', 'gon', 'grad'],                       'pi radians / 200',
 
 	# Solid Angle
-	['deg²'],									                  'deg^2',
-	['sp','spat'],								              '4 pi steradians',
+	['deg²'],                                   'deg^2',
+	['sp','spat'],                              '4 pi steradians',
 
 	# Time
 	['min', 'minute'],                          '60 s',
