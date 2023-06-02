@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/librasteve/raku-Physics-Unit.svg?branch=master)](https://travis-ci.com/librasteve/raku-Physics-Unit)
+[![raku-physics-unit -> DH](https://github.com/librasteve/raku-Physics-Unit/actions/workflows/unit-weekly.yaml/badge.svg)](https://github.com/librasteve/raku-Physics-Unit/actions/workflows/unit-weekly.yaml)
 
 # Physics::Unit
 A set of stock SI, Imperial and US Unit objects for raku that are employed by [Physics::Measure](https://github.com/librasteve/raku-Physics-Measure) objects.
