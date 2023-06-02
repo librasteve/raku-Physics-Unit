@@ -4,9 +4,9 @@
   "version": "1.1.9",
   "perl": "6.d",
   "authors": [
-    "p6steve"
+    "librasteve"
   ],
-  "auth": "zef:p6steve",
+  "auth": "zef:librasteve",
   "depends": [
     "SVG",
     "SVG::Plot"
@@ -23,5 +23,5 @@
     "Units"
   ],
   "api": "1",
-  "source-url": "https://github.com/p6steve/raku-Physics-Unit.git"
+  "source-url": "https://github.com/librasteve/raku-Physics-Unit.git"
 }

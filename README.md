@@ -1,14 +1,14 @@
-[![Build Status](https://travis-ci.com/p6steve/raku-Physics-Unit.svg?branch=master)](https://travis-ci.com/p6steve/raku-Physics-Unit)
+[![Build Status](https://travis-ci.com/librasteve/raku-Physics-Unit.svg?branch=master)](https://travis-ci.com/librasteve/raku-Physics-Unit)
 
 # Physics::Unit
-A set of stock SI, Imperial and US Unit objects for raku that are employed by [Physics::Measure](https://github.com/p6steve/raku-Physics-Measure) objects.
+A set of stock SI, Imperial and US Unit objects for raku that are employed by [Physics::Measure](https://github.com/librasteve/raku-Physics-Measure) objects.
 
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 # Instructions
 ```zef install Physics::Unit``` and, conversely, ```zef uninstall Physics::Unit```
 
-_for latest, go ```zef install https://github.com/p6steve/raku-Physics-Unit.git```_
+_for latest, go ```zef install https://github.com/librasteve/raku-Physics-Unit.git```_
 
 # Synopsis - Physics::Unit
 

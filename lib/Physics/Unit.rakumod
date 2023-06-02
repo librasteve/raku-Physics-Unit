@@ -1,4 +1,4 @@
-unit module Physics::Unit:ver<1.1.9>:auth<Steve Roe (p6steve@furnival.net)>;
+unit module Physics::Unit:ver<1.1.9>:auth<Steve Roe (librasteve@furnival.net)>;
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 my $db = 0;               #debug
@@ -29,7 +29,7 @@ my %affix-by-name;        #name => extended affix defn (eg. cm => 'centimetre') 
 my %affix-syns-by-name;   #name => list of synonyms for every affix [n, nano] X~ [m, metre, meter, metres, meters]
 my %type-to-protoname;    #type => prototype name
 my %type-to-prototype;    #type => prototype Unit object (when instantiated)
-my %type-to-dims;		  #type => dims vector
+my %type-to-dims;		      #type => dims vector
 my %odd-type-by-name;     #mop up a few exceptional types
 
 #Power synonyms
@@ -79,7 +79,7 @@ class Unit is export {
     }
     if @d == 0 { return '' }
     if @d == 1 { return @d[0] }
-    if $just1  { return type-hint(@d) }
+    if $just1  { return type-hint(@d) // die 'Cannot resolve to just1 type, please set one in %type-hint' }
     if @d > 1  { return @d.sort }
   }
 
@@ -934,7 +934,7 @@ InitUnit (
 	# Volume
 	['m^3', 'm3', 'm³'],                        'm^3',
 	['l', 'L', 'litre', 'liter'],               'm^3/1000',
-	['cc'],		                                'cubic centimetre',
+	['cc'],		                                  'cubic centimetre',
 	['bottle'],                                 '750 millilitre',
 	['fluidram'],                               '3.5516 millilitre',
 	['minim'],                                  '0.059194 millilitre',
@@ -942,16 +942,16 @@ InitUnit (
 	# setting Imperial (imp-) or US (us-) from \locale
 	['us-gallon'],                              '3.785411784 litre',
 	['imp-gallon'],                             '4.54609 litre',
-	['gallon'],									"1 {locale}-gallon",
-	['firkin'],							        '9 gallons',
-	['barrel'],							        '36 gallons',
+	['gallon'],									                "1 {locale}-gallon",
+	['firkin'],							                    '9 gallons',
+	['barrel'],							                    '36 gallons',
 	['quart'],                                  'gallon/4',
 	['peck'],                                   '8 quarts',
 	['bushel'],                                 '4 pecks',
 	['fifth'],                                  'us-gallon/5',
 	['us-pint'],                                'us-gallon/8',
 	['imp-pint'],                               'imp-gallon/8',
-	['pint'],									"1 {locale}-pint",
+	['pint'],									                  "1 {locale}-pint",
 	['cup'],                                    'us-pint/2',
 	['floz', 'fluid-ounce'],                    'cup/8',
 	['gill'],                                   '4 fluid-ounces',
@@ -959,7 +959,7 @@ InitUnit (
 	['teaspoon', 'tsp'],                        'tablespoon / 3',
 
 	# Speed
-	['m/s'],		                            'm/s',
+	['m/s'],		                                'm/s',
 	['mph'],                                    'miles per hour',
 	['kph'],                                    'kilometre per hour',
 	['kps'],                                    'kilometre per second',
@@ -967,7 +967,7 @@ InitUnit (
 	['knot'],                                   'nmile per hour',
 
 	# AngularSpeed
-	['radians per second'],			            'Hz',  #the SI unit (radians=1)
+	['radians per second'],			                'Hz',  #the SI unit (radians=1)
 	['revs', 'revolutions per second'],         '2 pi * Hz',
 	['rpm'],							        '60 revs',
 
