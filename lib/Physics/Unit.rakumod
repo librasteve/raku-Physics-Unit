@@ -813,6 +813,8 @@ InitTypes (
     'CatalyticActivity'  => 'kat',
     'FuelConsumption'    => 'm^3/m',
     'FuelEfficiency'     => 'm/l',
+    'Irradiance'         => 'W/m^2',
+    'Insolation'         => 'kWh/m^2',
 );
 InitTypeDims (
 	#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
