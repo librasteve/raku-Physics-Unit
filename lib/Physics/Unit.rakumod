@@ -1081,6 +1081,13 @@ InitUnit (
 	# FuelEfficiency
 	['m/l'],                                    'metre / m^3',
 	['mpg'],                                    'miles / gallon',
+
+	# Irradiance 
+	['W/m^2'],                                  'W / m^2',
+
+	# Insolation 
+	['kWh/m^2'],                                'kWh / m^2',
+	['Langley'],                                'calorie / cm^2',
 );
 
 
