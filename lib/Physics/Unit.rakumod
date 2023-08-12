@@ -29,7 +29,7 @@ my %affix-by-name;        #name => extended affix defn (eg. cm => 'centimetre') 
 my %affix-syns-by-name;   #name => list of synonyms for every affix [n, nano] X~ [m, metre, meter, metres, meters]
 my %type-to-protoname;    #type => prototype name
 my %type-to-prototype;    #type => prototype Unit object (when instantiated)
-my %type-to-dims;		      #type => dims vector
+my %type-to-dims;		  #type => dims vector
 my %odd-type-by-name;     #mop up a few exceptional types
 
 #Power synonyms
@@ -77,7 +77,7 @@ class Unit is export {
     for %type-to-dims.keys -> $k {
       push @d, $k if self.dims cmp %type-to-dims{$k} ~~ Same;
     }
-    if @d == 0 { return '' }
+    if @d == 0 { warn 'cannot match dims'; return '' }
     if @d == 1 { return @d[0] }
     if $just1  { return type-hint(@d) // die 'Cannot resolve to just1 type, please set one in %type-hint' }
     if @d > 1  { return @d.sort }
@@ -95,7 +95,7 @@ class Unit is export {
 
   #new by deep cloning an existing Unit
   method clone {
-    nextwith :names([]), :type(''), :dims(@.dims.clone), :dmix($.dmix.clone)
+    nextwith :names([]), :type(''), :dims(@!dims.clone), :dmix($!dmix.clone);
   }
   multi method new( Unit:D $u: @names ) {
     my $n = $u.clone;
@@ -860,6 +860,8 @@ InitTypeDims (
 	'CatalyticActivity'     => (0,0,-1,0,0,1,0,0),
 	'FuelConsumption'       => (2,0,0,0,0,0,0,0),
 	'FuelEfficiency'        => (-2,0,0,0,0,0,0,0),
+	'Irradiance'            => (0,1,-3,0,0,0,0,0),
+	'Insolation'            => (0,1,-2,0,0,0,0,0),
 );
 InitOddTypes (
     #mop up a few exceptional types
