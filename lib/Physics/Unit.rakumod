@@ -1,4 +1,4 @@
-unit module Physics::Unit:ver<1.1.12>:auth<Steve Roe (librasteve@furnival.net)>;
+unit module Physics::Unit:ver<1.1.13>:auth<Steve Roe (librasteve@furnival.net)>;
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 my $db = 0;               #debug
@@ -77,7 +77,7 @@ class Unit is export {
     for %type-to-dims.keys -> $k {
       push @d, $k if self.dims cmp %type-to-dims{$k} ~~ Same;
     }
-    if @d == 0 { warn 'cannot match dims'; return '' }
+    if @d == 0 { return '' }
     if @d == 1 { return @d[0] }
     if $just1  { return type-hint(@d) // die 'Cannot resolve to just1 type, please set one in %type-hint' }
     if @d > 1  { return @d.sort }
