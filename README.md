@@ -11,6 +11,8 @@ A set of stock SI, Imperial and US Unit objects for raku that are employed by [P
 
 The ```locale``` for units is set to 'us' or 'imp' (imperial) automatically depending on your ```%*ENV<LANG>``` system value
 You can override this with ```export RAKULAND='en_US'``` or ```export RAKULAND='anything else'```
+This affects vanilla gallons, pints, mpg, etc. so don't worry if you are from Europe
+You can always use ```imp-pint``` vs ```us-pint``` explicitly to override
 
 # Synopsis - Physics::Unit
 
