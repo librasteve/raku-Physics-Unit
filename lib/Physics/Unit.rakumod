@@ -1,5 +1,4 @@
-unit module Physics::Unit:ver<1.1.15>:auth<Steve Roe (librasteve@furnival.net)>;
-#viz. https://en.wikipedia.org/wiki/International_System_of_Units
+unit module Physics::Unit:ver<1.1.15>:auth<Steve Roe (librasteve@furnival.net)>; #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 my $db = 0;               #debug
 
@@ -13,8 +12,9 @@ our %type-hints = %(
 
 ##### Constants and Data Maps ######
 
-my  $sysloc = (%*ENV<LANG> ~~ /en_US/) ?? 'us' !! 'imp';
-our $locale = (%*ENV<RAKULANG> ~~ /en_US/) ?? 'us' !! $sysloc; 
+my $locale = 'imp';        # locale for 'us' or 'imp' gallons, pints, mpg etc.
+$locale = ($_ ~~ /en_US/) ?? 'us' !! 'imp'   with %*ENV<LANG>;
+$locale = ($_ ~~ /en_US/) ?? 'us' !! $locale with %*ENV<RAKULANG>; 
 
 constant \preload = 0;		#Preload All Units ie. for debug (precomp load 1.6s otherwise ~60s)
 
