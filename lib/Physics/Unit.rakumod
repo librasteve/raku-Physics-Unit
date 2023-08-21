@@ -1,4 +1,4 @@
-unit module Physics::Unit:ver<1.1.13>:auth<Steve Roe (librasteve@furnival.net)>;
+unit module Physics::Unit:ver<1.1.14>:auth<Steve Roe (librasteve@furnival.net)>;
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 my $db = 0;               #debug
@@ -812,7 +812,7 @@ InitTypes (
     'Dose'               => 'gray',
     'CatalyticActivity'  => 'kat',
     'FuelConsumption'    => 'm^3/m',
-    'FuelEfficiency'     => 'm/l',
+    'FuelEfficiency'     => 'm/m^3',
     'Irradiance'         => 'W/m^2',
     'Insolation'         => 'kWh/m^2',
 );
@@ -1080,10 +1080,11 @@ InitUnit (
 
 	# FuelConsumption
 	['m^3/m'],                                  'm^3 / metre',
-	['l/100km'],                                '0.1 litres /metre',
+	['l/100km'],                                '0.00001 litres / metre',
 
 	# FuelEfficiency
-	['m/l'],                                    'metre / m^3',
+	#['m/l'],                                    'metres / litre',
+	['m/m^3'],                                  'metres / m^3',
 	['mpg'],                                    'miles / gallon',
 
 	# Irradiance 
