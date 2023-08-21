@@ -7,9 +7,10 @@ A set of stock SI, Imperial and US Unit objects for raku that are employed by [P
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 # Instructions
-```zef install Physics::Unit``` and, conversely, ```zef uninstall Physics::Unit```
+```zef install Physics::Unit```
 
-_for latest, go ```zef install https://github.com/librasteve/raku-Physics-Unit.git```_
+The ```locale``` for units is set to 'us' or 'imp' (imperial) automatically depending on your ```%*ENV<LANG>``` system value
+You can override this with ```export RAKULAND='en_US'``` or ```export RAKULAND='anything else'```
 
 # Synopsis - Physics::Unit
 
