@@ -13,8 +13,8 @@ our %type-hints = %(
 
 ##### Constants and Data Maps ######
 
-my  $sysloc = (%*ENV<LANG>)     ~~ /en_US/) ?? 'us' !! 'imp';
-our $locale = (%*ENV<RAKULANG>) ~~ /en_US/) ?? 'us' !! $sysloc; 
+my  $sysloc = (%*ENV<LANG> ~~ /en_US/) ?? 'us' !! 'imp';
+our $locale = (%*ENV<RAKULANG> ~~ /en_US/) ?? 'us' !! $sysloc; 
 
 constant \preload = 0;		#Preload All Units ie. for debug (precomp load 1.6s otherwise ~60s)
 
