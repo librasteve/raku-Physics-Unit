@@ -1,4 +1,4 @@
-unit module Physics::Unit:ver<1.1.14>:auth<Steve Roe (librasteve@furnival.net)>;
+unit module Physics::Unit:ver<1.1.15>:auth<Steve Roe (librasteve@furnival.net)>;
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 my $db = 0;               #debug
@@ -13,7 +13,9 @@ our %type-hints = %(
 
 ##### Constants and Data Maps ######
 
-constant \locale = "imp";	#Imperial="imp"; US="us' FIXME v2 make export tag (en_US, en_UK)
+my  $sysloc = (%*ENV<LANG>     ~~ /en_US/) ?? 'us' !! 'imp';
+our $locale = (%*ENV<RAKULANG> ~~ /en_US/) ?? 'us' !! $sysloc; 
+
 constant \preload = 0;		#Preload All Units ie. for debug (precomp load 1.6s otherwise ~60s)
 
 constant \NumBases = 8;
@@ -938,24 +940,24 @@ InitUnit (
 	# Volume
 	['m^3', 'm3', 'm³'],                        'm^3',
 	['l', 'L', 'litre', 'liter'],               'm^3/1000',
-	['cc'],		                                  'cubic centimetre',
+	['cc'],		                                'cubic centimetre',
 	['bottle'],                                 '750 millilitre',
 	['fluidram'],                               '3.5516 millilitre',
 	['minim'],                                  '0.059194 millilitre',
 	['alcohol-unit'],                           '10 millilitre',            # of pure alcohol
-	# setting Imperial (imp-) or US (us-) from \locale
+	# setting Imperial (imp-) or US (us-) from $locale
 	['us-gallon'],                              '3.785411784 litre',
 	['imp-gallon'],                             '4.54609 litre',
-	['gallon'],									                "1 {locale}-gallon",
-	['firkin'],							                    '9 gallons',
-	['barrel'],							                    '36 gallons',
+	['gallon'],									"1 {$locale}-gallon",
+	['firkin'],							        '9 gallons',
+	['barrel'],							        '36 gallons',
 	['quart'],                                  'gallon/4',
 	['peck'],                                   '8 quarts',
 	['bushel'],                                 '4 pecks',
 	['fifth'],                                  'us-gallon/5',
 	['us-pint'],                                'us-gallon/8',
 	['imp-pint'],                               'imp-gallon/8',
-	['pint'],									                  "1 {locale}-pint",
+	['pint'],									"1 {$locale}-pint",
 	['cup'],                                    'us-pint/2',
 	['floz', 'fluid-ounce'],                    'cup/8',
 	['gill'],                                   '4 fluid-ounces',
@@ -963,7 +965,7 @@ InitUnit (
 	['teaspoon', 'tsp'],                        'tablespoon / 3',
 
 	# Speed
-	['m/s'],		                                'm/s',
+	['m/s'],		                            'm/s',
 	['mph'],                                    'miles per hour',
 	['kph'],                                    'kilometre per hour',
 	['kps'],                                    'kilometre per second',
@@ -971,7 +973,7 @@ InitUnit (
 	['knot'],                                   'nmile per hour',
 
 	# AngularSpeed
-	['radians per second'],			                'Hz',  #the SI unit (radians=1)
+	['radians per second'],			            'Hz',  #the SI unit (radians=1)
 	['revs', 'revolutions per second'],         '2 pi * Hz',
 	['rpm'],							        '60 revs',
 
