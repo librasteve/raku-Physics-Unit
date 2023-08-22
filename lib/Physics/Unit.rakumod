@@ -1,13 +1,14 @@
-unit module Physics::Unit:ver<1.1.16>:auth<Steve Roe (librasteve@furnival.net)>; #viz. https://en.wikipedia.org/wiki/International_System_of_Units
+unit module Physics::Unit:ver<1.1.17>:auth<Steve Roe (librasteve@furnival.net)>; #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 my $db = 0;               #debug
 
 #some units have the same dimensions but are different types - type hints steer type inference
 our %type-hints = %(
-    Area        => <Area FuelConsumption>,
-    Energy      => <Energy Torque>,
-    Momentum    => <Momentum Impulse>,
-    Frequency   => <Frequency Radioactivity>,
+    Area           => <Area FuelConsumption>,
+    Energy         => <Energy Torque>,
+    Momentum       => <Momentum Impulse>,
+    Frequency      => <Frequency Radioactivity>,
+    SpecificEnergy => <SpecificEnergy Dose>,
 );
 
 ##### Constants and Data Maps ######
@@ -815,6 +816,8 @@ InitTypes (
     'CatalyticActivity'  => 'kat',
     'FuelConsumption'    => 'm^3/m',
     'FuelEfficiency'     => 'm/m^3',
+	'ConsumptionRate'    => 'm^3/s',
+	'SpecificEnergy'     => 'J/kg',
     'Irradiance'         => 'W/m^2',
     'Insolation'         => 'kWh/m^2',
 );
@@ -862,6 +865,8 @@ InitTypeDims (
 	'CatalyticActivity'     => (0,0,-1,0,0,1,0,0),
 	'FuelConsumption'       => (2,0,0,0,0,0,0,0),
 	'FuelEfficiency'        => (-2,0,0,0,0,0,0,0),
+	'ConsumptionRate'       => (2,0,0,0,0,0,0,0),
+	'SpecificEnergy'        => (3,0,-1,0,0,0,0,0),
 	'Irradiance'            => (0,1,-3,0,0,0,0,0),
 	'Insolation'            => (0,1,-2,0,0,0,0,0),
 );
@@ -1085,9 +1090,16 @@ InitUnit (
 	['l/100km'],                                '0.00001 litres / metre',
 
 	# FuelEfficiency
-	#['m/l'],                                    'metres / litre',
 	['m/m^3'],                                  'metres / m^3',
 	['mpg'],                                    'miles / gallon',
+
+	# ConsumptionRate
+	['m^3/s'],                                  'm^3 / second',
+	['gpd'],                                    'gallons / day',
+
+	# SpecificEnergy 
+	['J/kg'],                                   'joules / kg',
+	['MJ/kg'],                                  'mega joules / kg',
 
 	# Irradiance 
 	['W/m^2'],                                  'W / m^2',
