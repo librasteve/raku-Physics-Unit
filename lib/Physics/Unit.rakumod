@@ -717,12 +717,14 @@ InitPrefix (
   'zepto',   1e-21,
   'yocto',   1e-24,
   #others
+  #`[
   'million', 1_000_000,
   'billion', 1_000_000_000,
   'trillion',1_000_000_000_000,
   'mn',      1_000_000,
   'bn',      1_000_000_000,
   'tn',      1_000_000_000_000,
+  #]
 );
 InitPrefixCode (
     #SI Prefix code
