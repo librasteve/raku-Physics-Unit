@@ -693,8 +693,8 @@ sub InitUnit( @_ , :$derived ) is export {
 ######## Unit Data ########
 
 InitPrefix (
-  #SI Prefixes
   #avoid 1e2 format to encourage Rats
+  #SI Prefixes
   'deka',    10,
   'deca',    10,
   'hecto',   100,
@@ -716,6 +716,11 @@ InitPrefix (
   'atto',    0.000000000000000001,
   'zepto',   1e-21,
   'yocto',   1e-24,
+  #others
+  'thousand',1_000,
+  'million', 1_000_000,
+  'billion', 1_000_000_000,
+  'trillion',1_000_000_000_000,
 );
 InitPrefixCode (
     #SI Prefix code
