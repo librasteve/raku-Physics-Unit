@@ -874,7 +874,7 @@ InitTypeDims (
 	'CatalyticActivity'     => (0,0,-1,0,0,1,0,0),
 	'FuelConsumption'       => (2,0,0,0,0,0,0,0),
 	'FuelEfficiency'        => (-2,0,0,0,0,0,0,0),
-	'ConsumptionRate'       => (2,0,0,0,0,0,0,0),
+	'ConsumptionRate'       => (2,0,-1,0,0,0,0,0),
 	'SpecificEnergy'        => (3,0,-1,0,0,0,0,0),
 	'Irradiance'            => (0,1,-3,0,0,0,0,0),
 	'Insolation'            => (0,1,-2,0,0,0,0,0),
