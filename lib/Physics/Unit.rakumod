@@ -1,4 +1,4 @@
-unit module Physics::Unit:ver<1.1.20>:auth<Steve Roe (librasteve@furnival.net)>; #viz. https://en.wikipedia.org/wiki/International_System_of_Units
+unit module Physics::Unit:ver<1.1.21>:auth<Steve Roe (librasteve@furnival.net)>; #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 my $db = 0;               #debug
 
@@ -717,14 +717,12 @@ InitPrefix (
   'zepto',   1e-21,
   'yocto',   1e-24,
   #others
-  #`[
   'million', 1_000_000,
   'billion', 1_000_000_000,
   'trillion',1_000_000_000_000,
   'mn',      1_000_000,
   'bn',      1_000_000_000,
   'tn',      1_000_000_000_000,
-  #]
 );
 InitPrefixCode (
     #SI Prefix code
