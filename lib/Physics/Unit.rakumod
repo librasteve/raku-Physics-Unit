@@ -976,6 +976,7 @@ InitUnit (
 	['tablespoon', 'tbsp'],                     'fluid-ounce / 2',
 	['teaspoon', 'tsp'],                        'tablespoon / 3',
 	['cord'],                                   '128 cubic feet',
+	['stere'],                                  '1 cubic metre',
 
 	# Speed
 	['m/s'],		                            'm/s',
