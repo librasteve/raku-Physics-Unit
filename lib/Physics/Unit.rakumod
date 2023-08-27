@@ -975,6 +975,7 @@ InitUnit (
 	['gill'],                                   '4 fluid-ounces',
 	['tablespoon', 'tbsp'],                     'fluid-ounce / 2',
 	['teaspoon', 'tsp'],                        'tablespoon / 3',
+	['cord'],                                   '128 cubic feet',
 
 	# Speed
 	['m/s'],		                            'm/s',
