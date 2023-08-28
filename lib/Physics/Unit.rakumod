@@ -1001,7 +1001,7 @@ InitUnit (
 
 	# Mass
 	['g', 'gram', 'gm', 'gramme'],              'kg / 1000',
-	['u', 'atomic-mass-unit'],                  '1.6605402e-27 kg',
+	['u', 'atomic-mass-unit', 'Da', 'Dalton'],  '1.6605402e-27 kg',
 	['metric-ton', 'tonne'],                    '1000 kg',
 	['grain'],                                  '0.0648 gm',
 	['lbm', 'pounds-mass'],                     '0.45359237 kg',
