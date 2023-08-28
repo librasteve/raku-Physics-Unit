@@ -1,4 +1,4 @@
-unit module Physics::Unit:ver<1.1.22>:auth<Steve Roe (librasteve@furnival.net)>; #viz. https://en.wikipedia.org/wiki/International_System_of_Units
+unit module Physics::Unit:ver<1.1.23>:auth<Steve Roe (librasteve@furnival.net)>; #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 my $db = 0;               #debug
 
@@ -827,6 +827,8 @@ InitTypes (
 	'SpecificEnergy'     => 'J/kg',
     'Irradiance'         => 'W/m^2',
     'Insolation'         => 'kWh/m^2',
+    'ThermalResistance'  => 'Km^2/W',
+    'ThermalConductance' => 'W/m^2K'
 );
 InitTypeDims (
 	#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
@@ -876,6 +878,8 @@ InitTypeDims (
 	'SpecificEnergy'        => (3,0,-1,0,0,0,0,0),
 	'Irradiance'            => (0,1,-3,0,0,0,0,0),
 	'Insolation'            => (0,1,-2,0,0,0,0,0),
+	'ThermalResistance'     => (0,-1,3,0,1,0,0,0),
+	'ThermalConductance'    => (0,1,-3,0,-1,0,0,0),
 );
 InitOddTypes (
     #mop up a few exceptional types
@@ -1116,9 +1120,14 @@ InitUnit (
 	# Insolation 
 	['kWh/m^2'],                                'kWh / m^2',
 	['Langley'],                                'calorie / cm^2',
+
+	# ThermalResistance 
+	['Km^2/W'],                                 'K m^2 / W',
+	['tog'],                                    '0.1 K m^2 / W',
+
+	# ThermalConductance 
+	['W/m^2K'],                                 'W / m^2 K',
 );
-
-
 
 if $db {
 say "+++++++++++++++++++";
