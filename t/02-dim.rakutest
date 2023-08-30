@@ -3,7 +3,7 @@
 #TESTALL$ prove6 ./t      [from root]
 use lib '../lib';
 use Test;
-plan 21;
+plan 19;
 
 use Physics::Unit;
 
@@ -35,8 +35,6 @@ InitDerivedUnit (
     ['lm', 'lumen'],                        'cd sr',
     ['lx', 'lux'],                          'm^-2 cd',
     ['Bq', 'becquerel'],                    '1 Hz',
-    ['Gy', 'gray'],                         'J / kg',
-    ['Sv', 'sievert'],                      'J / kg',
     ['kat', 'katal'],                       'mol s^-1',
     #SI coherent Derived Units in terms of base units - TBD [see url]
     #SI coherent Derived Units that include units with special names - TBD [see url]
@@ -61,8 +59,6 @@ Temperature
 LuminousFlux
 Illuminance
 Radioactivity
-Dose
-Dose
 CatalyticActivity
 >;
 
