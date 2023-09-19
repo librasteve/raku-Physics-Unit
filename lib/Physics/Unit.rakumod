@@ -823,7 +823,7 @@ InitTypes (
     'CatalyticActivity'  => 'kat',
     'FuelConsumption'    => 'm^3/m',
     'FuelEfficiency'     => 'm/m^3',
-	'Flow'    => 'm^3/s',
+	'Flow'               => 'm^3/s',
 	'SpecificEnergy'     => 'J/kg',
     'Irradiance'         => 'W/m^2',
     'Insolation'         => 'kWh/m^2',
