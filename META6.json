@@ -1,16 +1,13 @@
 {
   "name": "Physics::Unit",
   "description": "Some support for physical units.",
-  "version": "1.1.26",
+  "version": "2.x",
   "perl": "6.d",
   "authors": [
     "librasteve"
   ],
   "auth": "zef:librasteve",
-  "depends": [
-    "SVG",
-    "SVG::Plot"
-  ],
+  "depends": [],
   "build-depends": [],
   "test-depends": [],
   "provides": {
@@ -22,6 +19,6 @@
     "Physics",
     "Units"
   ],
-  "api": "1",
+  "api": "2",
   "source-url": "https://github.com/librasteve/raku-Physics-Unit.git"
 }

@@ -1,8 +1,21 @@
 #!/usr/bin/env raku
 use lib '../lib';
+
+use Data::Dump::Tree;
+
 use Physics::Unit;
 
 #SYNOPSIS
+
+#`[
+  Unit.new( factor => 1, offset => 0, defn => 'm', type => Length, dims => [1,0,0,0,0,0,0,0],
+  dmix => ("m"=>1).MixHash, names => ['m','metre','meter','metres','meters'] );
+#]
+
+
+dd GetUnit <m>;
+
+die;
 
 # Define your own Unit named "ff"
 my $ff = Unit.new( defn => 'furlong / fortnight', names => ['ff'] );

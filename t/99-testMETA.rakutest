@@ -11,6 +11,6 @@ if $auth-check {
     done-testing;
 }
 else {
-     skip-rest "Skipping author test";
-     exit;
+    skip-rest "Skipping author test";
+    exit;
 }

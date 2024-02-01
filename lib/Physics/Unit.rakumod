@@ -1,6 +1,6 @@
 unit module Physics::Unit:ver<1.1.26>:auth<Steve Roe (librasteve@furnival.net)>; #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
-my $db = 0;               #debug
+my $db = 1;               #debug
 
 #some units have the same dimensions but are different types - type hints steer type inference
 our %type-hints = %(
@@ -25,14 +25,18 @@ my Str @BaseNames;			#SI Base Unit names
 my %prefix-by-name;       #name => Prefix object
 my %prefix-by-code;       #code => Prefix name
 my %prefix-to-factor;     #name => Prefix factor
-my %defn-by-name;         #name => defn Str of known names incl. affix (values may be dupes)
-my %syns-by-name; 	      #name => list of synonyms (excl. user defined, incl. plurals)
-my %unit-by-name;         #name => Unit object cache (when instantiated)
+
+our %defn-by-name;         #name => defn Str of known names incl. affix (values may be dupes)
+our %syns-by-name; 	       #name => list of synonyms (excl. user defined, incl. plurals)
+our %unit-by-name;         #name => Unit object cache (when instantiated)
+
 my %affix-by-name;        #name => extended affix defn (eg. cm => 'centimetre') to decongest Grammar namespace
-my %affix-syns-by-name;   #name => list of synonyms for every affix [n, nano] X~ [m, metre, meter, metres, meters]
+my %asyns-by-name;        #name => list of synonyms for every affix [n, nano] X~ [m, metre, meter, metres, meters]
+
 my %type-to-protoname;    #type => prototype name
 my %type-to-prototype;    #type => prototype Unit object (when instantiated)
 my %type-to-dims;		  #type => dims vector
+
 my %odd-type-by-name;     #mop up a few exceptional types
 
 #Power synonyms
@@ -107,14 +111,14 @@ class Unit is export {
     return $n
   }
 
-	#| Manually make NewType when no preset type, eg. m-1
-	method NewType( Str $type-name ) {
-		for @.names -> $name {
-			%type-to-protoname{$type-name} = $name;
-		}
-		%type-to-prototype{$type-name} = self;
-		%type-to-dims{$type-name} = self.dims;
-	}
+  #| Manually make NewType when no preset type, eg. m-1
+  method NewType( Str $type-name ) {
+    for @.names -> $name {
+        %type-to-protoname{$type-name} = $name;
+    }
+    %type-to-prototype{$type-name} = self;
+    %type-to-dims{$type-name} = self.dims;
+  }
 
   ### output methods ###
   method Str  { self.name }
@@ -170,7 +174,7 @@ class Unit is export {
       }
     } else {
       #lookup defn in the affix synonyms
-      for %affix-syns-by-name.kv -> $k, $v {
+      for %asyns-by-name.kv -> $k, $v {
         if $v.grep($.defn) {
           @.names = @$v;
         }
@@ -270,7 +274,7 @@ class Unit is export {
     my $p = GetPrototype( $t );
     return( $t, $p )
   }
-  method root-extract( Int $n where 1 <= $n <= 4 ) {
+  method root-extract( Int $n where 1 <= * <= 4 ) {
     #only when all dims divisible by root
     my $l = self.clone;
     die "rebase failed" unless $l.factor == 1;
@@ -309,7 +313,7 @@ sub GetAffixByName is export {
 	return %affix-by-name;
 }
 sub GetAffixSynsByName is export {
-  return %affix-syns-by-name;
+  return %asyns-by-name;
 }
 sub GetPrototype( Str $type ) is export {
 	if my $pt = %type-to-prototype{$type} {
@@ -368,7 +372,7 @@ sub subst-shortest( Unit $u ) {
   }
 }
 
-sub type-hint(@t ) {
+sub type-hint( @t ) {
 	#type hints help when multiple types are found
 	for %type-hints.kv -> $k,$v {
 		return $k if @t.sort eq $v.sort
@@ -548,14 +552,16 @@ sub InitPrefix( @_ ) {
     $u.type:       'prefix';
 
     %prefix-by-name{$name} = $u;
-		%prefix-to-factor{$name} = $factor;
+    %prefix-to-factor{$name} = $factor;
 
     say "Initialized Prefix $name" if $db;
   }
 }
+
 sub InitPrefixCode( @_ ) {
 	@_.map( {%prefix-by-code{.key}=.value} );
 }
+
 sub InitBaseUnit( @_ ) {
   my $i = 0;
 
@@ -586,39 +592,41 @@ sub InitBaseUnit( @_ ) {
 
     @BaseNames.push: $u.name;
     %affix-by-name{$u.name} = @synonyms[1];			#extended name as value
-    %affix-syns-by-name{$u.name} = @synonyms;   #all synonyms as value
+    %asyns-by-name{$u.name} = @synonyms;   #all synonyms as value
 
     say "Initialized Base Unit $names[0]" if $db;
   }
 }
+
 sub InitDerivedUnit( @_ ) {
 	InitUnit( @_, :derived )
 }
+
 sub InitAffixUnit {
 	# so far %affix-by-name has been initialized with base and derived unit names
 
 	# replace kg with g
 	%affix-by-name<kg>:delete;
-  %affix-syns-by-name<kg>:delete;
+    %asyns-by-name<kg>:delete;
 	%affix-by-name<g> = 'gram';
-  %affix-syns-by-name<g> = <g gram grams gramme grammes>;
+    %asyns-by-name<g> = <g gram grams gramme grammes>;
 
 	# delete non-declining singletons from %affix-by-name so that they do not generate unwanted postfixes
-  # leave them in %affix-syns-by-name as we will want the syns for the singletons in do-postfix
+    # leave them in %affix-syns-by-name as we will want the syns for the singletons in do-postfix
 	#%affix-by-name<°>:delete;   (Angle does not make it to %affix-by-name)
 	%affix-by-name<°C>:delete;
 	%affix-by-name<radian>:delete;
 	%affix-by-name<steradian>:delete;
 
-  # Angle does not make it to %affix-syns-by-name ?!
-  %affix-syns-by-name<°> = <° degree degrees deg degs º>;
+    # Angle does not make it to %affix-syns-by-name ?!
+    %asyns-by-name<°> = <° degree degrees deg degs º>;
 
 	# pour in 'l' ie. ml, cl, etc quite common
 	%affix-by-name<l> = 'litre';
-	%affix-syns-by-name<l> = <l L litre litres liter liters>;
+	%asyns-by-name<l> = <l L litre litres liter liters>;
 
-  # now %affix-by-name has the right simple-names
-  # so now can copy these across and us them to spin up all the combos
+    # now %affix-by-name has the right simple-names
+    # so now can copy these across and us them to spin up all the combos
 	my %simple-names = %affix-by-name;
 
 	for %simple-names.keys -> $n {
@@ -628,36 +636,40 @@ sub InitAffixUnit {
 			my $combo = $c ~ $n;                                                #eg. 'ml' (used by custom Postfix op)
 			%affix-by-name{$combo} = %prefix-by-code{$c} ~ %simple-names{$n};   #eg. 'millilitres' (used by Grammar)
 
-      # set up synonym list for population of Unit object name
-      my $syns = %affix-syns-by-name{$n};
-      $syns = [ $p X~ @$syns ];   # using @$ to prevent ~ from stringifying the whole array
-      $syns.shift;                # drop eg. 'millil'
-      $syns.unshift: $combo;      # insert eg. 'ml'
+            # set up synonym list for population of Unit object name
+            my $syns = %asyns-by-name{$n};
+            $syns = [ $p X~ @$syns ];   # using @$ to prevent ~ from stringifying the whole array
+            $syns.shift;                # drop eg. 'millil'
+            $syns.unshift: $combo;      # insert eg. 'ml'
 
-      %affix-syns-by-name{$combo} = $syns;
+            %asyns-by-name{$combo} = $syns;
 		}
 	}
 }
+
 sub InitTypes( @_ )  {
   for @_ -> %p {
     %type-to-protoname{%p.key} = %p.value;
   }
 }
+
 sub InitTypeDims( @_ ) {
   for @_ -> %p {
 		%type-to-dims{%p.key} = %p.value;
 	}
 }
+
 sub InitOddTypes( @_ ) {
   for @_ -> %p {
     %odd-type-by-name{%p.key} = %p.value;
   }
 }
+
 sub InitUnit( @_ , :$derived ) is export {
 	#eg. ['N',  'newton'],           'kg m / s^2',
 	#      |     ^^^^^^ synonyms      ^^^^^^^^^^ defn
-	#	     |
-	#	     > canonical name
+	#	   |
+	#	   > canonical name
 
 	if not preload {
 		#load data map hashes only - instantiate Unit objects on demand
@@ -678,7 +690,7 @@ sub InitUnit( @_ , :$derived ) is export {
 			}
 			if $derived {
 				%affix-by-name{@synonyms[0]} = @synonyms[1];
-        %affix-syns-by-name{@synonyms[0]} = @synonyms;
+                %asyns-by-name{@synonyms[0]} = @synonyms;
 			}
 		}
 	} else {
@@ -687,7 +699,6 @@ sub InitUnit( @_ , :$derived ) is export {
             Unit.new( defn => $defn, names => [|$names] );
 		}
 	}
-
 }
 
 ######## Unit Data ########
@@ -724,6 +735,7 @@ InitPrefix (
   'bn',      1_000_000_000,
   'tn',      1_000_000_000_000,
 );
+
 InitPrefixCode (
     #SI Prefix code
     da => 'deka',
@@ -748,6 +760,7 @@ InitPrefixCode (
     z => 'zepto',
     y => 'yocto',
 );
+
 InitBaseUnit (
     #SI Base Units
     #viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
@@ -761,6 +774,7 @@ InitBaseUnit (
     'Luminosity'  => ['cd', 'candela', 'candle',],
     'Angle'		  => ['radian',],
 );
+
 InitDerivedUnit (
 	#SI Derived Units with special names & symbols
 	['sr', 'steradian'],                    'radian^2',
@@ -785,8 +799,10 @@ InitDerivedUnit (
 	['Sv', 'sievert'],                      'J / kg',
 	['kat','katal'],                        'mol s^-1',
 );
+
 InitAffixUnit;
 	#Load SI Prefix code / Unit combos to data map hashes for postfix operators
+
 InitTypes (
 	#sets name of prototype unit
     'Dimensionless'      => 'unity',
@@ -830,6 +846,7 @@ InitTypes (
     'ThermalResistance'  => 'Km^2/W',
     'ThermalConductance' => 'W/m^2K'
 );
+
 InitTypeDims (
 	#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
 	#                          (L,M,T,I,Θ,N,J,A)  [A=Angle]
@@ -881,6 +898,7 @@ InitTypeDims (
 	'ThermalResistance'     => (0,-1,3,0,1,0,0,0),
 	'ThermalConductance'    => (0,1,-3,0,-1,0,0,0),
 );
+
 InitOddTypes (
     #mop up a few exceptional types
     'eV'      => 'Energy',
@@ -894,6 +912,7 @@ InitOddTypes (
     'kWh'     => 'Energy',
     'ft-lb'   => 'Torque',
 );
+
 InitUnit (
 	# Dimensionless
 	['①','(1)','one','unity'],                  '1',  #U-2460 CIRCLED DIGIT ONE
@@ -908,15 +927,15 @@ InitUnit (
 
 	# Solid Angle
 	['deg²'],                                   'deg^2',
-	['sp','spat'],                              '4 pi steradians',
+	['sp','spat'],                              '4 pi steradian',
 
 	# Time
 	['min', 'minute'],                          '60 s',
 	['hr', 'hour'],                             '60 min',
 	['day'],                                    '24 hr',
-	['week'],                                   '7 days',
+	['week'],                                   '7 day',
 	['fortnight'],                              '2 week',
-	['yr', 'year'],                             '365.25 days',
+	['yr', 'year'],                             '365.25 day',
 	['month'],                                  'year / 12',    # an average month
 	['century', 'centuries'],                   '100 yr',
 	['millenium', 'millenia'],                  '1000 yr',
@@ -924,7 +943,7 @@ InitUnit (
 	# Frequency
 	['cycle'],                                  '1 Hz',
 	['revolution'],                             '1',
-	['rpm'],                                    'revolutions per minute',
+	['rpm'],                                    'revolution per minute',
 
 	# Length
 	['km'],				                        'kilometre',
@@ -937,9 +956,9 @@ InitUnit (
 	['ft', 'foot', 'feet'],                     '0.3048 m',
 	['in', 'inch'],                             'ft/12',
 	['yard'],                                   '3 ft',
-	['fathom'],                                 '2 yards',
-	['rod', 'pole', 'perch'],                   '5.5 yards',
-	['furlong'],                                '40 rods',
+	['fathom'],                                 '2 yard',
+	['rod', 'pole', 'perch'],                   '5.5 yard',
+	['furlong'],                                '40 rod',
 	['mile'],                                   '5280 ft',
 	['nmile', 'nautical-mile'],                 '1852 m',
 	['ca', 'cable'],		                    '185.2 m',
@@ -948,9 +967,9 @@ InitUnit (
 
 	# Area
 	['m^2', 'm2', 'm²'],                        'm^2',
-	['are'],                                    '100 square metres',
-	['hectare'],                                '100 ares',
-	['barn'],                                   '1e-28 square metres',
+	['are'],                                    '100 square metre',
+	['hectare'],                                '100 are',
+	['barn'],                                   '1e-28 square metre',
 	['acre'],                                   '43560 square feet',
 
 	# Volume
@@ -965,18 +984,18 @@ InitUnit (
 	['us-gallon'],                              '3.785411784 litre',
 	['imp-gallon'],                             '4.54609 litre',
 	['gallon'],									"1 {$locale}-gallon",
-	['firkin'],							        '9 gallons',
-	['barrel'],							        '36 gallons',
+	['firkin'],							        '9 gallon',
+	['barrel'],							        '36 gallon',
 	['quart'],                                  'gallon/4',
-	['peck'],                                   '8 quarts',
-	['bushel'],                                 '4 pecks',
+	['peck'],                                   '8 quart',
+	['bushel'],                                 '4 peck',
 	['fifth'],                                  'us-gallon/5',
 	['us-pint'],                                'us-gallon/8',
 	['imp-pint'],                               'imp-gallon/8',
 	['pint'],									"1 {$locale}-pint",
 	['cup'],                                    'us-pint/2',
 	['floz', 'fluid-ounce'],                    'cup/8',
-	['gill'],                                   '4 fluid-ounces',
+	['gill'],                                   '4 fluid-ounce',
 	['tablespoon', 'tbsp'],                     'fluid-ounce / 2',
 	['teaspoon', 'tsp'],                        'tablespoon / 3',
 	['cord'],                                   '128 cubic feet',
@@ -984,7 +1003,7 @@ InitUnit (
 
 	# Speed
 	['m/s'],		                            'm/s',
-	['mph'],                                    'miles per hour',
+	['mph'],                                    'mile per hour',
 	['kph'],                                    'kilometre per hour',
 	['kps'],                                    'kilometre per second',
 	['fps'],                                    'feet per second',
@@ -1047,7 +1066,7 @@ InitUnit (
 	# Pressure
 	['bar'],                                    '1e5 pascal',
 	['torr'],                                   '133.322368 pascal',  #(101325 / 760)
-	['psi'],                                    'pounds per inch^2',
+	['psi'],                                    'pound per inch^2',
 	['atm', 'atmosphere'],                      '101325 pascal',
 	['mmHg'],                                   '133.322 pascal',
 
@@ -1061,8 +1080,8 @@ InitUnit (
 	['MeV'],                                    'mega electron-volt',
 	['GeV'],                                    'giga electron-volt',
 	['TeV'],                                    'tera electron-volt',
-	['cal', 'calorie'],                         '4.184 joules',
-	['kcal'],                                   'kilocalories',
+	['cal', 'calorie'],                         '4.184 joule',
+	['kcal'],                                   'kilocalorie',
 	['btu', 'british-thermal-unit'],            '1055.056 joule',
 	['therm'],                                  '1.0e5 btu',
 	['erg'],                                    '1.0e-7 joule',
@@ -1100,26 +1119,26 @@ InitUnit (
 
 	# FuelConsumption
 	['m^3/m'],                                  'm^3 / metre',
-	['l/100km'],                                '0.00001 litres / metre',
+	['l/100km'],                                '0.00001 litre / metre',
 
 	# FuelEfficiency
-	['m/m^3'],                                  'metres / m^3',
-	['mpg'],                                    'miles / gallon',
+	['m/m^3'],                                  'metre / m^3',
+	['mpg'],                                    'mile / gallon',
 
 	# Flow
 	['m^3/s'],                                  'm^3 / second',
-	['gpd'],                                    'gallons / day',
+	['gpd'],                                    'gallon / day',
 
 	# SpecificEnergy 
-	['J/kg'],                                   'joules / kg',
-	['MJ/kg'],                                  'mega joules / kg',
+	['J/kg'],                                   'joule / kg',
+	['MJ/kg'],                                  'mega joule / kg',
 
 	# Irradiance 
 	['W/m^2'],                                  'W / m^2',
 
 	# Insolation 
 	['kWh/m^2'],                                'kWh / m^2',
-	['Langley'],                                'calorie / cm^2',
+	['Langley'],                                'cal / 10000 m^2',
 
 	# ThermalResistance 
 	['Km^2/W'],                                 'K m^2 / W',
