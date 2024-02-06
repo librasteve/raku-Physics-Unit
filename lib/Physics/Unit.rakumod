@@ -1,6 +1,8 @@
 unit module Physics::Unit:ver<1.1.26>:auth<Steve Roe (librasteve@furnival.net)>; #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
-my $db = 1;               #debug
+use Data::Dump::Tree;
+
+my $db = 0;               #debug
 
 #some units have the same dimensions but are different types - type hints steer type inference
 our %type-hints = %(
@@ -22,6 +24,16 @@ constant \preload = 0;		#Preload All Units ie. for debug (precomp load 1.6s othe
 constant \NumBases = 8;
 my Str @BaseNames;			#SI Base Unit names
 
+#Power synonyms
+my %pwr-preword   = ( square  => 2, sq => 2, cubic => 3, cu => 3 );
+my %pwr-postword  = ( squared => 2, cubed => 3, );
+
+#Power superscripts eg. x¹ x² x³ x⁴ x⁻¹ x⁻² x⁻³ x⁻⁴
+my %pwr-superscript = (
+     '¹' =>  1,  '²' =>  2,  '³' =>  3,  '⁴' =>  4,
+    '⁻¹' => -1, '⁻²' => -2, '⁻³' => -3, '⁻⁴' => -4,
+);
+
 my %prefix-by-name;       #name => Prefix object
 my %prefix-by-code;       #code => Prefix name
 my %prefix-to-factor;     #name => Prefix factor
@@ -39,15 +51,28 @@ my %type-to-dims;		  #type => dims vector
 
 my %odd-type-by-name;     #mop up a few exceptional types
 
-#Power synonyms
-my %pwr-preword   = ( square  => 2, sq => 2, cubic => 3, cu => 3 );
-my %pwr-postword  = ( squared => 2, cubed => 3, );
+class UnitServices {
+    has %.defn-by-name;         #name => defn Str of known names incl. affix (values may be dupes)
+    has %.syns-by-name; 	       #name => list of synonyms (excl. user defined, incl. plurals)
+    has %.unit-by-name;         #name => Unit object cache (when instantiated)
 
-#Power superscripts eg. x¹ x² x³ x⁴ x⁻¹ x⁻² x⁻³ x⁻⁴
-my %pwr-superscript = (
-     '¹' =>  1,  '²' =>  2,  '³' =>  3,  '⁴' =>  4,
-    '⁻¹' => -1, '⁻²' => -2, '⁻³' => -3, '⁻⁴' => -4,
-);
+    method TWEAK {
+        %!defn-by-name := %defn-by-name;
+        %!syns-by-name := %syns-by-name;
+        %!unit-by-name := %unit-by-name;
+    }
+}
+
+class Session {           ## rename?
+    has UnitServices $.unit-services;
+
+    method TWEAK {
+        $!unit-services := UnitServices.new;
+    }
+}
+
+my $session = Session.new;
+ddt $session;
 
 ######## Classes & Roles ########
 

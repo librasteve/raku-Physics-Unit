@@ -14,6 +14,9 @@
   - Unit Directory
   - Session class
 - use lizmat role Cached
+- turn data maps into Session / Directory services
+- add currency dim
+- package units
 
 ## TODOS
 - [ ] cc info to main (check preload = 1)
