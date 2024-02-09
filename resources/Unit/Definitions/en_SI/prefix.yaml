@@ -1,49 +1,28 @@
-#Type:
-#  - names:
-#      - one
-#      - two
-#    defn: watt * hour
-#  - names:
-#      - three
-#      - four
-#    defn: km
-#
-#Type2:
-#  - names:
-#      - one
-#      - two
-#    defn: watt * hour
+#Physics::Units::Definitions::en_SI - prefix.yaml
 
+#SI Prefixes
+#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
 
-#or
-#Type:
-#  - names: ['one','two']
-#    defn: watt * hour
-#
-#  - names: ['three','four']
-#    defn: km
-#
-#Type2:
-#  - names: ['one','two']
-#    defn: watt * hour
+# Format key:
+#- {names: [symbol, synonym-one, synonym-two ...], defn: 'definition string'}
 
-
-#or
-#Type:
-#  - names: [one, two]
-#    defn: watt * hour
-#
-#  - names: [three, four]
-#    defn: km
-#
-#Type2:
-#  - names: [one, two]
-#    defn: watt * hour
-
-#or THIS!!!
-Type:
-  - {names: [one, two],    defn: watt * hour}
-  - {names: [three, four], defn: watt * hour}
-
-Type2:
-  - {names: [one, two],    defn: watt * hour}
+- {names: [da, deka], defn: 10}
+- {names: [h, hecto], defn: 100}
+- {names: [k, kilo],  defn: 1000}
+- {names: [M, mega],  defn: 1000000}
+- {names: [G, giga],  defn: 1000000000}
+- {names: [T, tera],  defn: 1000000000000}
+- {names: [P, peta],  defn: 1000000000000000}
+- {names: [E, exa],   defn: 1000000000000000000}
+- {names: [Z, zetta], defn: 1000000000000000000000}
+- {names: [Y, yotta], defn: 1000000000000000000000000}
+- {names: [d, deci],  defn: 0.1}
+- {names: [c, centi], defn: 0.01}
+- {names: [m, milli], defn: 0.001}
+- {names: [μ, micro], defn: 0.000001}
+- {names: [n, nano],  defn: 0.000000001}
+- {names: [p, pico],  defn: 0.000000000001}
+- {names: [f, femto], defn: 0.000000000000001}
+- {names: [a, atto],  defn: 0.000000000000000001}
+- {names: [z, zepto], defn: 1e-21}
+- {names: [y, yocto], defn: 1e-24}

@@ -3,7 +3,16 @@ use v6.d;
 use Data::Dump::Tree;
 use YAMLish;
 
-class Physics::Unit::Definitions::en_SI {      #adjust to is Loader?
+sub debool($s is copy) {                           # FIXME export me
+    my @boolies = <y Y yes Yes YES n N no No NO
+            true True TRUE false False FALSE 
+            on On ON off Off OFF>;
+
+    $s ~~ s:g/<|w>(<@boolies>)<|w>/\"$0\"/;
+    $s
+}
+
+class Physics::Unit::Definitions::en_SI {      # FIXME adjust to is Loader?
     has @!parts = <base derived prefix>;
 
     has %!yobs;
@@ -12,10 +21,9 @@ class Physics::Unit::Definitions::en_SI {      #adjust to is Loader?
         my $path = $?CLASS.^name.split("::").[*-3..*-1].join('/');
 
         for @!parts -> $part {
-            %!yobs{$part} = %?RESOURCES{"$path/$part.yaml"}.slurp.&load-yaml
+            %!yobs{$part} = %?RESOURCES{"$path/$part.yaml"}.&slurp.&debool.&load-yaml;
         }
+
         ddt %!yobs;
-
-
     }
 }
