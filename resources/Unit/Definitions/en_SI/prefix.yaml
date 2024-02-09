@@ -1,0 +1,49 @@
+#Type:
+#  - names:
+#      - one
+#      - two
+#    defn: watt * hour
+#  - names:
+#      - three
+#      - four
+#    defn: km
+#
+#Type2:
+#  - names:
+#      - one
+#      - two
+#    defn: watt * hour
+
+
+#or
+#Type:
+#  - names: ['one','two']
+#    defn: watt * hour
+#
+#  - names: ['three','four']
+#    defn: km
+#
+#Type2:
+#  - names: ['one','two']
+#    defn: watt * hour
+
+
+#or
+#Type:
+#  - names: [one, two]
+#    defn: watt * hour
+#
+#  - names: [three, four]
+#    defn: km
+#
+#Type2:
+#  - names: [one, two]
+#    defn: watt * hour
+
+#or THIS!!!
+Type:
+  - {names: [one, two],    defn: watt * hour}
+  - {names: [three, four], defn: watt * hour}
+
+Type2:
+  - {names: [one, two],    defn: watt * hour}

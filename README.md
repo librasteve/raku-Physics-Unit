@@ -6,9 +6,13 @@
 
 ## Issues / Opportunities
 - GetUnit revert to Unit.new
+- Measure Types to be parameterized? and international?
+- consider 20 but <km> [again]
 
 
 ## Thoughts
+- add synth units
+  - need unique name/type pattern
 - add something like
   - Unit Factory
   - Unit Directory
@@ -20,6 +24,129 @@
 
 ## TODOS
 - [ ] cc info to main (check preload = 1)
+- [ ] externalise unit defs
+
+en_US - English (United States)
+en_GB - English (United Kingdom)
+fr_FR - French (France)
+es_ES - Spanish (Spain)
+de_DE - German (Germany)
+it_IT - Italian (Italy)
+pt_BR - Portuguese (Brazil)
+zh_CN - Chinese (China)
+ja_JP - Japanese (Japan)
+ru_RU - Russian (Russia)
+ko_KR - Korean (South Korea)
+ar_SA - Arabic (Saudi Arabia)
+hi_IN - Hindi (India)
+tr_TR - Turkish (Turkey)
+nl_NL - Dutch (Netherlands)
+pl_PL - Polish (Poland)
+sv_SE - Swedish (Sweden)
+fi_FI - Finnish (Finland)
+da_DK - Danish (Denmark)
+no_NO - Norwegian (Norway)
+
+en_SI
+
+## Pint lessons
+_default_en.txt_
+- dimension meta formulae - discard (P::U auto induces this)
+- dimension - base link -discard (P::U has this hardwired)
+- add currency and information dimensions - then certain prefix KiB, MiB etc only applies to info
+- consider "symbol" attr (later)
+- defer any system stuff (cgs etc)
+- defer log units (dB ...)
+- underscore k_C stuff ignore
+- lift semantics, but not syntax
+- what about internationalization
+  - ^^ LLMs
+  - ^^ Type names
+
+``` pint
+# Energy
+watt_hour = watt * hour = Wh = watthour
+```
+
+``` P::U
+# Energy
+['Wh', 'watt_hour', 'watthour'], 'watt * hour',
+<Wh watt_hour watthour>, 'watt * hour',
+```
+
+```
+Type => [
+  [
+    [names],     # .first is symbol
+    'defn',
+  ],
+  [
+    [names],     # .first is symbol
+    'defn',
+  ],
+]
+```
+
+```
+class Unit::Raw  {
+  has Str $.type;
+  has Str @.names;
+  has Str $.defn;
+}
+```
+
+these are the things that need to be pluggable...!
+the inheritance / append method means that they are extensions to base
+
+Core / Base, Derived, Prefix
+InitBaseUnit (
+#SI Base Units
+#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
+##FIXME revert to algorithmic plurals
+'Length'      => ['m', 'metre', 'meter',],
+'Mass'        => ['kg', 'kilogram',],
+'Time'        => ['s', 'sec', 'second',],
+'Current'     => ['A', 'amp', 'ampere', 'ampère',],
+'Temperature' => ['K', 'kelvin',],
+'Substance'   => ['mol', 'mole',],
+'Luminosity'  => ['cd', 'candela', 'candle',],
+'Angle'		  => ['radian',],
+);
+
+fr_SI / Base, Derived
+InitBaseUnit (
+# Unités de base du SI
+# Voir https://fr.wikipedia.org/wiki/Analyse_dimensionnelle#Définition
+##FIXME revenir aux pluriels algorithmiques
+'Longueur'    => ['m', 'mètre',],
+'Masse'       => ['kg', 'kilogramme',],
+'Temps'       => ['s', 'sec', 'seconde',],
+'Courant'     => ['A', 'amp', 'ampère',],
+'Température' => ['K', 'kelvin',],
+'Substance'   => ['mol', 'mole',],
+'Luminosité'  => ['cd', 'candela',],
+'Angle'       => ['radian',],
+);
+
+de_SI / Base, Derived
+InitBaseUnit (
+# SI-Basiseinheiten
+# Siehe https://de.wikipedia.org/wiki/Dimensionale_Analyse#Definition
+##FIXME zurück zu algorithmischen Pluralformen
+'Länge'        => ['m', 'Meter',],
+'Masse'        => ['kg', 'Kilogramm',],
+'Zeit'         => ['s', 'sek', 'Sekunde',],
+'Stromstärke'  => ['A', 'Amp', 'Ampere',],
+'Temperatur'   => ['K', 'Kelvin',],
+'Stoffmenge'   => ['mol', 'Mol',],
+'Lichtstärke'  => ['cd', 'Candela',],
+'Winkel'       => ['Radiant',],
+);
+
+class Longueur is Length {}
+
+Length.names.append: ['m', 'mètre',],
+
 
 
 # Physics::Unit

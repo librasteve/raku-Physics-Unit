@@ -52,9 +52,9 @@ my %type-to-dims;		  #type => dims vector
 my %odd-type-by-name;     #mop up a few exceptional types
 
 class UnitServices {
-    has %.defn-by-name;         #name => defn Str of known names incl. affix (values may be dupes)
-    has %.syns-by-name; 	       #name => list of synonyms (excl. user defined, incl. plurals)
-    has %.unit-by-name;         #name => Unit object cache (when instantiated)
+    has %.defn-by-name;   #name => defn Str of known names incl. affix (values may be dupes)
+    has %.syns-by-name;   #name => list of synonyms (excl. user defined, incl. plurals)
+    has %.unit-by-name;   #name => Unit object cache (when instantiated)
 
     method TWEAK {
         %!defn-by-name := %defn-by-name;
@@ -273,13 +273,20 @@ class Unit is export {
   }
 
   #### convert & compare methods ####
+
+  #| used to provide shortest name
+  #| note the equal factor constraint
+  #| should be private (when sub are folded in)
   method same-dims( Unit $u ) {
-    return 0 unless $u.dmix eqv self.dmix;
+    return 0 unless $u.dmix  eqv self.dmix;
     return 0 unless $u.factor == self.factor;
     return 1
   }
+
+  #| used by Measure cmp
+  #| maybe rename to method cmp?
   method same-unit( Unit $u ) {
-    return 0 unless $u.dims eqv self.dims;
+    return 0 unless $u.dims  eqv self.dims;
     return 0 unless $u.factor == self.factor;
     return 1
   }
@@ -616,8 +623,8 @@ sub InitBaseUnit( @_ ) {
     %type-to-prototype{$type} = $u;
 
     @BaseNames.push: $u.name;
-    %affix-by-name{$u.name} = @synonyms[1];			#extended name as value
-    %asyns-by-name{$u.name} = @synonyms;   #all synonyms as value
+    %affix-by-name{$u.name} = @synonyms[1];	 #extended name as value
+    %asyns-by-name{$u.name} = @synonyms;     #all synonyms as value
 
     say "Initialized Base Unit $names[0]" if $db;
   }
@@ -680,8 +687,8 @@ sub InitTypes( @_ )  {
 
 sub InitTypeDims( @_ ) {
   for @_ -> %p {
-		%type-to-dims{%p.key} = %p.value;
-	}
+    %type-to-dims{%p.key} = %p.value;
+  }
 }
 
 sub InitOddTypes( @_ ) {
@@ -926,6 +933,7 @@ InitTypeDims (
 
 InitOddTypes (
     #mop up a few exceptional types
+    #FIXME - avoid exceptions
     'eV'      => 'Energy',
     'MeV'     => 'Energy',
     'GeV'     => 'Energy',
