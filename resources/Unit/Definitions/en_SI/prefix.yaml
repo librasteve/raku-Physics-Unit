@@ -1,12 +1,10 @@
 #Physics::Units::Definitions::en_SI - prefix.yaml
 
 #SI Prefixes
-#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
+#avoid 1e2 format to encourage Rats
 
 # Format key:
 #- {names: [symbol, synonym-one, synonym-two ...], defn: 'definition string'}
-
-#avoid 1e2 format to encourage Rats
 
 - {names: [da, deka], defn: 10}
 - {names: [h, hecto], defn: 100}

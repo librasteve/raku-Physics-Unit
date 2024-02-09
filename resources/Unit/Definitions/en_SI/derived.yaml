@@ -1,7 +1,6 @@
 #Physics::Units::Definitions::en_SI - derived.yaml
 
 #SI Derived Units
-#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
 
 # Format key:
 #- {names: [symbol, synonym-one, synonym-two ...], defn: 'definition string'}

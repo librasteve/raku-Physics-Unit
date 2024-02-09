@@ -931,6 +931,8 @@ InitTypeDims (
 	'ThermalConductance'    => (0,1,-3,0,-1,0,0,0),
 );
 
+#iamerejh ... next is stub all above ^^
+
 InitOddTypes (
     #mop up a few exceptional types
     #FIXME - avoid exceptions
@@ -949,7 +951,7 @@ InitOddTypes (
 InitUnit (
 	# Dimensionless
 	['①','(1)','one','unity'],                  '1',  #U-2460 CIRCLED DIGIT ONE
-	['semi','demi','hemi'],                     '1/2',
+	['semi','demi','hemi'],                     '1/2',   # FIXME prefix?
 	['%','percent'],                            '1/100',
 	['ABV'],                                    '1',
 	['pi'],                                     '3.1415926535897932385',

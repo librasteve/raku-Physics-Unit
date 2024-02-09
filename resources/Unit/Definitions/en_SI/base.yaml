@@ -1,7 +1,6 @@
 #Physics::Units::Definitions::en_SI - base.yaml
 
 #SI Base Units
-#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
 
 # Format key:
 #Type:        [symbol, synonym-one, synonym-two ...]

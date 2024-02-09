@@ -18,7 +18,9 @@
   "resources": [
     "Unit/Definitions/en_SI/base.yaml",
     "Unit/Definitions/en_SI/derived.yaml",
-    "Unit/Definitions/en_SI/prefix.yaml"
+    "Unit/Definitions/en_SI/prefix.yaml",
+    "Unit/Definitions/en_SI/types.yaml",
+    "Unit/Definitions/en_SI/dims.yaml"
   ],
   "license": "Artistic-2.0",
   "tags": [
