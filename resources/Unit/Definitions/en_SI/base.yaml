@@ -3,8 +3,7 @@
 #SI Base Units
 
 # Format key:
-#Type:        [symbol, synonym-one, synonym-two ...]
-
+#Type:       [symbol, synonym-one, synonym-two ...]
 Length:      [m, metre, meter]
 Mass:        [kg, kilogram]
 Time:        [s, sec, second]

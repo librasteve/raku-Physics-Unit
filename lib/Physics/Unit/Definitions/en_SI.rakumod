@@ -4,9 +4,12 @@ use Data::Dump::Tree;
 use YAMLish;
 
 sub debool($s is copy) {                           # pr to yamlish 09-Feb-24
-    my @boolies =  <y Y yes Yes YES n N no No NO
-                    true True TRUE false False FALSE
-                    on On ON off Off OFF>;
+    my @boolies =  <y Y yes Yes YES
+                    n N no  No  NO
+                    true  True  TRUE
+                    false False FALSE
+                    on    On    ON
+                    off   Off   OFF>;
 
     $s ~~ s:g/<|w>(<@boolies>)<|w>/\"$0\"/;
     $s
@@ -27,6 +30,6 @@ class Physics::Unit::Definitions::en_SI {      # FIXME adjust to is Loader?
             %!yobs{$part} = %?RESOURCES{"$path/$part.yaml"}.slurp.&debool.&load-yaml;
         }
 
-        ddt %!yobs;
+        ddt %!yobs.sort;
     }
 }
