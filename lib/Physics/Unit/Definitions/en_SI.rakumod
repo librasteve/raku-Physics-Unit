@@ -4,9 +4,9 @@ use Data::Dump::Tree;
 use YAMLish;
 
 sub debool($s is copy) {                           # FIXME export me
-    my @boolies = <y Y yes Yes YES n N no No NO
-            true True TRUE false False FALSE 
-            on On ON off Off OFF>;
+    my @boolies =  <y Y yes Yes YES n N no No NO
+                    true True TRUE false False FALSE
+                    on On ON off Off OFF>;
 
     $s ~~ s:g/<|w>(<@boolies>)<|w>/\"$0\"/;
     $s

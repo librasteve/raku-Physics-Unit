@@ -6,6 +6,8 @@
 # Format key:
 #- {names: [symbol, synonym-one, synonym-two ...], defn: 'definition string'}
 
+#avoid 1e2 format to encourage Rats
+
 - {names: [da, deka], defn: 10}
 - {names: [h, hecto], defn: 100}
 - {names: [k, kilo],  defn: 1000}
@@ -26,3 +28,8 @@
 - {names: [a, atto],  defn: 0.000000000000000001}
 - {names: [z, zepto], defn: 1e-21}
 - {names: [y, yocto], defn: 1e-24}
+
+#others
+- {names: [mn, million],  defn: 1000000}
+- {names: [bn, billion],  defn: 1000000000}
+- {names: [tn, trillion], defn: 1000000000000}
