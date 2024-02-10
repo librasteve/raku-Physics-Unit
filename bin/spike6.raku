@@ -1,36 +1,31 @@
 #!/usr/bin/env raku
+use v6.d;
 use lib '../lib';
 
 use Data::Dump::Tree;
 
 use Physics::Unit;
 
-#V2
-
-
-
-
-
-#dd Unit.new('m');
+#SYNOPSIS
 
 #`[
   Unit.new( factor => 1, offset => 0, defn => 'm', type => Length, dims => [1,0,0,0,0,0,0,0],
   dmix => ("m"=>1).MixHash, names => ['m','metre','meter','metres','meters'] );
 #]
 
-#say '--';
-#say 'defn-by-name';
-#say %Physics::Unit::defn-by-name;
-#say '--';
-#say 'syns-by-name';
-#say %Physics::Unit::syns-by-name;
-#say '--';
-#say 'unit-by-name';
-#say %Physics::Unit::unit-by-name;
+
+my $u = GetUnit <ohm>;
+#say $u.WHICH;   #Physics::Unit::Unit|4267563835920   #PU4267563835920
+
+say '==============';
+
+
+#dd %Physics::Unit::defn-by-name;
+
+
 
 die;
 
-##`[
 # Define your own Unit named "ff"
 my $ff = Unit.new( defn => 'furlong / fortnight', names => ['ff'] );
 say "$ff";				# 'ff' ... string context gives unit name
@@ -56,7 +51,6 @@ say ~$u3;
 say "compare $u1, $u2... " ~ $u2.same-dims($u1);
 
 put ListUnits().sort;
-#]]
 
 #`[[
 ##### Principles & Behaviours ######

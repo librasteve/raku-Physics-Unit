@@ -6,9 +6,14 @@
 
 ## Issues / Opportunities
 - GetUnit revert to Unit.new
-- Measure Types to be parameterized? and international?
+- Measure Types to be parameterized? and international? - yep (breaks Nav)
+- Measure[]
 - consider 20 but <km> [again]
-
+- Physics::Unit::Unit => Physics::Unit
+- slangify
+- synthetic units Type = u.WHICH  (valid identifier)  ??
+  - my $u = GetUnit <ohm>; say $u.WHICH;   #Physics::Unit::Unit|4267563835920   #PU4267563835920
+- https://raku.land/zef:lizmat/ObjectCache
 
 ## Thoughts
 - add synth units
@@ -24,7 +29,7 @@
 
 ## TODOS
 - [ ] cc info to main (check preload = 1)
-- [ ] externalise unit defs
+
 
 en_US - English (United States)
 en_GB - English (United Kingdom)

@@ -51,32 +51,71 @@ my %type-to-dims;		  #type => dims vector
 
 my %odd-type-by-name;     #mop up a few exceptional types
 
-class Dictionary {
+#-------------------------- NEW SHIT
+
+subset Name of Str;
+subset Defn of Str;
+
+# todo
+# 1 interpose Dictionary service
+# 1a units
+# 1b prefixs
+# 1c other
+# externailze all but Unit
+
+role Dictionary {
     has %.defn-by-name;   #name => defn Str of known names incl. affix (values may be dupes)
     has %.syns-by-name;   #name => list of synonyms (excl. user defined, incl. plurals)
     has %.unit-by-name;   #name => Unit object cache (when instantiated)
+
+    ### Singleton Behaviour ###
+    my Dictionary $instance;
+
+    method new {!!!}
+
+    method instance {
+        $instance = Dictionary.bless unless $instance;
+        $instance;
+    }
+    ###
 
     method TWEAK {
         %!defn-by-name := %defn-by-name;
         %!syns-by-name := %syns-by-name;
         %!unit-by-name := %unit-by-name;
     }
-}
 
-class Session {           ## rename?
-    has Dictionary $.unit-services;
-
-    method TWEAK {
-        $!unit-services := Dictionary.new;
+    method defn(Name $n --> Defn) {      #getter
+        %!defn-by-name{$n}
     }
 }
 
-my $session = Session.new;
-ddt $session;
+class Session {
+    has Dictionary $.dictionary .= instance;
+
+    ### Singleton Behaviour ###
+    my Session $instance;
+
+    method new {!!!}
+
+    method instance {
+        $instance = Session.bless unless $instance;
+        $instance;
+    }
+    ###
+
+    method TWEAK {
+        use Physics::Unit::Loader;
+        Loader.new: session => self;
+    }
+}
+
+
 
 ######## Classes & Roles ########
 
 class Unit is export {
+  has Session $!session .= instance;
   has Real $!factor = 1;
   has Real $!offset = 0;				#ie. for K <=> °C
   has Str  $!defn   = '';
@@ -1182,6 +1221,9 @@ InitUnit (
 	# ThermalConductance 
 	['W/m^2K'],                                 'W / m^2 K',
 );
+
+my $session = Session.instance;
+ddt $session;
 
 if $db {
 say "+++++++++++++++++++";

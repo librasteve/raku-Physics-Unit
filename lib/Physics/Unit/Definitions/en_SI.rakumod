@@ -1,5 +1,3 @@
-use v6.d;
-
 use Data::Dump::Tree;
 use YAMLish;
 
@@ -16,7 +14,6 @@ sub debool(Str $s is copy --> Str) {                           # pr to yamlish 0
     $s ~~ s:g/<|w>(<@booleys>)<|w>/\"$0\"/;
     $s
 }
-
 
 class Physics::Unit::Definitions::en_SI {      # FIXME adjust to is Loader?
     #viz. https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
