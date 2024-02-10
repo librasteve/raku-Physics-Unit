@@ -51,7 +51,7 @@ my %type-to-dims;		  #type => dims vector
 
 my %odd-type-by-name;     #mop up a few exceptional types
 
-class UnitServices {
+class Dictionary {
     has %.defn-by-name;   #name => defn Str of known names incl. affix (values may be dupes)
     has %.syns-by-name;   #name => list of synonyms (excl. user defined, incl. plurals)
     has %.unit-by-name;   #name => Unit object cache (when instantiated)
@@ -64,10 +64,10 @@ class UnitServices {
 }
 
 class Session {           ## rename?
-    has UnitServices $.unit-services;
+    has Dictionary $.unit-services;
 
     method TWEAK {
-        $!unit-services := UnitServices.new;
+        $!unit-services := Dictionary.new;
     }
 }
 
@@ -933,9 +933,9 @@ InitTypeDims (
 
 #iamerejh ... next is stub all above ^^
 
+# FIXME - avoid exceptions
 InitOddTypes (
     #mop up a few exceptional types
-    #FIXME - avoid exceptions
     'eV'      => 'Energy',
     'MeV'     => 'Energy',
     'GeV'     => 'Energy',
