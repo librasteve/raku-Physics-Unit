@@ -12,8 +12,7 @@
   "test-depends": [],
   "provides": {
     "Physics::Unit": "lib/Physics/Unit.rakumod",
-    "Physics::Unit::Definitions::en_SI": "lib/Physics/Unit/Definitions/en_SI.rakumod",
-    "Physics::Unit::Loader": "lib/Physics/Unit/Loader.rakumod"
+    "Physics::Unit::Definitions::en_SI": "lib/Physics/Unit/Definitions/en_SI.rakumod"
   },
   "resources": [
     "Unit/Definitions/en_SI/base.yaml",

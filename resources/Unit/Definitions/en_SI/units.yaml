@@ -15,7 +15,7 @@ Dimensionless:
   - {names: [①, (1), one, unity],        defn: '1'}          #U-2460 CIRCLED DIGIT ONE
   - {names: [semi, demi, hemi],          defn: '1/2'}         # FIXME prefix?
   - {names: ['%' , percent],             defn: '1/100'}
-  - {names: [ABV],                       defn: '1'}
+  - {names: [ABV],                       defn: '1/100'}       # FIXME 1/100?
   - {names: [pi],                        defn: '3.1415926535897932385'}
 
 Angle:

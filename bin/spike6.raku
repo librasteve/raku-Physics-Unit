@@ -15,6 +15,9 @@ use Physics::Unit;
 
 
 my $u = GetUnit <ohm>;
+dd $u;
+
+die;
 #say $u.WHICH;   #Physics::Unit::Unit|4267563835920   #PU4267563835920
 
 say '==============';
@@ -24,10 +27,10 @@ say '==============';
 
 
 
-die;
 
 # Define your own Unit named "ff"
 my $ff = Unit.new( defn => 'furlong / fortnight', names => ['ff'] );
+dd $ff;
 say "$ff";				# 'ff' ... string context gives unit name
 say $ff.type;			# 'Speed' inferred from defn
 say $ff.canonical;		# 'm.s-1' SI derived unit representation

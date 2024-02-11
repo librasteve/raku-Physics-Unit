@@ -25,10 +25,12 @@
 - use lizmat role Cached
 - turn data maps into Session / Directory services
 - add currency dim
+- add information dim
 - package units
 
 ## TODOS
 - [ ] cc info to main (check preload = 1)
+- [ ] general config (ie core definitions)
 
 
 en_US - English (United States)
@@ -52,7 +54,19 @@ fi_FI - Finnish (Finland)
 da_DK - Danish (Denmark)
 no_NO - Norwegian (Norway)
 
+en loads both UK and US variants
+
 en_SI
+en_Liquid (ABV, volumes)
+en_Kitchen (spoons, etc)
+en_Time
+en_CGS
+en_KMS   (? needed)
+en_Avoirdupois
+en_Astronomical
+en_Earth (knot, atm)
+en_Green
+en_Chemistry
 
 ## Pint lessons
 _default_en.txt_

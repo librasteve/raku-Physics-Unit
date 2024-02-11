@@ -53,45 +53,85 @@ my %odd-type-by-name;     #mop up a few exceptional types
 
 #-------------------------- NEW SHIT
 
-subset Name of Str;
-subset Defn of Str;
-
 # todo
 # 1 interpose Dictionary service
-# 1a units
-# 1b prefixs
-# 1c other
+#   -prefix base derived (affix) types dims (odd) units
 # externailze all but Unit
+# drop ##s
+# appenders
 
 role Dictionary {
-    has %.defn-by-name;   #name => defn Str of known names incl. affix (values may be dupes)
-    has %.syns-by-name;   #name => list of synonyms (excl. user defined, incl. plurals)
-    has %.unit-by-name;   #name => Unit object cache (when instantiated)
-
-    ### Singleton Behaviour ###
-    my Dictionary $instance;
-
-    method new {!!!}
-
-    method instance {
-        $instance = Dictionary.bless unless $instance;
-        $instance;
-    }
-    ###
+    has %.prefix-by-name;       #name => Prefix object
+    has %.prefix-by-code;       #code => Prefix name
+    has %.prefix-to-factor;     #name => Prefix factor
+    
+#    has %.defn-by-name;   #name => defn Str of known names incl. affix (values may be dupes)
+#    has %.syns-by-name;   #name => list of synonyms (excl. user defined, incl. plurals)
+#    has %.unit-by-name;   #name => Unit object cache (when instantiated)
 
     method TWEAK {
-        %!defn-by-name := %defn-by-name;
-        %!syns-by-name := %syns-by-name;
-        %!unit-by-name := %unit-by-name;
+        %!prefix-by-name   := %prefix-by-name;
+        %!prefix-by-code   := %prefix-by-code;
+        %!prefix-to-factor := %prefix-to-factor;
+
+#        %!defn-by-name := %defn-by-name;
+#        %!syns-by-name := %syns-by-name;
+#        %!unit-by-name := %unit-by-name;
     }
 
-    method defn(Name $n --> Defn) {      #getter
-        %!defn-by-name{$n}
+    method get-prefix(:$name) {
+        %!prefix-by-name{$name}
+    }
+
+    method all-prefixes {
+        %!prefix-by-name.keys.join('|')
+    }
+
+#    method defn(Name $n --> Defn) {      #getter
+#        %!defn-by-name{$n}
+#    }
+}
+
+class Unit {...}
+
+class Loader {
+    has $.session;
+    has @.loadees = 'en_SI'; # populate loadees from loaders / config or error
+    #    has @.loaders;    # get loaders from file system
+    #    has @.requests;   # get config (requests) from .new method
+
+    sub InitPrefix( @_ ) {
+        for @_ -> $name, $factor {
+            my $u = Unit.new;
+            $u.factor:     $factor;
+            $u.defn:       $factor;
+            $u.names.push: $name;
+            $u.type:       'prefix';
+
+            #            %prefix-by-name{$name} = $u;
+            #            %prefix-to-factor{$name} = $factor;
+            #            say "Initialized Prefix $name" if $db;
+        }
+    } #iamerejh
+
+    submethod TWEAK {
+        say 'loading';
+
+        require Physics::Unit::Definitions::en_SI;
+        my $load = Physics::Unit::Definitions::en_SI.new;
+
+        say $load.yobs<prefix>;
+        #- {names: [da, deka],     defn: 10}
+
+        #        has %.prefix-by-name;       #name => Prefix object
+        #        has %.prefix-by-code;       #code => Prefix name
+        #        has %.prefix-to-factor;     #name => Prefix factor
+        say 'yo';
     }
 }
 
 class Session {
-    has Dictionary $.dictionary .= instance;
+    has Dictionary $.dictionary .= new;
 
     ### Singleton Behaviour ###
     my Session $instance;
@@ -105,17 +145,17 @@ class Session {
     ###
 
     method TWEAK {
-        use Physics::Unit::Loader;
+        # FIXME - load general config & inject to loader
+
         Loader.new: session => self;
     }
 }
-
-
 
 ######## Classes & Roles ########
 
 class Unit is export {
   has Session $!session .= instance;
+  has Dictionary $!dictionary = $!session.dictionary;
   has Real $!factor = 1;
   has Real $!offset = 0;				#ie. for K <=> °C
   has Str  $!defn   = '';
@@ -141,7 +181,8 @@ class Unit is export {
     return $!type   if $!type;
 
     #2 we are a prefix
-    return 'prefix' if %prefix-by-name{self.name};
+##    return 'prefix' if %prefix-by-name{self.name};
+    return 'prefix' if $!dictionary.get-prefix(:$.name);
 
     #3 by looking up dims
     my @d;
@@ -395,7 +436,8 @@ sub GetPrototype( Str $type ) is export {
 		}
 	}
 }
-sub GetUnit( $u ) is export {
+sub GetUnit( $u ) is export {     # FIXME make Unit class method (revert to $!dictionary0
+  my $dictionary := Session.instance.dictionary;
 
   #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
   say "GU1 from $u" if $db;
@@ -407,7 +449,8 @@ sub GetUnit( $u ) is export {
   say "GU2 from $u" if $db;
 
   return %unit-by-name{$u}   if %unit-by-name{$u}.defined;
-  return %prefix-by-name{$u} if %prefix-by-name{$u}.defined;
+##  return %prefix-by-name{$u} if %prefix-by-name{$u}.defined;
+  return $dictionary.get-prefix(:name($u)) if $dictionary.get-prefix(:name($u)).defined;
 
   #3 if name in our defns, instantiate it
   say "GU3 from $u" if $db;
@@ -463,10 +506,11 @@ sub naive-plural( $n ) {
 
 ######## Grammars ########
 
-sub CreateUnit( $defn is copy ) {
+sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
 	#6.d faster regexes with Strings {<$str>} & slower with Arrays {<@arr>}
+    my $dictionary := Session.instance.dictionary;
 
-	$defn .= trim;
+    $defn .= trim;
 
 	#| preprocess affix units to extended defn - eg. cm to centimetre
 	$defn = %affix-by-name{$defn} // $defn;
@@ -474,7 +518,9 @@ sub CreateUnit( $defn is copy ) {
     #| rm compound names from element unit-name match candidates (to force regen of dmix)
     my $unit-names       = %defn-by-name.keys.grep({! /<[\s*^./]>/}).join('|');
 
-    my $prefix-names     = %prefix-by-name.keys.join('|');
+##    my $prefix-names     = %prefix-by-name.keys.join('|');
+    my $prefix-names     = $dictionary.all-prefixes;
+
     my $pwr-prewords     = %pwr-preword.keys.join('|');
     my $pwr-postwords    = %pwr-postword.keys.join('|');
     my $pwr-superscripts = %pwr-superscript.keys.join('|');
@@ -972,7 +1018,7 @@ InitTypeDims (
 
 #iamerejh ... next is stub all above ^^
 
-# FIXME - avoid exceptions
+# FIXME - avoid exceptions - after yamls
 InitOddTypes (
     #mop up a few exceptional types
     'eV'      => 'Energy',
@@ -1223,7 +1269,7 @@ InitUnit (
 );
 
 my $session = Session.instance;
-ddt $session;
+#ddt $session;
 
 if $db {
 say "+++++++++++++++++++";
