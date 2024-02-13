@@ -68,17 +68,38 @@ class Loader {
     #    has @.loaders;    # get loaders from file system
 #        has @.requests;   # get config (requests) from .new method
 
-    sub InitPrefix( @_ ) {
-        for @_ -> $name, $factor {
+#    sub init-prefix( @_ ) {
+#        for @_ -> $name, $factor {
+#            my $u = Unit.new;
+#            $u.factor:     $factor;
+#            $u.defn:       $factor;
+#            $u.names.push: $name;
+#            $u.type:       'prefix';
+#
+#            #            %prefix-by-name{$name} = $u;
+#            #            %prefix-to-factor{$name} = $factor;
+#            #            say "Initialized Prefix $name" if $db;
+#        }
+##    }
+#    sub InitPrefixCode( @_ ) {
+#        @_.map( {%prefix-by-code{.key}=.value} );
+#    }
+
+    submethod init-prefix-code( @a ) {
+
+        for @a -> %h {
+            my ( $code, $name ) = %h<names>;
             my $u = Unit.new;
-            $u.factor:     $factor;
-            $u.defn:       $factor;
+            $u.factor:     %h<defn>;
+            $u.defn:       %h<defn>;
             $u.names.push: $name;
             $u.type:       'prefix';
 
-            #            %prefix-by-name{$name} = $u;
-            #            %prefix-to-factor{$name} = $factor;
-            #            say "Initialized Prefix $name" if $db;
+            $!dictionary.prefix-by-name{$name} = $u;
+            $!dictionary.prefix-by-code{$code} = $u;
+
+#            #            %prefix-to-factor{$name} = $factor;
+#            #            say "Initialized Prefixes $name" if $db;
         }
     } #iamerejh
 
@@ -89,6 +110,8 @@ class Loader {
         my $load = Physics::Unit::Definitions::en_SI.new;
 
         say $load.yobs<prefix>;
+
+        self.init-prefix-code: $load.yobs<prefix>;
 
 #        'mega',    1000000,
 #        M => 'mega',
@@ -126,8 +149,8 @@ class Dictionary {
 
         Loader.new: dictionary => self;
 
-        %!prefix-by-name   := %prefix-by-name;
-        %!prefix-by-code   := %prefix-by-code;
+#        %!prefix-by-name   := %prefix-by-name;
+#        %!prefix-by-code   := %prefix-by-code;
         %!prefix-to-factor := %prefix-to-factor;
 
         #        %!defn-by-name := %defn-by-name;
@@ -176,7 +199,7 @@ class Unit is export {
   multi method type(:$just1) {
 
     #1 type has been explicitly set ... eg. prefix or to avoid ambiguous state
-    return $!type with $!type;
+    return $!type if $!type;
 
     #2 by looking up dims
     my @d;
@@ -261,6 +284,7 @@ class Unit is export {
     END
   }
 
+# FIXME meld these with accessors
   ### behavioural methods ###
   method SetNames( @new-names ) {
     if @new-names.so {
@@ -291,14 +315,14 @@ class Unit is export {
       #set up this Unit as a prototype
       for %type-to-protoname -> %p {
         if %p.value eq $n {
-          $!type = %p.key;
+          $.type: %p.key;
           %type-to-prototype{$!type} = self;
         }
       }
       #mop up any odd types
       for %odd-type-by-name -> %p {
         if %p.key eq $n {
-          $!type = %p.value;
+          $.type: %p.value;
         }
       }
     }
@@ -527,7 +551,7 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
     grammar UnitGrammar {
       token TOP         { ^  \s* <numerator=.compound>
                             [\s* <divider> \s* <denominator=.compound>]?
-                            [\s* '+' \s* <offset>  ]? \s* $	}		#offset '+' hardwired
+                            [\s* '+' \s* <offset>  ]? \s* $	             }  #offset '+' hardwired
       token divider     { '/' || 'per' }
       token compound    { <element>+ % <sep> }
       token sep         { [ '*' || '.' || ' *' || ' .' || ' ' || '⋅' ] }
@@ -550,8 +574,8 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
       token pwr-supers  { <$pwr-superscripts> }
 
       token pwr-normal  { <pwr-symbol>? \s*? <pwr-digits> }
-      token pwr-digits  { <[-+]>? <[1..4]> }
       token pwr-symbol  { '**' || '^' }
+      token pwr-digits  { <[-+]>? <[1..4]> }
     }
 
     class UnitActions   {
@@ -642,9 +666,9 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
     my $match = UnitGrammar.parse( $defn, :actions(UnitActions) );
 
     if $match.so {
-		  say "Made: $match\t= ", $match.made if $db;
+      say "Made: $match\t= ", $match.made if $db;
 
-		  my $made-unit = $match.made;
+      my $made-unit = $match.made;
       $made-unit.defn: $defn;
       return $made-unit;
     } else {
@@ -654,24 +678,24 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
 
 ######## Initialization ########
 
-sub InitPrefix( @_ ) {
-  for @_ -> $name, $factor {
-    my $u = Unit.new;
-    $u.factor:     $factor;
-    $u.defn:       $factor;
-    $u.names.push: $name;
-    $u.type:       'prefix';
-
-    %prefix-by-name{$name} = $u;
-    %prefix-to-factor{$name} = $factor;
-
-    say "Initialized Prefix $name" if $db;
-  }
-}
-
-sub InitPrefixCode( @_ ) {
-	@_.map( {%prefix-by-code{.key}=.value} );
-}
+#sub InitPrefix( @_ ) {
+#  for @_ -> $name, $factor {
+#    my $u = Unit.new;
+#    $u.factor:     $factor;
+#    $u.defn:       $factor;
+#    $u.names.push: $name;
+#    $u.type:       'prefix';
+#
+#    %prefix-by-name{$name} = $u;
+#    %prefix-to-factor{$name} = $factor;
+#
+#    say "Initialized Prefix $name" if $db;
+#  }
+#}
+#
+#sub InitPrefixCode( @_ ) {
+#	@_.map( {%prefix-by-code{.key}=.value} );
+#}
 
 sub InitBaseUnit( @_ ) {
   my $i = 0;
@@ -814,63 +838,63 @@ sub InitUnit( @_ , :$derived ) is export {
 
 ######## Unit Data ########
 
-InitPrefix (
-  #avoid 1e2 format to encourage Rats
-  #SI Prefixes
-  'deka',    10,
-  'deca',    10,
-  'hecto',   100,
-  'kilo',    1000,
-  'mega',    1000000,
-  'giga',    1000000000,
-  'tera',    1000000000000,
-  'peta',    1000000000000000,
-  'exa',     1000000000000000000,
-  'zetta',   1000000000000000000000,
-  'yotta',   1000000000000000000000000,
-  'deci',    0.1,
-  'centi',   0.01,
-  'milli',   0.001,
-  'micro',   0.000001,
-  'nano',    0.000000001,
-  'pico',    0.000000000001,
-  'femto',   0.000000000000001,
-  'atto',    0.000000000000000001,
-  'zepto',   1e-21,
-  'yocto',   1e-24,
-  #others
-  'million', 1_000_000,
-  'billion', 1_000_000_000,
-  'trillion',1_000_000_000_000,
-  'mn',      1_000_000,
-  'bn',      1_000_000_000,
-  'tn',      1_000_000_000_000,
-);
-
-InitPrefixCode (
-    #SI Prefix code
-    da => 'deka',
-    #'deca', ignore this spelling alterative
-    h => 'hecto',
-    k => 'kilo',
-    M => 'mega',
-    G => 'giga',
-    T => 'tera',
-    P => 'peta',
-    E => 'exa',
-    Z => 'zetta',
-    Y => 'yotta',
-    d => 'deci',
-    c => 'centi',
-    m => 'milli',
-    μ => 'micro',
-    n => 'nano',
-    p => 'pico',
-    f => 'femto',
-    a => 'atto',
-    z => 'zepto',
-    y => 'yocto',
-);
+#InitPrefix (
+#  #avoid 1e2 format to encourage Rats
+#  #SI Prefixes
+#  'deka',    10,
+#  'deca',    10,
+#  'hecto',   100,
+#  'kilo',    1000,
+#  'mega',    1000000,
+#  'giga',    1000000000,
+#  'tera',    1000000000000,
+#  'peta',    1000000000000000,
+#  'exa',     1000000000000000000,
+#  'zetta',   1000000000000000000000,
+#  'yotta',   1000000000000000000000000,
+#  'deci',    0.1,
+#  'centi',   0.01,
+#  'milli',   0.001,
+#  'micro',   0.000001,
+#  'nano',    0.000000001,
+#  'pico',    0.000000000001,
+#  'femto',   0.000000000000001,
+#  'atto',    0.000000000000000001,
+#  'zepto',   1e-21,
+#  'yocto',   1e-24,
+#  #others
+#  'million', 1_000_000,
+#  'billion', 1_000_000_000,
+#  'trillion',1_000_000_000_000,
+#  'mn',      1_000_000,
+#  'bn',      1_000_000_000,
+#  'tn',      1_000_000_000_000,
+#);
+#
+#InitPrefixCode (
+#    #SI Prefix code
+#    da => 'deka',
+#    #'deca', ignore this spelling alterative
+#    h => 'hecto',
+#    k => 'kilo',
+#    M => 'mega',
+#    G => 'giga',
+#    T => 'tera',
+#    P => 'peta',
+#    E => 'exa',
+#    Z => 'zetta',
+#    Y => 'yotta',
+#    d => 'deci',
+#    c => 'centi',
+#    m => 'milli',
+#    μ => 'micro',
+#    n => 'nano',
+#    p => 'pico',
+#    f => 'femto',
+#    a => 'atto',
+#    z => 'zepto',
+#    y => 'yocto',
+#);
 
 InitBaseUnit (
     #SI Base Units
