@@ -90,7 +90,7 @@ class Loader {
         for @a -> %h {
             my ( $code, $name ) = %h<names>;
             my $u = Unit.new;
-            $u.factor:     %h<defn>;
+            $u.factor:     %h<defn>;            # FIXME - go 'is built'
             $u.defn:       %h<defn>;
             $u.names.push: $name;
             $u.type:       'prefix';
@@ -131,7 +131,10 @@ class Dictionary {
     method new {!!!}
 
     method instance {
-        $instance = Dictionary.bless unless $instance;
+        unless $instance {
+            $instance = Dictionary.bless;
+            $instance.load;
+        }
         $instance;
     }
     ###
@@ -144,7 +147,7 @@ class Dictionary {
     #    has %.syns-by-name;   #name => list of synonyms (excl. user defined, incl. plurals)
     #    has %.unit-by-name;   #name => Unit object cache (when instantiated)
 
-    method TWEAK {              # runs after .bless
+    method load {
         # FIXME - load general config & inject to loader
 
         Loader.new: dictionary => self;
@@ -174,8 +177,7 @@ class Dictionary {
 ######## Classes & Roles ########
 
 class Unit is export {
-#  has Session $!session .= instance;
-#  has Dictionary $!dictionary = $!session.dictionary;
+  has $!dictionary = Dictionary.instance;
 
   has Real $!factor = 1;
   has Real $!offset = 0;				#ie. for K <=> °C
@@ -285,6 +287,7 @@ class Unit is export {
   }
 
 # FIXME meld these with accessors
+# FIXME write dictionary somehow
   ### behavioural methods ###
   method SetNames( @new-names ) {
     if @new-names.so {
