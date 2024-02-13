@@ -45,7 +45,7 @@ my %type-to-protoname;    #type => prototype name
 my %type-to-prototype;    #type => prototype Unit object (when instantiated)
 my %type-to-dims;		  #type => dims vector
 
-my %odd-type-by-name;     #mop up a few exceptional types
+my %odd-type-by-name;     #mop up a few exceptional types   # FIXME
 
 #-------------------------- NEW SHIT
 
@@ -62,10 +62,10 @@ class Unit {...}
 class Loader {
     has $.dictionary;
     has @.loadees = 'en_SI'; # populate loadees from loaders / config or error
-    #    has @.loaders;    # get loaders from file system
-#        has @.requests;   # get config (requests) from .new method
+#    has @.loaders;    # get loaders from file system
+#    has @.requests;   # get config (requests) from .new method
 
-    submethod init-prefix-code( @a ) {
+    submethod load-prefix( @a ) {
         for @a -> %h {
             my ( $code, $name ) = %h<names>;
             my $u = Unit.new;
@@ -77,7 +77,44 @@ class Loader {
             $!dictionary.prefix-by-name{$name} = $u;
             $!dictionary.prefix-by-code{$code} = $u;
 
-            say "Initialized Prefixes $name" if $db;
+            say "Initialized Prefix $name" if $db;
+        }
+    }
+
+    submethod load-base( %h ) {
+        my $i = 0;
+
+        for %h.kv -> $type, $names {
+            #iamerejh - do this in Synonym class?
+            my @synonyms = |$names;
+
+            #| for each name (ie. synonym)
+            for |$names -> $singular {
+                if naive-plural( $singular ) -> $plural {
+                    @synonyms.push: $plural;
+                }
+            }
+            @synonyms.map( { $!dictionary.syns-by-name{$_} = |@synonyms } );
+
+            my $u = Unit.new;
+            $u.SetNames: @synonyms;
+            $u.defn: $u.name;
+
+            #dimension vector has zeros in all but one place
+            $u.dims[$i++] = 1;
+            $u.dmix{$u.name} = 1;
+
+            $u.type: $type;
+
+            say ~$u;
+#            %type-to-protoname{$type} = $u.name;
+#            %type-to-prototype{$type} = $u;
+#
+#            @BaseNames.push: $u.name;
+#            %affix-by-name{$u.name} = @synonyms[1];	 #extended name as value
+#            %asyns-by-name{$u.name} = @synonyms;     #all synonyms as value
+#
+#            say "Initialized Base $names[0]" if $db;
         }
     }
 
@@ -87,9 +124,8 @@ class Loader {
         require Physics::Unit::Definitions::en_SI;
         my $load = Physics::Unit::Definitions::en_SI.new;
 
-        self.init-prefix-code: $load.yobs<prefix>;
-
-
+        self.load-prefix: $load.yobs<prefix>;
+        self.load-base:   $load.yobs<base>;
 
     }
 }
@@ -112,9 +148,18 @@ class Dictionary {
     has %.prefix-by-name;       #name => Prefix object
     has %.prefix-by-code;       #code => Prefix name
 
-    #    has %.defn-by-name;   #name => defn Str of known names incl. affix (values may be dupes)
-    #    has %.syns-by-name;   #name => list of synonyms (excl. user defined, incl. plurals)
-    #    has %.unit-by-name;   #name => Unit object cache (when instantiated)
+#    has %.defn-by-name;   #name => defn Str of known names incl. affix (values may be dupes)
+    has %.syns-by-name;   #name => list of synonyms (excl. user defined, incl. plurals)
+#    has %.unit-by-name;   #name => Unit object cache (when instantiated)
+#
+#    has %.affix-by-name;        #name => extended affix defn (eg. cm => 'centimetre') to decongest Grammar namespace
+#    has %.asyns-by-name;        #name => list of synonyms for every affix [n, nano] X~ [m, metre, meter, metres, meters]
+#
+#    has %.type-to-protoname;    #type => prototype name
+#    has %.type-to-prototype;    #type => prototype Unit object (when instantiated)
+#    has %.type-to-dims;		  #type => dims vector
+#
+#    has %.odd-type-by-name;     #mop up a few exceptional types
 
     method load {
         # FIXME - load general config & inject to loader
@@ -432,7 +477,6 @@ sub GetUnit( $u ) is export {     # FIXME make Unit class method (revert to $!di
   say "GU2 from $u" if $db;
 
   return %unit-by-name{$u}   if %unit-by-name{$u}.defined;
-##  return %prefix-by-name{$u} if %prefix-by-name{$u}.defined;
   return $dictionary.get-prefix(:name($u)) if $dictionary.get-prefix(:name($u)).defined;
 
   #3 if name in our defns, instantiate it
@@ -501,7 +545,6 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
     #| rm compound names from element unit-name match candidates (to force regen of dmix)
     my $unit-names       = %defn-by-name.keys.grep({! /<[\s*^./]>/}).join('|');
 
-##    my $prefix-names     = %prefix-by-name.keys.join('|');
     my $prefix-names     = $dictionary.all-prefixes;
 
     my $pwr-prewords     = %pwr-preword.keys.join('|');
@@ -785,64 +828,6 @@ sub InitUnit( @_ , :$derived ) is export {
 }
 
 ######## Unit Data ########
-
-#InitPrefix (
-#  #avoid 1e2 format to encourage Rats
-#  #SI Prefixes
-#  'deka',    10,
-#  'deca',    10,
-#  'hecto',   100,
-#  'kilo',    1000,
-#  'mega',    1000000,
-#  'giga',    1000000000,
-#  'tera',    1000000000000,
-#  'peta',    1000000000000000,
-#  'exa',     1000000000000000000,
-#  'zetta',   1000000000000000000000,
-#  'yotta',   1000000000000000000000000,
-#  'deci',    0.1,
-#  'centi',   0.01,
-#  'milli',   0.001,
-#  'micro',   0.000001,
-#  'nano',    0.000000001,
-#  'pico',    0.000000000001,
-#  'femto',   0.000000000000001,
-#  'atto',    0.000000000000000001,
-#  'zepto',   1e-21,
-#  'yocto',   1e-24,
-#  #others
-#  'million', 1_000_000,
-#  'billion', 1_000_000_000,
-#  'trillion',1_000_000_000_000,
-#  'mn',      1_000_000,
-#  'bn',      1_000_000_000,
-#  'tn',      1_000_000_000_000,
-#);
-#
-#InitPrefixCode (
-#    #SI Prefix code
-#    da => 'deka',
-#    #'deca', ignore this spelling alterative
-#    h => 'hecto',
-#    k => 'kilo',
-#    M => 'mega',
-#    G => 'giga',
-#    T => 'tera',
-#    P => 'peta',
-#    E => 'exa',
-#    Z => 'zetta',
-#    Y => 'yotta',
-#    d => 'deci',
-#    c => 'centi',
-#    m => 'milli',
-#    μ => 'micro',
-#    n => 'nano',
-#    p => 'pico',
-#    f => 'femto',
-#    a => 'atto',
-#    z => 'zepto',
-#    y => 'yocto',
-#);
 
 InitBaseUnit (
     #SI Base Units

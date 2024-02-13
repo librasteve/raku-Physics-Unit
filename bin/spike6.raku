@@ -17,15 +17,13 @@ use Physics::Unit;
 my $u = GetUnit <ohm>;
 dd $u;
 
-#die;
+die;
 #say $u.WHICH;   #Physics::Unit::Unit|4267563835920   #PU4267563835920
 
 say '==============';
 
 
 #dd %Physics::Unit::defn-by-name;
-
-
 
 
 # Define your own Unit named "ff"

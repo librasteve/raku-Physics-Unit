@@ -29,7 +29,7 @@ grammar Schema::Core::NoBools is Schema::Core {
 class Physics::Unit::Definitions::en_SI {      # FIXME adjust to is Loader?
     #viz. https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
 
-    has @!parts = <prefix>;
+    has @!parts = <prefix base>;
 #    has @!parts = <prefix base derived types dims units>;
 
     has %.yobs;
