@@ -13,7 +13,8 @@
 - slangify
 - synthetic units Type = u.WHICH  (valid identifier)  ??
   - my $u = GetUnit <ohm>; say $u.WHICH;   #Physics::Unit::Unit|4267563835920   #PU4267563835920
-- https://raku.land/zef:lizmat/ObjectCache
+- https://raku.land/zef:lizmat/ObjectCache ??
+- rework us vs imp
 
 ## Thoughts
 - add synth units

@@ -34,7 +34,6 @@ dd $ff;
 say "$ff";				# 'ff' ... string context gives unit name
 say $ff.type;			# 'Speed' inferred from defn
 say $ff.canonical;		# 'm.s-1' SI derived unit representation
-die;
 say $ff.pretty;			# 'm⋅s⁻¹' SI recommended string representation
 say $ff.raku;			#  or 'say $ff;' or 'dd $ff;' for details
 

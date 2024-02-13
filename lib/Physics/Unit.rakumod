@@ -34,13 +34,9 @@ my %pwr-superscript = (
     '⁻¹' => -1, '⁻²' => -2, '⁻³' => -3, '⁻⁴' => -4,
 );
 
-my %prefix-by-name;       #name => Prefix object
-my %prefix-by-code;       #code => Prefix name
-my %prefix-to-factor;     #name => Prefix factor
-
-our %defn-by-name;         #name => defn Str of known names incl. affix (values may be dupes)
-our %syns-by-name; 	       #name => list of synonyms (excl. user defined, incl. plurals)
-our %unit-by-name;         #name => Unit object cache (when instantiated)
+my %defn-by-name;         #name => defn Str of known names incl. affix (values may be dupes)
+my %syns-by-name; 	       #name => list of synonyms (excl. user defined, incl. plurals)
+my %unit-by-name;         #name => Unit object cache (when instantiated)
 
 my %affix-by-name;        #name => extended affix defn (eg. cm => 'centimetre') to decongest Grammar namespace
 my %asyns-by-name;        #name => list of synonyms for every affix [n, nano] X~ [m, metre, meter, metres, meters]
@@ -59,6 +55,7 @@ my %odd-type-by-name;     #mop up a few exceptional types
 # externailze all but Unit
 # drop ##s
 # appenders
+# FIXME s
 
 class Unit {...}
 
@@ -68,29 +65,11 @@ class Loader {
     #    has @.loaders;    # get loaders from file system
 #        has @.requests;   # get config (requests) from .new method
 
-#    sub init-prefix( @_ ) {
-#        for @_ -> $name, $factor {
-#            my $u = Unit.new;
-#            $u.factor:     $factor;
-#            $u.defn:       $factor;
-#            $u.names.push: $name;
-#            $u.type:       'prefix';
-#
-#            #            %prefix-by-name{$name} = $u;
-#            #            %prefix-to-factor{$name} = $factor;
-#            #            say "Initialized Prefix $name" if $db;
-#        }
-##    }
-#    sub InitPrefixCode( @_ ) {
-#        @_.map( {%prefix-by-code{.key}=.value} );
-#    }
-
     submethod init-prefix-code( @a ) {
-
         for @a -> %h {
             my ( $code, $name ) = %h<names>;
             my $u = Unit.new;
-            $u.factor:     %h<defn>;            # FIXME - go 'is built'
+            $u.factor:     %h<defn>;            # FIXME - go 'is built'  ?
             $u.defn:       %h<defn>;
             $u.names.push: $name;
             $u.type:       'prefix';
@@ -98,10 +77,9 @@ class Loader {
             $!dictionary.prefix-by-name{$name} = $u;
             $!dictionary.prefix-by-code{$code} = $u;
 
-#            #            %prefix-to-factor{$name} = $factor;
-#            #            say "Initialized Prefixes $name" if $db;
+            say "Initialized Prefixes $name" if $db;
         }
-    } #iamerejh
+    }
 
     submethod TWEAK {
         say 'loading';
@@ -109,18 +87,10 @@ class Loader {
         require Physics::Unit::Definitions::en_SI;
         my $load = Physics::Unit::Definitions::en_SI.new;
 
-        say $load.yobs<prefix>;
-
         self.init-prefix-code: $load.yobs<prefix>;
 
-#        'mega',    1000000,
-#        M => 'mega',
-#        - {names: [M, mega],      defn: 1000000}
 
-        #        has %.prefix-by-name;       #name => Prefix object
-        #        has %.prefix-by-code;       #code => Prefix name
-        #        has %.prefix-to-factor;     #name => Prefix factor
-        say 'yo';
+
     }
 }
 
@@ -141,7 +111,6 @@ class Dictionary {
     
     has %.prefix-by-name;       #name => Prefix object
     has %.prefix-by-code;       #code => Prefix name
-    has %.prefix-to-factor;     #name => Prefix factor
 
     #    has %.defn-by-name;   #name => defn Str of known names incl. affix (values may be dupes)
     #    has %.syns-by-name;   #name => list of synonyms (excl. user defined, incl. plurals)
@@ -151,10 +120,6 @@ class Dictionary {
         # FIXME - load general config & inject to loader
 
         Loader.new: dictionary => self;
-
-#        %!prefix-by-name   := %prefix-by-name;
-#        %!prefix-by-code   := %prefix-by-code;
-        %!prefix-to-factor := %prefix-to-factor;
 
         #        %!defn-by-name := %defn-by-name;
         #        %!syns-by-name := %syns-by-name;
@@ -436,9 +401,6 @@ sub ListTypes is export {
 sub ListBases is export {
     return @BaseNames;
 }
-sub GetPrefixToFactor is export {
-	return %prefix-to-factor;
-}
 sub GetSynsByName is export {
   return %syns-by-name;
 }
@@ -681,25 +643,6 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
 
 ######## Initialization ########
 
-#sub InitPrefix( @_ ) {
-#  for @_ -> $name, $factor {
-#    my $u = Unit.new;
-#    $u.factor:     $factor;
-#    $u.defn:       $factor;
-#    $u.names.push: $name;
-#    $u.type:       'prefix';
-#
-#    %prefix-by-name{$name} = $u;
-#    %prefix-to-factor{$name} = $factor;
-#
-#    say "Initialized Prefix $name" if $db;
-#  }
-#}
-#
-#sub InitPrefixCode( @_ ) {
-#	@_.map( {%prefix-by-code{.key}=.value} );
-#}
-
 sub InitBaseUnit( @_ ) {
   my $i = 0;
 
@@ -741,7 +684,9 @@ sub InitDerivedUnit( @_ ) {
 }
 
 sub InitAffixUnit {
-	# so far %affix-by-name has been initialized with base and derived unit names
+    my $dictionary := Dictionary.instance;
+
+    # so far %affix-by-name has been initialized with base and derived unit names
 
 	# replace kg with g
 	%affix-by-name<kg>:delete;
@@ -768,11 +713,11 @@ sub InitAffixUnit {
 	my %simple-names = %affix-by-name;
 
 	for %simple-names.keys -> $n {
-		for %prefix-by-code.kv -> $c, $p {
+		for $dictionary.prefix-by-code.kv -> $c, $p {
 
 			# combine short keys and values, then extend both codes & names to decongest namespace
 			my $combo = $c ~ $n;                                                #eg. 'ml' (used by custom Postfix op)
-			%affix-by-name{$combo} = %prefix-by-code{$c} ~ %simple-names{$n};   #eg. 'millilitres' (used by Grammar)
+			%affix-by-name{$combo} = $dictionary.prefix-by-code{$c} ~ %simple-names{$n};   #eg. 'millilitres' (used by Grammar)
 
             # set up synonym list for population of Unit object name
             my $syns = %asyns-by-name{$n};
@@ -1288,8 +1233,6 @@ InitUnit (
 	# ThermalConductance 
 	['W/m^2K'],                                 'W / m^2 K',
 );
-
-Dictionary.instance;
 
 if $db {
 say "+++++++++++++++++++";
