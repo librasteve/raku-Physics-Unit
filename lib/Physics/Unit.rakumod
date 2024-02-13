@@ -98,7 +98,7 @@ class Loader {
     has $.session;
     has @.loadees = 'en_SI'; # populate loadees from loaders / config or error
     #    has @.loaders;    # get loaders from file system
-    #    has @.requests;   # get config (requests) from .new method
+        has @.requests;   # get config (requests) from .new method
 
     sub InitPrefix( @_ ) {
         for @_ -> $name, $factor {
@@ -121,7 +121,10 @@ class Loader {
         my $load = Physics::Unit::Definitions::en_SI.new;
 
         say $load.yobs<prefix>;
-        #- {names: [da, deka],     defn: 10}
+
+#        'mega',    1000000,
+#        M => 'mega',
+#        - {names: [M, mega],      defn: 1000000}
 
         #        has %.prefix-by-name;       #name => Prefix object
         #        has %.prefix-by-code;       #code => Prefix name
@@ -177,14 +180,10 @@ class Unit is export {
   multi method type($t)   { $!type = $t.Str }
   multi method type(:$just1) {
 
-    #1 type has been explicitly set ... rarely used eg. to avoid ambiguous state
-    return $!type   if $!type;
+    #1 type has been explicitly set ... eg. prefix or to avoid ambiguous state
+    return $!type with $!type;
 
-    #2 we are a prefix
-##    return 'prefix' if %prefix-by-name{self.name};
-    return 'prefix' if $!dictionary.get-prefix(:$.name);
-
-    #3 by looking up dims
+    #2 by looking up dims
     my @d;
     for %type-to-dims.keys -> $k {
       push @d, $k if self.dims cmp %type-to-dims{$k} ~~ Same;

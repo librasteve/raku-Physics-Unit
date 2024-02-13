@@ -39,8 +39,7 @@ class Physics::Unit::Definitions::en_SI {      # FIXME adjust to is Loader?
 
         for @!parts -> $part {
             #e.g. /Unit/Definitions/en_SI/base.yaml
-            %!yobs{$part} = %?RESOURCES{"$path/$part.yaml"}
-                    .slurp.&load-yaml: :schema(Schema::Core::NoBools);
+            %!yobs{$part} = %?RESOURCES{"$path/$part.yaml"}.slurp.&load-yaml: :schema(Schema::Core::NoBools);
         }
     }
 }
