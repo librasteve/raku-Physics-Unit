@@ -35,7 +35,7 @@ my %pwr-superscript = (
 );
 
 my %defn-by-name;         #name => defn Str of known names incl. affix (values may be dupes)
-my %syns-by-name; 	       #name => list of synonyms (excl. user defined, incl. plurals)
+#my %syns-by-name; 	       #name => list of synonyms (excl. user defined, incl. plurals)
 my %unit-by-name;         #name => Unit object cache (when instantiated)
 
 my %affix-by-name;        #name => extended affix defn (eg. cm => 'centimetre') to decongest Grammar namespace
@@ -94,7 +94,7 @@ class Loader {
                     @synonyms.push: $plural;
                 }
             }
-            @synonyms.map( { $!dictionary.syns-by-name{$_} = |@synonyms } );
+            @synonyms.map({ $!dictionary.syns-by-name{$_} = |@synonyms });
 
             my $u = Unit.new;
             $u.SetNames: @synonyms;
@@ -177,6 +177,10 @@ class Dictionary {
 
     method all-prefixes {
         %!prefix-by-name.keys.join('|')
+    }
+
+    method get-syns(:$name) {       # type as Name?
+        %!syns-by-name{$name}
     }
 
     #    method defn(Name $n --> Defn) {      #getter
@@ -301,7 +305,8 @@ class Unit is export {
   ### behavioural methods ###
   method SetNames( @new-names ) {
     if @new-names.so {
-      if %syns-by-name{@new-names[0]} -> @syns {
+#      if %syns-by-name{@new-names[0]} -> @syns {
+      if $!dictionary.get-syns(name => @new-names[0]) -> @syns {
         #predefined Unit, assign synonyms
         @.names = @syns;
       } else {
@@ -378,7 +383,8 @@ class Unit is export {
     self.factor: self.factor ** $d;
     self.dims >>*=>> $d;
 
-    my $e-can = %syns-by-name{$e}[0];		#lookup the canonical name
+#    my $e-can = %syns-by-name{$e}[0];		#lookup the canonical name
+    my $e-can = $!dictionary.get-syns(name => $e)[0];		#lookup the canonical name
     self.dmix{$e-can} = $d;
     return self
   }
@@ -445,9 +451,6 @@ sub ListTypes is export {
 }
 sub ListBases is export {
     return @BaseNames;
-}
-sub GetSynsByName is export {
-  return %syns-by-name;
 }
 sub GetAffixByName is export {
 	return %affix-by-name;
@@ -687,6 +690,7 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
 ######## Initialization ########
 
 sub InitBaseUnit( @_ ) {
+  my $dictionary = Dictionary.instance;
   my $i = 0;
 
   for @_ -> %h {
@@ -700,7 +704,7 @@ sub InitBaseUnit( @_ ) {
         @synonyms.push: $plural;
       }
     }
-    @synonyms.map( { %syns-by-name{$_} = |@synonyms } );
+    @synonyms.map( { $dictionary.syns-by-name{$_} = |@synonyms } );
 
     my $u = Unit.new;
     $u.SetNames: @synonyms;
@@ -792,6 +796,8 @@ sub InitOddTypes( @_ ) {
 }
 
 sub InitUnit( @_ , :$derived ) is export {
+    my $dictionary = Dictionary.instance;
+
 	#eg. ['N',  'newton'],           'kg m / s^2',
 	#      |     ^^^^^^ synonyms      ^^^^^^^^^^ defn
 	#	   |
@@ -812,7 +818,7 @@ sub InitUnit( @_ , :$derived ) is export {
 			}
 			for @synonyms -> $name {
 				%defn-by-name{$name} = $defn;
-				%syns-by-name{$name} = @synonyms;
+				$dictionary.syns-by-name{$name} = @synonyms;
 			}
 			if $derived {
 				%affix-by-name{@synonyms[0]} = @synonyms[1];

@@ -28,6 +28,7 @@
 - add currency dim
 - add information dim
 - package units
+- class Prefix, Base ... is Unit
 
 ## TODOS
 - [ ] cc info to main (check preload = 1)
