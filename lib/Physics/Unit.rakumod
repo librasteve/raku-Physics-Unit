@@ -41,8 +41,8 @@ my %unit-by-name;         #name => Unit object cache (when instantiated)
 my %affix-by-name;        #name => extended affix defn (eg. cm => 'centimetre') to decongest Grammar namespace
 my %asyns-by-name;        #name => list of synonyms for every affix [n, nano] X~ [m, metre, meter, metres, meters]
 
-my %type-to-protoname;    #type => prototype name
-my %type-to-prototype;    #type => prototype Unit object (when instantiated)
+#my %type-to-protoname;    #type => prototype name
+#my %type-to-prototype;    #type => prototype Unit object (when instantiated)
 my %type-to-dims;		  #type => dims vector
 
 my %odd-type-by-name;     #mop up a few exceptional types   # FIXME
@@ -85,8 +85,7 @@ class Loader {
         my $i = 0;
 
         for %h.kv -> $type, $names {
-            #iamerejh - do this in Synonym class?
-            my @synonyms = |$names;
+            my @synonyms = |$names;     # FIXME do this in Synonym class?
 
             #| for each name (ie. synonym)
             for |$names -> $singular {
@@ -107,8 +106,10 @@ class Loader {
             $u.type: $type;
 
             say ~$u;
-#            %type-to-protoname{$type} = $u.name;
-#            %type-to-prototype{$type} = $u;
+            #iamerejh
+
+            $!dictionary.type-to-protoname{$type} = $u.name;
+#            $!dictionary.type-to-prototype{$type} = $u;
 #
 #            @BaseNames.push: $u.name;
 #            %affix-by-name{$u.name} = @synonyms[1];	 #extended name as value
@@ -155,8 +156,8 @@ class Dictionary {
 #    has %.affix-by-name;        #name => extended affix defn (eg. cm => 'centimetre') to decongest Grammar namespace
 #    has %.asyns-by-name;        #name => list of synonyms for every affix [n, nano] X~ [m, metre, meter, metres, meters]
 #
-#    has %.type-to-protoname;    #type => prototype name
-#    has %.type-to-prototype;    #type => prototype Unit object (when instantiated)
+    has %.type-to-protoname;    #type => prototype name
+    has %.type-to-prototype;    #type => prototype Unit object (when instantiated)
 #    has %.type-to-dims;		  #type => dims vector
 #
 #    has %.odd-type-by-name;     #mop up a few exceptional types
@@ -165,10 +166,6 @@ class Dictionary {
         # FIXME - load general config & inject to loader
 
         Loader.new: dictionary => self;
-
-        #        %!defn-by-name := %defn-by-name;
-        #        %!syns-by-name := %syns-by-name;
-        #        %!unit-by-name := %unit-by-name;
     }
 
     method get-prefix(:$name) {       # type as Name?
@@ -252,9 +249,9 @@ class Unit is export {
   #| Manually make NewType when no preset type, eg. m-1
   method NewType( Str $type-name ) {
     for @.names -> $name {
-        %type-to-protoname{$type-name} = $name;
+        $!dictionary.type-to-protoname{$type-name} = $name;
     }
-    %type-to-prototype{$type-name} = self;
+    $!dictionary.type-to-prototype{$type-name} = self;
     %type-to-dims{$type-name} = self.dims;
   }
 
@@ -331,10 +328,10 @@ class Unit is export {
   method SetType( $t? ) {
     for @.names -> $n {
       #set up this Unit as a prototype
-      for %type-to-protoname -> %p {
+      for $!dictionary.type-to-protoname -> %p {
         if %p.value eq $n {
           $.type: %p.key;
-          %type-to-prototype{$!type} = self;
+          $!dictionary.type-to-prototype{$!type} = self;
         }
       }
       #mop up any odd types
@@ -443,13 +440,15 @@ class Unit is export {
 
 ######## Subroutines (Exported) ########
 
-sub ListUnits is export {
+sub ListUnits is export {       # FIXME make Unit class method (revert to $!dictionary0
 	return %defn-by-name.keys;
 }
-sub ListTypes is export {
-    return sort keys %type-to-protoname;
+sub ListTypes is export {       # FIXME make Unit class method (revert to $!dictionary0
+    my $dictionary := Dictionary.instance;
+
+    return sort keys $dictionary.type-to-protoname;
 }
-sub ListBases is export {
+sub ListBases is export {       # FIXME make Unit class method (revert to $!dictionary0
     return @BaseNames;
 }
 sub GetAffixByName is export {
@@ -458,11 +457,13 @@ sub GetAffixByName is export {
 sub GetAffixSynsByName is export {
   return %asyns-by-name;
 }
-sub GetPrototype( Str $type ) is export {
-	if my $pt = %type-to-prototype{$type} {
+sub GetPrototype( Str $type ) {     # FIXME make Unit class method (revert to $!dictionary0
+    my $dictionary := Dictionary.instance;
+
+    if my $pt = $dictionary.type-to-prototype{$type} {
 		return $pt;
 	} else {
-		for %type-to-protoname -> %p {
+		for $dictionary.type-to-protoname -> %p {
 			return GetUnit(%p.value) if %p.key eq $type;
 		}
 	}
@@ -715,8 +716,8 @@ sub InitBaseUnit( @_ ) {
     $u.dmix{$u.name} = 1;
 
     $u.type: $type;
-    %type-to-protoname{$type} = $u.name;
-    %type-to-prototype{$type} = $u;
+    $dictionary.type-to-protoname{$type} = $u.name;
+    $dictionary.type-to-prototype{$type} = $u;
 
     @BaseNames.push: $u.name;
     %affix-by-name{$u.name} = @synonyms[1];	 #extended name as value
@@ -778,8 +779,10 @@ sub InitAffixUnit {
 }
 
 sub InitTypes( @_ )  {
-  for @_ -> %p {
-    %type-to-protoname{%p.key} = %p.value;
+    my $dictionary = Dictionary.instance;
+
+    for @_ -> %p {
+    $dictionary.type-to-protoname{%p.key} = %p.value;
   }
 }
 

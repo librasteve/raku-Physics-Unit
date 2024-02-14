@@ -17,7 +17,7 @@ use Physics::Unit;
 my $u = GetUnit <ohm>;
 dd $u;
 
-die;
+#die;
 #say $u.WHICH;   #Physics::Unit::Unit|4267563835920   #PU4267563835920
 
 say '==============';
@@ -51,7 +51,8 @@ my $u3 = GetUnit( 'kg m^2/s^2' );
 say ~$u3;
 say "compare $u1, $u2... " ~ $u2.same-dims($u1);
 
-put ListUnits().sort;
+put ListTypes().sort;
+#put ListUnits().sort;
 
 #`[[
 ##### Principles & Behaviours ######
