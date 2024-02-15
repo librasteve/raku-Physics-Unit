@@ -20,9 +20,8 @@ $locale = ($_ ~~ /en_US/) ?? 'us' !! 'imp'   with %*ENV<LANG>;
 $locale = ($_ ~~ /en_US/) ?? 'us' !! $locale with %*ENV<RAKULANG>; 
 
 constant \preload = 0;		#Preload All Units ie. for debug (precomp load 1.6s otherwise ~60s)
-
 constant \NumBases = 8;
-my Str @BaseNames;			#SI Base Unit names
+#my Str @BaseNames;			#SI Base Unit names
 
 #Power synonyms
 my %pwr-preword   = ( square  => 2, sq => 2, cubic => 3, cu => 3 );
@@ -57,139 +56,13 @@ my %odd-type-by-name;     #mop up a few exceptional types   # FIXME
 # appenders
 # FIXME s
 
-class Unit {...}
-
-class Loader {
-    has $.dictionary;
-    has @.loadees = 'en_SI'; # populate loadees from loaders / config or error
-#    has @.loaders;    # get loaders from file system
-#    has @.requests;   # get config (requests) from .new method
-
-    submethod load-prefix( @a ) {
-        for @a -> %h {
-            my ( $code, $name ) = %h<names>;
-            my $u = Unit.new;
-            $u.factor:     %h<defn>;            # FIXME - go 'is built'  ?
-            $u.defn:       %h<defn>;
-            $u.names.push: $name;
-            $u.type:       'prefix';
-
-            $!dictionary.prefix-by-name{$name} = $u;
-            $!dictionary.prefix-by-code{$code} = $u;
-
-            say "Initialized Prefix $name" if $db;
-        }
-    }
-
-    submethod load-base( %h ) {
-        my $i = 0;
-
-        for %h.kv -> $type, $names {
-            my @synonyms = |$names;     # FIXME do this in Synonym class?
-
-            #| for each name (ie. synonym)
-            for |$names -> $singular {
-                if naive-plural( $singular ) -> $plural {
-                    @synonyms.push: $plural;
-                }
-            }
-            @synonyms.map({ $!dictionary.syns-by-name{$_} = |@synonyms });
-
-            my $u = Unit.new;
-            $u.SetNames: @synonyms;
-            $u.defn: $u.name;
-
-            #dimension vector has zeros in all but one place
-            $u.dims[$i++] = 1;
-            $u.dmix{$u.name} = 1;
-
-            $u.type: $type;
-
-            say ~$u;
-            #iamerejh
-
-            $!dictionary.type-to-protoname{$type} = $u.name;
-#            $!dictionary.type-to-prototype{$type} = $u;
-#
-#            @BaseNames.push: $u.name;
-#            %affix-by-name{$u.name} = @synonyms[1];	 #extended name as value
-#            %asyns-by-name{$u.name} = @synonyms;     #all synonyms as value
-#
-#            say "Initialized Base $names[0]" if $db;
-        }
-    }
-
-    submethod TWEAK {
-        say 'loading';
-
-        require Physics::Unit::Definitions::en_SI;
-        my $load = Physics::Unit::Definitions::en_SI.new;
-
-        self.load-prefix: $load.yobs<prefix>;
-        self.load-base:   $load.yobs<base>;
-
-    }
-}
-
-class Dictionary {
-    ### Singleton Behaviour ###
-    my Dictionary $instance;
-
-    method new {!!!}
-
-    method instance {
-        unless $instance {
-            $instance = Dictionary.bless;
-            $instance.load;
-        }
-        $instance;
-    }
-    ###
-    
-    has %.prefix-by-name;       #name => Prefix object
-    has %.prefix-by-code;       #code => Prefix name
-
-#    has %.defn-by-name;   #name => defn Str of known names incl. affix (values may be dupes)
-    has %.syns-by-name;   #name => list of synonyms (excl. user defined, incl. plurals)
-#    has %.unit-by-name;   #name => Unit object cache (when instantiated)
-#
-#    has %.affix-by-name;        #name => extended affix defn (eg. cm => 'centimetre') to decongest Grammar namespace
-#    has %.asyns-by-name;        #name => list of synonyms for every affix [n, nano] X~ [m, metre, meter, metres, meters]
-#
-    has %.type-to-protoname;    #type => prototype name
-    has %.type-to-prototype;    #type => prototype Unit object (when instantiated)
-#    has %.type-to-dims;		  #type => dims vector
-#
-#    has %.odd-type-by-name;     #mop up a few exceptional types
-
-    method load {
-        # FIXME - load general config & inject to loader
-
-        Loader.new: dictionary => self;
-    }
-
-    method get-prefix(:$name) {       # type as Name?
-        %!prefix-by-name{$name}
-    }
-
-    method all-prefixes {
-        %!prefix-by-name.keys.join('|')
-    }
-
-    method get-syns(:$name) {       # type as Name?
-        %!syns-by-name{$name}
-    }
-
-    #    method defn(Name $n --> Defn) {      #getter
-    #        %!defn-by-name{$n}
-    #    }
-}
+class Dictionary { ... }
 
 ######## Classes & Roles ########
 
 class Unit is export {
-  has $!dictionary = Dictionary.instance;
-
+  has $.dictionary = Dictionary.instance;
+  
   has Real $!factor = 1;
   has Real $!offset = 0;				#ie. for K <=> °C
   has Str  $!defn   = '';
@@ -268,8 +141,8 @@ class Unit is export {
     for 0 ..^ NumBases -> $i {
       given @.dims[$i] {
         when 0  { $ds = '' }
-        when 1  { $ds = "@BaseNames[$i]" }
-        default { $ds = "@BaseNames[$i]$_" }
+        when 1  { $ds = "{$.dictionary.basenames[$i]}" }
+        default { $ds = "{$.dictionary.basenames[$i]}$_" }
       }
       @dim-str.push: $ds if $ds;
     }
@@ -282,8 +155,8 @@ class Unit is export {
     for 0 ..^ NumBases -> $i {
       given @.dims[$i] {
           when 0  { $ds = '' }
-          when 1  { $ds = "@BaseNames[$i]" }
-          default { $ds = "@BaseNames[$i]%pwr-sup-rev{$_}" }
+          when 1  { $ds = "{$.dictionary.basenames[$i]}" }
+          default { $ds = "{$.dictionary.basenames[$i]}%pwr-sup-rev{$_}" }
       }
       @dim-str.push: $ds if $ds;
     }
@@ -438,18 +311,154 @@ class Unit is export {
   }
 }
 
+class Unit::Prefix is Unit {
+
+    method load( @a ) {
+
+        for @a -> %h {
+            my ( $code, $name ) = %h<names>;
+
+            my $u = Unit.new;
+            $u.factor:     %h<defn>;            # FIXME - go 'is built'  ?
+            $u.defn:       %h<defn>;
+            $u.names.push: $name;
+            $u.type:       'prefix';
+
+            $.dictionary.prefix-by-name{$name} = $u;
+            $.dictionary.prefix-by-code{$code} = $u;
+            $.dictionary.prefix-to-factor{$name} = %h<defn>;
+
+            say "Initialized Prefix $name" if $db;
+        }
+    }
+}
+
+class Unit::Base is Unit {
+
+    method load( @a ) {
+
+        my $i = 0;
+        for @a -> %h {
+            my ( $type, $names ) = %h.kv;
+
+            my @synonyms = |$names;                     # FIXME do this in a Synonym class?
+
+            #| for each name (ie. synonym)
+            for |$names -> $singular {                  # FIXME do this in a Plurals class?
+                if naive-plural($singular) -> $plural {
+                    @synonyms.push: $plural;
+                }
+            }
+            @synonyms.map({ $.dictionary.syns-by-name{$_} = |@synonyms });
+
+            my $u = Unit.new;
+            $u.SetNames: @synonyms;
+            $u.defn: $u.name;
+
+            #dimension vector has zeros in all but one place
+            $u.dims[$i++] = 1;
+            $u.dmix{$u.name} = 1;
+            $u.type: $type;
+
+            $.dictionary.type-to-protoname{$type} = $u.name;
+            $.dictionary.type-to-prototype{$type} = $u;
+
+            $.dictionary.basenames.push: $u.name;
+            
+#            %affix-by-name{$u.name} = @synonyms[1];    #extended name as value
+#            %asyns-by-name{$u.name} = @synonyms;       #all synonyms as value
+
+            say "Initialized Base $names[0]" if $db;
+            #iamerejh
+        }
+    }
+}
+
+class Dictionary {
+    ### Singleton Behaviour ###
+    my Dictionary $instance;
+
+    method new {!!!}
+
+    method instance {
+        unless $instance {
+            $instance = Dictionary.bless;
+            $instance.load;
+        }
+        $instance;
+    }
+    ###
+
+    has @.basenames;
+    
+    has %.prefix-by-name;       #name => Prefix object
+    has %.prefix-by-code;       #code => Prefix name
+    has %.prefix-to-factor;     #name => Prefix factor
+
+    #    has %.defn-by-name;   #name => defn Str of known names incl. affix (values may be dupes)
+    has %.syns-by-name;   #name => list of synonyms (excl. user defined, incl. plurals)
+    #    has %.unit-by-name;   #name => Unit object cache (when instantiated)
+    #
+    #    has %.affix-by-name;        #name => extended affix defn (eg. cm => 'centimetre') to decongest Grammar namespace
+    #    has %.asyns-by-name;        #name => list of synonyms for every affix [n, nano] X~ [m, metre, meter, metres, meters]
+    #
+    has %.type-to-protoname;    #type => prototype name
+    has %.type-to-prototype;    #type => prototype Unit object (when instantiated)
+    #    has %.type-to-dims;		  #type => dims vector
+    #
+    #    has %.odd-type-by-name;     #mop up a few exceptional types
+
+    submethod load {
+        # FIXME - load general config & inject to loader
+
+        require Physics::Unit::Definitions::en_SI;
+        my $load = Physics::Unit::Definitions::en_SI.new;
+
+        Unit::Prefix.new.load: $load.config<prefix>;
+        Unit::Base.new.load:   $load.config<base>;
+    }
+
+    method get-prefix(:$name) {       # type as Name?
+        %!prefix-by-name{$name}
+    }
+
+    method all-prefixes {
+        %!prefix-by-name.keys.join('|')
+    }
+
+    method get-syns(:$name) {       # type as Name?
+        %!syns-by-name{$name}
+    }
+
+    # FIXME need methods for
+    # type-to-prototype
+    # type-to-protoname
+
+    #    method defn(Name $n --> Defn) {      #getter
+    #        %!defn-by-name{$n}
+    #    }
+}
+
+
 ######## Subroutines (Exported) ########
 
-sub ListUnits is export {       # FIXME make Unit class method (revert to $!dictionary0
+sub ListUnits is export {       # FIXME make Unit class method (revert to $!dictionary)
 	return %defn-by-name.keys;
 }
-sub ListTypes is export {       # FIXME make Unit class method (revert to $!dictionary0
+sub ListTypes is export {       # FIXME make Unit class method (revert to $!dictionary)
     my $dictionary := Dictionary.instance;
 
     return sort keys $dictionary.type-to-protoname;
 }
-sub ListBases is export {       # FIXME make Unit class method (revert to $!dictionary0
-    return @BaseNames;
+sub ListBases is export {       # FIXME make Unit class method (revert to $!dictionary)
+    my $dictionary := Dictionary.instance;
+
+    return $dictionary.basenames;
+}
+sub GetPrefixToFactor is export {
+    my $dictionary := Dictionary.instance;
+
+    return $dictionary.prefix-to-factor;
 }
 sub GetAffixByName is export {
 	return %affix-by-name;
@@ -457,7 +466,7 @@ sub GetAffixByName is export {
 sub GetAffixSynsByName is export {
   return %asyns-by-name;
 }
-sub GetPrototype( Str $type ) {     # FIXME make Unit class method (revert to $!dictionary0
+sub GetPrototype( Str $type ) is export {     # FIXME make Unit class method (revert to $!dictionary)
     my $dictionary := Dictionary.instance;
 
     if my $pt = $dictionary.type-to-prototype{$type} {
@@ -468,7 +477,7 @@ sub GetPrototype( Str $type ) {     # FIXME make Unit class method (revert to $!
 		}
 	}
 }
-sub GetUnit( $u ) is export {     # FIXME make Unit class method (revert to $!dictionary0
+sub GetUnit( $u ) is export {     # FIXME make Unit class method (revert to $!dictionary)
   my $dictionary := Dictionary.instance;
 
   #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
@@ -690,51 +699,29 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
 
 ######## Initialization ########
 
-sub InitBaseUnit( @_ ) {
-  my $dictionary = Dictionary.instance;
-  my $i = 0;
-
-  for @_ -> %h {
-    my ($type, $names) = %h.key, %h.value;
-
-    my @synonyms = |$names;
-
-    #| for each name (ie. synonym)
-    for |$names -> $singular {
-      if naive-plural( $singular ) -> $plural {
-        @synonyms.push: $plural;
-      }
-    }
-    @synonyms.map( { $dictionary.syns-by-name{$_} = |@synonyms } );
-
-    my $u = Unit.new;
-    $u.SetNames: @synonyms;
-    $u.defn: $u.name;
-
-    #dimension vector has zeros in all but one place
-    $u.dims[$i++] = 1;
-    $u.dmix{$u.name} = 1;
-
-    $u.type: $type;
-    $dictionary.type-to-protoname{$type} = $u.name;
-    $dictionary.type-to-prototype{$type} = $u;
-
-    @BaseNames.push: $u.name;
-    %affix-by-name{$u.name} = @synonyms[1];	 #extended name as value
-    %asyns-by-name{$u.name} = @synonyms;     #all synonyms as value
-
-    say "Initialized Base Unit $names[0]" if $db;
-  }
+sub InitDerivedUnit( @_ ) {
+    InitUnit( @_, :derived )
 }
 
-sub InitDerivedUnit( @_ ) {
-	InitUnit( @_, :derived )
+sub InitTypes( @_ )  {
+    my $dictionary = Dictionary.instance;
+
+    for @_ -> %p {
+        $dictionary.type-to-protoname{%p.key} = %p.value;
+    }
+}
+
+sub InitTypeDims( @_ ) {
+    for @_ -> %p {
+        %type-to-dims{%p.key} = %p.value;
+    }
 }
 
 sub InitAffixUnit {
     my $dictionary := Dictionary.instance;
 
     # so far %affix-by-name has been initialized with base and derived unit names
+    # redo THIS!!! ^^^
 
 	# replace kg with g
 	%affix-by-name<kg>:delete;
@@ -778,26 +765,6 @@ sub InitAffixUnit {
 	}
 }
 
-sub InitTypes( @_ )  {
-    my $dictionary = Dictionary.instance;
-
-    for @_ -> %p {
-    $dictionary.type-to-protoname{%p.key} = %p.value;
-  }
-}
-
-sub InitTypeDims( @_ ) {
-  for @_ -> %p {
-    %type-to-dims{%p.key} = %p.value;
-  }
-}
-
-sub InitOddTypes( @_ ) {
-  for @_ -> %p {
-    %odd-type-by-name{%p.key} = %p.value;
-  }
-}
-
 sub InitUnit( @_ , :$derived ) is export {
     my $dictionary = Dictionary.instance;
 
@@ -838,20 +805,6 @@ sub InitUnit( @_ , :$derived ) is export {
 
 ######## Unit Data ########
 
-InitBaseUnit (
-    #SI Base Units
-    #viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
-    ##FIXME revert to algorithmic plurals
-    'Length'      => ['m', 'metre', 'meter',],
-    'Mass'        => ['kg', 'kilogram',],
-    'Time'        => ['s', 'sec', 'second',],
-    'Current'     => ['A', 'amp', 'ampere', 'ampère',],
-    'Temperature' => ['K', 'kelvin',],
-    'Substance'   => ['mol', 'mole',],
-    'Luminosity'  => ['cd', 'candela', 'candle',],
-    'Angle'		  => ['radian',],
-);
-
 InitDerivedUnit (
 	#SI Derived Units with special names & symbols
 	['sr', 'steradian'],                    'radian^2',
@@ -876,9 +829,6 @@ InitDerivedUnit (
 	['Sv', 'sievert'],                      'J / kg',
 	['kat','katal'],                        'mol s^-1',
 );
-
-InitAffixUnit;
-	#Load SI Prefix code / Unit combos to data map hashes for postfix operators
 
 InitTypes (
 	#sets name of prototype unit
@@ -976,22 +926,8 @@ InitTypeDims (
 	'ThermalConductance'    => (0,1,-3,0,-1,0,0,0),
 );
 
-#iamerejh ... next is stub all above ^^
-
-# FIXME - avoid exceptions - after yamls
-InitOddTypes (
-    #mop up a few exceptional types
-    'eV'      => 'Energy',
-    'MeV'     => 'Energy',
-    'GeV'     => 'Energy',
-    'TeV'     => 'Energy',
-    'cal'     => 'Energy',
-    'kcal'    => 'Energy',
-    'btu'     => 'Energy',
-    'erg'     => 'Energy',
-    'kWh'     => 'Energy',
-    'ft-lb'   => 'Torque',
-);
+InitAffixUnit;
+#Load SI Prefix code / Unit combos to data map hashes for postfix operators
 
 InitUnit (
 	# Dimensionless
@@ -1226,6 +1162,27 @@ InitUnit (
 
 	# ThermalConductance 
 	['W/m^2K'],                                 'W / m^2 K',
+);
+
+sub InitOddTypes( @_ ) {
+    for @_ -> %p {
+        %odd-type-by-name{%p.key} = %p.value;
+    }
+}
+
+# FIXME - avoid exceptions - after yamls
+InitOddTypes (
+    #mop up a few exceptional types
+    'eV'      => 'Energy',
+    'MeV'     => 'Energy',
+    'GeV'     => 'Energy',
+    'TeV'     => 'Energy',
+    'cal'     => 'Energy',
+    'kcal'    => 'Energy',
+    'btu'     => 'Energy',
+    'erg'     => 'Energy',
+    'kWh'     => 'Energy',
+    'ft-lb'   => 'Torque',
 );
 
 if $db {
