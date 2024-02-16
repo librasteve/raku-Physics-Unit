@@ -33,9 +33,9 @@ my %pwr-superscript = (
     '⁻¹' => -1, '⁻²' => -2, '⁻³' => -3, '⁻⁴' => -4,
 );
 
-my %defn-by-name;         #name => defn Str of known names incl. affix (values may be dupes)
+#my %defn-by-name;         #name => defn Str of known names incl. affix (values may be dupes)
 #my %syns-by-name; 	       #name => list of synonyms (excl. user defined, incl. plurals)
-my %unit-by-name;         #name => Unit object cache (when instantiated)
+#my %unit-by-name;         #name => Unit object cache (when instantiated)
 
 my %affix-by-name;        #name => extended affix defn (eg. cm => 'centimetre') to decongest Grammar namespace
 my %asyns-by-name;        #name => list of synonyms for every affix [n, nano] X~ [m, metre, meter, metres, meters]
@@ -56,263 +56,309 @@ my %odd-type-by-name;     #mop up a few exceptional types   # FIXME
 # appenders
 # FIXME s
 
+class Unit { ... }
 class Dictionary { ... }
 
 ######## Classes & Roles ########
 
-class Unit is export {
-  has $.dictionary = Dictionary.instance;
-  
-  has Real $!factor = 1;
-  has Real $!offset = 0;				#ie. for K <=> °C
-  has Str  $!defn   = '';
-  has Str  $!type;
-  has Str  @.names is rw = [];
-  has Int  @.dims = 0 xx NumBases;
-  has MixHash $.dmix is rw = ∅.MixHash;
-
-  ### accessor methods ###		    #use 'self.attr: 42' not 'self.attr = 42'
-  multi method factor($f) { self.CheckChange; $!factor = $f }
-  multi method factor     { $!factor }
-
-  multi method offset($o) { self.CheckChange; $!offset = $o }
-  multi method offset     { $!offset }
-
-  multi method defn($d)   { $!defn = $d.Str }
-  multi method defn       { $!defn }
-
-  multi method type($t)   { $!type = $t.Str }
-  multi method type(:$just1) {
-
-    #1 type has been explicitly set ... eg. prefix or to avoid ambiguous state
-    return $!type if $!type;
-
-    #2 by looking up dims
-    my @d;
-    for %type-to-dims.keys -> $k {
-      push @d, $k if self.dims cmp %type-to-dims{$k} ~~ Same;
+role Maths {
+    ### mathematical methods ###
+    multi method times( Real $t ) {
+        self.factor: self.factor * $t;
+        return self
     }
-    if @d == 0 { return '' }
-    if @d == 1 { return @d[0] }
-    if $just1  { return type-hint(@d) // die 'Cannot resolve to just1 type, please set one in %type-hint' }
-    if @d > 1  { return @d.sort }
-  }
-
-  ### new & clone methods ###
-
-  #new by named arguments
-  multi method new( :$defn!, :@names ) {
-    my $n = CreateUnit( $defn );
-    $n.SetNames: @names;
-    $n.SetType();
-    return $n
-  }
-
-  #new by deep cloning an existing Unit
-  method clone {
-    nextwith :names([]), :type(''), :dims(@!dims.clone), :dmix($!dmix.clone);
-  }
-  multi method new( Unit:D $u: @names ) {
-    my $n = $u.clone;
-    $n.SetNames: @names;
-    $n.SetType();
-    return $n
-  }
-
-  #| Manually make NewType when no preset type, eg. m-1
-  method NewType( Str $type-name ) {
-    for @.names -> $name {
-        $!dictionary.type-to-protoname{$type-name} = $name;
+    multi method times( Unit $t ) {
+        self.factor: self.factor * $t.factor;
+        self.dims >>+=<< $t.dims;
+        self.dmix = ( self.dmix (+) $t.dmix ).MixHash;
+        self.type: '';
+        return self
     }
-    $!dictionary.type-to-prototype{$type-name} = self;
-    %type-to-dims{$type-name} = self.dims;
-  }
-
-  ### output methods ###
-  method Str  { self.name }
-  method gist { self.Str }
-
-  multi method name()         { @!names[0] || '' }
-  multi method name( Str $n ) { self.SetNames([$n]) }
-
-  method canonical {
-  #reset to SI base names
-    my ( $ds, @dim-str );
-    for 0 ..^ NumBases -> $i {
-      given @.dims[$i] {
-        when 0  { $ds = '' }
-        when 1  { $ds = "{$.dictionary.basenames[$i]}" }
-        default { $ds = "{$.dictionary.basenames[$i]}$_" }
-      }
-      @dim-str.push: $ds if $ds;
+    method invert {
+        self.factor: 1 / self.factor;
+        self.dims = -<< self.dims;
+        self.dmix = ( ∅ (-) self.dmix ).MixHash;
+        return self
     }
-    return @dim-str.join('.')
-  }
-  method pretty {
-  #following SI recommendation
-    my %pwr-sup-rev = %pwr-superscript.kv.reverse;
-    my ( $ds, @dim-str );
-    for 0 ..^ NumBases -> $i {
-      given @.dims[$i] {
-          when 0  { $ds = '' }
-          when 1  { $ds = "{$.dictionary.basenames[$i]}" }
-          default { $ds = "{$.dictionary.basenames[$i]}%pwr-sup-rev{$_}" }
-      }
-      @dim-str.push: $ds if $ds;
+    multi method share( Real $d ) {
+        self.factor: self.factor / $d;
+        return self
     }
-    return @dim-str.join('⋅')
-  }
-  method raku {
-  my $t-str = self.type;
-    return qq:to/END/;
+    multi method share( Unit $d ) {
+        my $u = GetUnit($d).clone;
+        self.times: $u.invert;
+        return self
+    }
+    method raise( $d, $e ) {
+        #raise a one-element unit ($e) to power of $d digits
+        self.factor: self.factor ** $d;
+        self.dims >>*=>> $d;
+
+        #    my $e-can = %syns-by-name{$e}[0];		#lookup the canonical name
+        my $e-can = $.dictionary.get-syns(name => $e)[0];		#lookup the canonical name
+        self.dmix{$e-can} = $d;
+        return self
+    }
+
+    #### convert & compare methods ####
+
+    #| used to provide shortest name
+    #| note the equal factor constraint
+    #| should be private (when sub are folded in)
+    method same-dims( Unit $u ) {
+        return 0 unless $u.dmix  eqv self.dmix;
+        return 0 unless $u.factor == self.factor;
+        return 1
+    }
+
+    #| used by Measure cmp
+    #| maybe rename to method cmp?
+    method same-unit( Unit $u ) {
+        return 0 unless $u.dims  eqv self.dims;
+        return 0 unless $u.factor == self.factor;
+        return 1
+    }
+
+    ### Units part of Measure operations ###
+    method multiply( Unit $r ) {
+        my $l = self.clone;
+        my $x = $l.times( $r );
+        my $t = $x.type( :just1 );		    #occasionally can be > one type
+        my $p = GetPrototype( $t );
+        return( $t, $p )
+    }
+    method divide( Unit $r ) {
+        my $l = self.clone;
+        my $x = $l.share( $r );
+        my $t = $x.type( :just1 );		    #occasionally can be > one type
+        my $p = GetPrototype( $t );
+        return( $t, $p )
+    }
+    method root-extract( Int $n where 1 <= * <= 4 ) {
+        #only when all dims divisible by root
+        my $l = self.clone;
+        die "rebase failed" unless $l.factor == 1;
+        $l.defn: '';
+        $l.type: '';
+        $l.dims = $l.dims.map({($_/$n).Int});
+
+        for $l.dmix.kv -> $k,$v {
+            $l.dmix{$k} = $v/$n
+        }
+
+        my $t = $l.type( :just1 );		    #occasionally can be > one type
+        my $p = GetPrototype( $t );
+        return( $t, $p )
+    }
+}
+
+class Unit does Maths is export {
+    has $.dictionary = Dictionary.instance;
+
+    has Real $!factor = 1;
+    has Real $!offset = 0;				#ie. for K <=> °C
+    has Str  $!defn   = '';
+    has Str  $!type;
+    has Str  @.names is rw = [];
+    has Int  @.dims = 0 xx NumBases;
+    has MixHash $.dmix is rw = ∅.MixHash;
+
+    ### accessor methods ###		    #use 'self.attr: 42' not 'self.attr = 42'
+    multi method factor($f) { self.CheckChange; $!factor = $f }
+    multi method factor     { $!factor }
+
+    multi method offset($o) { self.CheckChange; $!offset = $o }
+    multi method offset     { $!offset }
+
+    multi method defn($d)   { $!defn = $d.Str }
+    multi method defn       { $!defn }
+
+    multi method type($t)   { $!type = $t.Str }
+    multi method type(:$just1) {
+
+        #1 type has been explicitly set ... eg. prefix or to avoid ambiguous state
+        return $!type if $!type;
+
+        #2 by looking up dims
+        my @d;
+        for %type-to-dims.keys -> $k {
+            push @d, $k if self.dims cmp %type-to-dims{$k} ~~ Same;
+        }
+        if @d == 0 { return '' }
+        if @d == 1 { return @d[0] }
+        if $just1  { return type-hint(@d) // die 'Cannot resolve to just1 type, please set one in %type-hint' }
+        if @d > 1  { return @d.sort }
+    }
+
+    ### new & clone methods ###
+
+    #new by named arguments
+    multi method new( :$defn!, :@names ) {
+        my $n = CreateUnit( $defn );
+        $n.SetNames: @names;
+        $n.SetType();
+        return $n
+    }
+
+    #new by deep cloning an existing Unit
+    method clone {
+        nextwith :names([]), :type(''), :dims(@!dims.clone), :dmix($!dmix.clone);
+    }
+    multi method new( Unit:D $u: @names ) {
+        my $n = $u.clone;
+        $n.SetNames: @names;
+        $n.SetType();
+        return $n
+    }
+
+    #| Manually make NewType when no preset type, eg. m-1
+    method NewType( Str $type-name ) {
+        for @.names -> $name {
+            $!dictionary.type-to-protoname{$type-name} = $name;
+        }
+        $!dictionary.type-to-prototype{$type-name} = self;
+        %type-to-dims{$type-name} = self.dims;
+    }
+
+    ### output methods ###
+    method Str  { self.name }
+    method gist { self.Str }
+
+    multi method name()         { @!names[0] || '' }
+    multi method name( Str $n ) { self.SetNames([$n]) }
+
+    method canonical {
+        #reset to SI base names
+        my ( $ds, @dim-str );
+        for 0 ..^ NumBases -> $i {
+            given @.dims[$i] {
+                when 0  { $ds = '' }
+                when 1  { $ds = "{$.dictionary.basenames[$i]}" }
+                default { $ds = "{$.dictionary.basenames[$i]}$_" }
+            }
+            @dim-str.push: $ds if $ds;
+        }
+        return @dim-str.join('.')
+    }
+    method pretty {
+        #following SI recommendation
+        my %pwr-sup-rev = %pwr-superscript.kv.reverse;
+        my ( $ds, @dim-str );
+        for 0 ..^ NumBases -> $i {
+            given @.dims[$i] {
+                when 0  { $ds = '' }
+                when 1  { $ds = "{$.dictionary.basenames[$i]}" }
+                default { $ds = "{$.dictionary.basenames[$i]}%pwr-sup-rev{$_}" }
+            }
+            @dim-str.push: $ds if $ds;
+        }
+        return @dim-str.join('⋅')
+    }
+    method raku {
+        my $t-str = self.type;
+        return qq:to/END/;
       Unit.new( factor => $.factor, offset => $.offset, defn => '$.defn', type => $t-str,
       dims => [{@.dims.join(',')}], dmix => {$.dmix.raku}, names => [{@.names.map( ->$n {"'$n'"}).join(',')}] );
     END
   }
 
-# FIXME meld these with accessors
-# FIXME write dictionary somehow
-  ### behavioural methods ###
-  method SetNames( @new-names ) {
-    if @new-names.so {
-#      if %syns-by-name{@new-names[0]} -> @syns {
-      if $!dictionary.get-syns(name => @new-names[0]) -> @syns {
-        #predefined Unit, assign synonyms
-        @.names = @syns;
-      } else {
-        #user defined Unit, assign names provided
-        @.names = @new-names;
-      }
-    } else {
-      #lookup defn in the affix synonyms
-      for %asyns-by-name.kv -> $k, $v {
-        if $v.grep($.defn) {
-          @.names = @$v;
+    # FIXME meld these with accessors
+    # FIXME write dictionary somehow
+    ### behavioural methods ###
+    method SetNames( @new-names ) {
+        if @new-names.so {
+            #      if %syns-by-name{@new-names[0]} -> @syns {
+            if $!dictionary.get-syns(name => @new-names[0]) -> @syns {
+                #predefined Unit, assign synonyms
+                @.names = @syns;
+            } else {
+                #user defined Unit, assign names provided
+                @.names = @new-names;
+            }
+        } else {
+            #lookup defn in the affix synonyms
+            for %asyns-by-name.kv -> $k, $v {
+                if $v.grep($.defn) {
+                    @.names = @$v;
+                }
+            }
+            #otherwise, just assign defn
+            @.names = [$.defn] unless @.names;
         }
-      }
-      #otherwise, just assign defn
-      @.names = [$.defn] unless @.names;
+        @.names.map( { $.dictionary.defn-by-name{$_} = self.defn } );
+        @.names.map( { $.dictionary.unit-by-name{$_} = self } );
+
+        say "SetNames: {@.names}" if $db;
     }
-    @.names.map( { %defn-by-name{$_} = self.defn } );
-    @.names.map( { %unit-by-name{$_} = self } );
+    method SetType( $t? ) {
+        for @.names -> $n {
+            #set up this Unit as a prototype
+            for $.dictionary.type-to-protoname -> %p {
+                if %p.value eq $n {
+                    $.type: %p.key;
+                    $.dictionary.type-to-prototype{$!type} = self;
+                }
+            }
+            #mop up any odd types
+            for %odd-type-by-name -> %p {
+                if %p.key eq $n {
+                    $.type: %p.value;
+                }
+            }
+        }
 
-    say "SetNames: {@.names}" if $db;
-  }
-  method SetType( $t? ) {
-    for @.names -> $n {
-      #set up this Unit as a prototype
-      for $!dictionary.type-to-protoname -> %p {
-        if %p.value eq $n {
-          $.type: %p.key;
-          $!dictionary.type-to-prototype{$!type} = self;
-        }
-      }
-      #mop up any odd types
-      for %odd-type-by-name -> %p {
-        if %p.key eq $n {
-          $.type: %p.value;
-        }
-      }
+        say "SetType: $.type" if $db;
     }
-
-    say "SetType: $.type" if $db;
-  }
-  method CheckChange {
-      warn "You're not allowed to change named units!" if self.name;
-  }
-
-  ### mathematical mutating Module methods ###
-  multi method times( Real $t ) {
-    self.factor: self.factor * $t;
-    return self
-  }
-  multi method times( Unit $t ) {
-    self.factor: self.factor * $t.factor;
-    self.dims >>+=<< $t.dims;
-    self.dmix = ( self.dmix (+) $t.dmix ).MixHash;
-    self.type: '';
-    return self
-  }
-  method invert {
-    self.factor: 1 / self.factor;
-    self.dims = -<< self.dims;
-    self.dmix = ( ∅ (-) self.dmix ).MixHash;
-    return self
-  }
-  multi method share( Real $d ) {
-    self.factor: self.factor / $d;
-    return self
-  }
-  multi method share( Unit $d ) {
-    my $u = GetUnit($d).clone;
-    self.times: $u.invert;
-    return self
-  }
-  method raise( $d, $e ) {
-    #raise a one-element unit ($e) to power of $d digits
-    self.factor: self.factor ** $d;
-    self.dims >>*=>> $d;
-
-#    my $e-can = %syns-by-name{$e}[0];		#lookup the canonical name
-    my $e-can = $!dictionary.get-syns(name => $e)[0];		#lookup the canonical name
-    self.dmix{$e-can} = $d;
-    return self
-  }
-
-  #### convert & compare methods ####
-
-  #| used to provide shortest name
-  #| note the equal factor constraint
-  #| should be private (when sub are folded in)
-  method same-dims( Unit $u ) {
-    return 0 unless $u.dmix  eqv self.dmix;
-    return 0 unless $u.factor == self.factor;
-    return 1
-  }
-
-  #| used by Measure cmp
-  #| maybe rename to method cmp?
-  method same-unit( Unit $u ) {
-    return 0 unless $u.dims  eqv self.dims;
-    return 0 unless $u.factor == self.factor;
-    return 1
-  }
-
-  ### Units part of Measure operations ###
-  method multiply( Unit $r ) {
-    my $l = self.clone;
-    my $x = $l.times( $r );
-    my $t = $x.type( :just1 );		    #occasionally can be > one type
-    my $p = GetPrototype( $t );
-    return( $t, $p )
-  }
-  method divide( Unit $r ) {
-    my $l = self.clone;
-    my $x = $l.share( $r );
-    my $t = $x.type( :just1 );		    #occasionally can be > one type
-    my $p = GetPrototype( $t );
-    return( $t, $p )
-  }
-  method root-extract( Int $n where 1 <= * <= 4 ) {
-    #only when all dims divisible by root
-    my $l = self.clone;
-    die "rebase failed" unless $l.factor == 1;
-    $l.defn: '';
-    $l.type: '';
-    $l.dims = $l.dims.map({($_/$n).Int});
-
-    for $l.dmix.kv -> $k,$v {
-      $l.dmix{$k} = $v/$n
+    method CheckChange {
+        warn "You're not allowed to change named units!" if self.name;
     }
 
-    my $t = $l.type( :just1 );		    #occasionally can be > one type
-    my $p = GetPrototype( $t );
-    return( $t, $p )
-  }
+    multi method load( @a ) {
+
+        #eg. ['N',  'newton'],           'kg m / s^2',
+        #      |     ^^^^^^ synonyms      ^^^^^^^^^^ defn
+        #	   |
+        #	   > canonical name
+
+        if not preload {
+            #load data map hashes only - instantiate Unit objects on demand
+
+            #| iterate over each unit line
+            for @a -> %h {
+                my ($defn, $names) = %h<defn>, %h<names>;
+
+                my @synonyms = |$names;
+
+                #| for each name (ie. synonym)
+                for |$names -> $singular {
+                    if naive-plural($singular) -> $plural {
+                        @synonyms.push: $plural;
+                    }
+                }
+                for @synonyms -> $name {
+                    say $name;
+                    $.dictionary.defn-by-name{$name} = $defn;
+                    $.dictionary.syns-by-name{$name} = @synonyms;
+                }
+#                if $derived {          #FIXME - up to Unit::Derived
+#                    %affix-by-name{@synonyms[0]} = @synonyms[1];
+#                    %asyns-by-name{@synonyms[0]} = @synonyms;
+#                }
+            }
+        } else {
+            #instantiate all Units right away (slow)   #FIXME - wrong anyway
+
+            for @a -> %h {
+                my ($defn, $names) = %h<defn>, %h<names>;
+
+                Unit.new(defn => $defn, names => [|$names]);
+            }
+        }
+    }
 }
 
-class Unit::Prefix is Unit {
 
+class Unit::Prefix is Unit {
     method load( @a ) {
 
         for @a -> %h {
@@ -334,7 +380,6 @@ class Unit::Prefix is Unit {
 }
 
 class Unit::Base is Unit {
-
     method load( @a ) {
 
         my $i = 0;
@@ -374,6 +419,16 @@ class Unit::Base is Unit {
     }
 }
 
+class Unit::Derived is Unit {
+    method load( @a ) {
+        callsame;
+    }
+}
+
+class Unit::Types {
+
+}
+
 class Dictionary {
     ### Singleton Behaviour ###
     my Dictionary $instance;
@@ -395,9 +450,9 @@ class Dictionary {
     has %.prefix-by-code;       #code => Prefix name
     has %.prefix-to-factor;     #name => Prefix factor
 
-    #    has %.defn-by-name;   #name => defn Str of known names incl. affix (values may be dupes)
+    has %.defn-by-name;   #name => defn Str of known names incl. affix (values may be dupes)
     has %.syns-by-name;   #name => list of synonyms (excl. user defined, incl. plurals)
-    #    has %.unit-by-name;   #name => Unit object cache (when instantiated)
+    has %.unit-by-name;   #name => Unit object cache (when instantiated)
     #
     #    has %.affix-by-name;        #name => extended affix defn (eg. cm => 'centimetre') to decongest Grammar namespace
     #    has %.asyns-by-name;        #name => list of synonyms for every affix [n, nano] X~ [m, metre, meter, metres, meters]
@@ -414,8 +469,11 @@ class Dictionary {
         require Physics::Unit::Definitions::en_SI;
         my $load = Physics::Unit::Definitions::en_SI.new;
 
-        Unit::Prefix.new.load: $load.config<prefix>;
-        Unit::Base.new.load:   $load.config<base>;
+        Unit::Prefix.new.load:  $load.config<prefix>;
+        Unit::Base.new.load:    $load.config<base>;
+
+        say $load.config<derived>;
+        Unit::Derived.new.load: $load.config<derived>;
     }
 
     method get-prefix(:$name) {       # type as Name?
@@ -441,14 +499,29 @@ class Dictionary {
 
 
 ######## Subroutines (Exported) ########
+sub ListSyns is export {       # FIXME make Unit class method (revert to $!dictionary)
+    my $dictionary := Dictionary.instance;
 
+    $dictionary.syns-by-name;
+    #	return sort keys $dictionary.defn-by-name;
+}
+sub ListDefns is export {       # FIXME make Unit class method (revert to $!dictionary)
+    my $dictionary := Dictionary.instance;
+
+    $dictionary.defn-by-name;
+#	return sort keys $dictionary.defn-by-name;
+}
 sub ListUnits is export {       # FIXME make Unit class method (revert to $!dictionary)
-	return %defn-by-name.keys;
+    my $dictionary := Dictionary.instance;
+
+    $dictionary.unit-by-name;
+    #	return sort keys $dictionary.defn-by-name;
 }
 sub ListTypes is export {       # FIXME make Unit class method (revert to $!dictionary)
     my $dictionary := Dictionary.instance;
 
-    return sort keys $dictionary.type-to-protoname;
+    $dictionary.type-to-protoname
+#    return sort keys $dictionary.type-to-protoname;
 }
 sub ListBases is export {       # FIXME make Unit class method (revert to $!dictionary)
     my $dictionary := Dictionary.instance;
@@ -489,13 +562,13 @@ sub GetUnit( $u ) is export {     # FIXME make Unit class method (revert to $!di
   #2 if name or prefix already instantiated
   say "GU2 from $u" if $db;
 
-  return %unit-by-name{$u}   if %unit-by-name{$u}.defined;
+  return $dictionary.unit-by-name{$u} if $dictionary.unit-by-name{$u}.defined;
   return $dictionary.get-prefix(:name($u)) if $dictionary.get-prefix(:name($u)).defined;
 
   #3 if name in our defns, instantiate it
   say "GU3 from $u" if $db;
 
-  for %defn-by-name -> %p {
+  for $dictionary.defn-by-name -> %p {
     if %p.key.grep($u) {
       my $nuo = Unit.new( defn => %p.value, names => [%p.key] );
       return $nuo;
@@ -512,18 +585,20 @@ sub GetUnit( $u ) is export {     # FIXME make Unit class method (revert to $!di
 ######## Subroutines (Internal) ########
 
 sub subst-shortest( Unit $u ) {
-  # substitutes shortest name if >1 unit name has same dimensions
-  # ... so that eg. 'J' beats 'kg m^2 / s^2'
-  # ... requires eg. 'J' to be instantiated first
+    my $dictionary = Dictionary.instance;
 
-  my @same-dims;
-  for %unit-by-name.kv -> $k,$v {
-    @same-dims.push($k) if $v.same-dims($u)
-  }
-  if @same-dims {
-    my @sort-by-size = @same-dims.sort({$^a.chars cmp $^b.chars});
-    return %unit-by-name{@sort-by-size[0]}  #shortest
-  }
+    # substitutes shortest name if >1 unit name has same dimensions
+    # ... so that eg. 'J' beats 'kg m^2 / s^2'
+    # ... requires eg. 'J' to be instantiated first
+
+    my @same-dims;
+    for $dictionary.unit-by-name.kv -> $k,$v {
+        @same-dims.push($k) if $v.same-dims($u)
+    }
+    if @same-dims {
+        my @sort-by-size = @same-dims.sort({$^a.chars cmp $^b.chars});
+        return $dictionary.unit-by-name{@sort-by-size[0]}  #shortest
+    }
 }
 
 sub type-hint( @t ) {
@@ -534,14 +609,14 @@ sub type-hint( @t ) {
 }
 
 sub naive-plural( $n ) {
-  #naive plurals - append 's' ...
-  unless $n.chars <= 2                #...too short
-    || $n.comb.first(:end) eq 's'	  #...already ends with 's'
-    || $n.comb.first(:end) eq 'z'     #...already ends with 'z'
-    || $n ~~ /<[\d\/^*]>/             #...contains a digit or a symbol
-  {
-    return $n ~ 's';
-  }
+    #naive plurals - append 's' ...
+    unless $n.chars <= 2                #...too short
+        || $n.comb.first(:end) eq 's'	  #...already ends with 's'
+        || $n.comb.first(:end) eq 'z'     #...already ends with 'z'
+        || $n ~~ /<[\d\/^*]>/             #...contains a digit or a symbol
+    {
+        return $n ~ 's';
+    }
 }
 
 ######## Grammars ########
@@ -556,7 +631,7 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
 	$defn = %affix-by-name{$defn} // $defn;
 
     #| rm compound names from element unit-name match candidates (to force regen of dmix)
-    my $unit-names       = %defn-by-name.keys.grep({! /<[\s*^./]>/}).join('|');
+    my $unit-names       = $dictionary.defn-by-name.keys.grep({! /<[\s*^./]>/}).join('|');
 
     my $prefix-names     = $dictionary.all-prefixes;
 
@@ -699,9 +774,9 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
 
 ######## Initialization ########
 
-sub InitDerivedUnit( @_ ) {
-    InitUnit( @_, :derived )
-}
+#sub InitDerivedUnit( @_ ) {
+#    InitUnit( @_, :derived )
+#}
 
 sub InitTypes( @_ )  {
     my $dictionary = Dictionary.instance;
@@ -787,7 +862,7 @@ sub InitUnit( @_ , :$derived ) is export {
 				}
 			}
 			for @synonyms -> $name {
-				%defn-by-name{$name} = $defn;
+				$dictionary.defn-by-name{$name} = $defn;
 				$dictionary.syns-by-name{$name} = @synonyms;
 			}
 			if $derived {
@@ -796,7 +871,7 @@ sub InitUnit( @_ , :$derived ) is export {
 			}
 		}
 	} else {
-		#instantiate all Units right away (slow)
+		#instantiate all Units right away (slow)   #FIXME - wrong anyway
 		for @_ -> $names, $defn {
             Unit.new( defn => $defn, names => [|$names] );
 		}
@@ -805,30 +880,30 @@ sub InitUnit( @_ , :$derived ) is export {
 
 ######## Unit Data ########
 
-InitDerivedUnit (
-	#SI Derived Units with special names & symbols
-	['sr', 'steradian'],                    'radian^2',
-	['Hz', 'hertz'],                        '1 / s',
-	['N',  'newton'],                       'kg m / s^2',
-	['Pa', 'pascal'],                       'N / m^2',
-	['J',  'joule'],                        'kg m^2 / s^2',
-	['W',  'watt'],                         'kg m^2 / s^3',
-	['C',  'coulomb'],                      'A s',
-	['V',  'volt'],                         'kg m^2 / A s^3',
-	['F',  'farad'],                        'A^2 s^4 / kg m^2',
-	['Ω',  'ohm'],                          'kg m^2 / A^2 s^3',
-	['S',  'siemens'],                      'A^2 s^3 / kg m^2',
-	['Wb', 'weber'],                        'kg m^2 / A s^2',
-	['T',  'tesla'],                        'kg / A s^2',
-	['H',  'henry'],                        'kg m^2 / A^2 s^2',
-	['°C', 'celsius', 'Centigrade'],        'K + 273.15',
-	['lm', 'lumen'],                        'cd sr',
-	['lx', 'lux'],                          'm^-2 cd',
-	['Bq', 'becquerel'],                    '1 Hz',
-	['Gy', 'gray'],                         'J / kg',
-	['Sv', 'sievert'],                      'J / kg',
-	['kat','katal'],                        'mol s^-1',
-);
+#InitDerivedUnit (
+#	#SI Derived Units with special names & symbols
+#	['sr', 'steradian'],                    'radian^2',
+#	['Hz', 'hertz'],                        '1 / s',
+#	['N',  'newton'],                       'kg m / s^2',
+#	['Pa', 'pascal'],                       'N / m^2',
+#	['J',  'joule'],                        'kg m^2 / s^2',
+#	['W',  'watt'],                         'kg m^2 / s^3',
+#	['C',  'coulomb'],                      'A s',
+#	['V',  'volt'],                         'kg m^2 / A s^3',
+#	['F',  'farad'],                        'A^2 s^4 / kg m^2',
+#	['Ω',  'ohm'],                          'kg m^2 / A^2 s^3',
+#	['S',  'siemens'],                      'A^2 s^3 / kg m^2',
+#	['Wb', 'weber'],                        'kg m^2 / A s^2',
+#	['T',  'tesla'],                        'kg / A s^2',
+#	['H',  'henry'],                        'kg m^2 / A^2 s^2',
+#	['°C', 'celsius', 'Centigrade'],        'K + 273.15',
+#	['lm', 'lumen'],                        'cd sr',
+#	['lx', 'lux'],                          'm^-2 cd',
+#	['Bq', 'becquerel'],                    '1 Hz',
+#	['Gy', 'gray'],                         'J / kg',
+#	['Sv', 'sievert'],                      'J / kg',
+#	['kat','katal'],                        'mol s^-1',
+#);
 
 InitTypes (
 	#sets name of prototype unit
@@ -929,261 +1004,261 @@ InitTypeDims (
 InitAffixUnit;
 #Load SI Prefix code / Unit combos to data map hashes for postfix operators
 
-InitUnit (
-	# Dimensionless
-	['①','(1)','one','unity'],                  '1',  #U-2460 CIRCLED DIGIT ONE
-	['semi','demi','hemi'],                     '1/2',   # FIXME prefix?
-	['%','percent'],                            '1/100',
-	['ABV'],                                    '1',
-	['pi'],                                     '3.1415926535897932385',
-
-	# Angle
-	['°', 'degree', 'deg', 'º'],                'pi radians / 180',
-	['ᵍ', 'gon', 'grad'],                       'pi radians / 200',
-
-	# Solid Angle
-	['deg²'],                                   'deg^2',
-	['sp','spat'],                              '4 pi steradian',
-
-	# Time
-	['min', 'minute'],                          '60 s',
-	['hr', 'hour'],                             '60 min',
-	['day'],                                    '24 hr',
-	['week'],                                   '7 day',
-	['fortnight'],                              '2 week',
-	['yr', 'year'],                             '365.25 day',
-	['month'],                                  'year / 12',    # an average month
-	['century', 'centuries'],                   '100 yr',
-	['millenium', 'millenia'],                  '1000 yr',
-
-	# Frequency
-	['cycle'],                                  '1 Hz',
-	['revolution'],                             '1',
-	['rpm'],                                    'revolution per minute',
-
-	# Length
-	['km'],				                        'kilometre',
-	['fm'],				                        'femtometre',   #for 'MeV.fm'
-	['μ', 'micron'],                            '1e-6 m',
-	['å', 'angstrom'],                          '1e-10 m',
-	['au', 'astronomical-unit'],                '1.49598e11 m',
-	['ly', 'light-year'],                       '9.46e15 m',
-	['parsec'],                                 '3.083e16 m',
-	['ft', 'foot', 'feet'],                     '0.3048 m',
-	['in', 'inch'],                             'ft/12',
-	['yard'],                                   '3 ft',
-	['fathom'],                                 '2 yard',
-	['rod', 'pole', 'perch'],                   '5.5 yard',
-	['furlong'],                                '40 rod',
-	['mile'],                                   '5280 ft',
-	['nmile', 'nautical-mile'],                 '1852 m',
-	['ca', 'cable'],		                    '185.2 m',
-	['pica'],                                   'in/6',	#chosen defn not unique
-	['point'],                                  'pica/12',
-
-	# Area
-	['m^2', 'm2', 'm²'],                        'm^2',
-	['are'],                                    '100 square metre',
-	['hectare'],                                '100 are',
-	['barn'],                                   '1e-28 square metre',
-	['acre'],                                   '43560 square feet',
-
-	# Volume
-	['m^3', 'm3', 'm³'],                        'm^3',
-	['l', 'L', 'litre', 'liter'],               'm^3/1000',
-	['cc'],		                                'cubic centimetre',
-	['bottle'],                                 '750 millilitre',
-	['fluidram'],                               '3.5516 millilitre',
-	['minim'],                                  '0.059194 millilitre',
-	['alcohol-unit'],                           '10 millilitre',            # of pure alcohol
-	# setting Imperial (imp-) or US (us-) from $locale
-	['us-gallon'],                              '3.785411784 litre',
-	['imp-gallon'],                             '4.54609 litre',
-	['gallon'],									"1 {$locale}-gallon",
-	['firkin'],							        '9 gallon',
-	['barrel'],							        '36 gallon',
-	['quart'],                                  'gallon/4',
-	['peck'],                                   '8 quart',
-	['bushel'],                                 '4 peck',
-	['fifth'],                                  'us-gallon/5',
-	['us-pint'],                                'us-gallon/8',
-	['imp-pint'],                               'imp-gallon/8',
-	['pint'],									"1 {$locale}-pint",
-	['cup'],                                    'us-pint/2',
-	['floz', 'fluid-ounce'],                    'cup/8',
-	['gill'],                                   '4 fluid-ounce',
-	['tablespoon', 'tbsp'],                     'fluid-ounce / 2',
-	['teaspoon', 'tsp'],                        'tablespoon / 3',
-	['cord'],                                   '128 cubic feet',
-	['stere'],                                  '1 cubic metre',
-
-	# Speed
-	['m/s'],		                            'm/s',
-	['mph'],                                    'mile per hour',
-	['kph'],                                    'kilometre per hour',
-	['kps'],                                    'kilometre per second',
-	['fps'],                                    'feet per second',
-	['knot'],                                   'nmile per hour',
-
-	# AngularSpeed
-	['radians per second'],			            'Hz',  #the SI unit (radians=1)
-	['revs', 'revolutions per second'],         '2 pi * Hz',
-	['rpm'],							        '60 revs',
-
-	# Acceleration
-	['m/s^2'],                                  'm/s^2',
-	['g0', 'earth-gravity'],                    '9.80665 m/s^2',
-
-	# Mass
-	['g', 'gram', 'gm', 'gramme'],              'kg / 1000',
-	['u', 'atomic-mass-unit', 'Da', 'Dalton'],  '1.6605402e-27 kg',
-	['metric-ton', 'tonne'],                    '1000 kg',
-	['grain'],                                  '0.0648 gm',
-	['lbm', 'pounds-mass'],                     '0.45359237 kg',
-	['oz', 'ounce'],                            'lbm/16',
-	['stone'],                                  '14 lbm',
-	['hundredweight'],                          '100 lbm',
-	['ton', 'short-ton'],                       '2000 lbm',
-	['long-ton'],                               '2240 lbm',
-	['slug'],                                   'lbm g0 s^2/ft',
-	['dram'],                                   'ounce / 16',
-	['troy-pound'],                             '0.373 kg',
-	['troy-ounce'],                             '31.103 gm',
-	['pennyweight'],                            '1.555 gm',
-	['scruple'],                                '1.296 gm',
-	['carat', 'karat'],                         '200 milligram',
-	['j-point'],                                '2 carat',
-
-	# MomentOfInertia
-	['kg m^2'],                                 'kg m^2',
-
-	# Momentum
-	['kg m/s'],                                 'kg m/s',
-	['slug ft/s'],                              'slug feet/s',
-
-	# AngularMomentum
-	['kg m^2/s'],                               'kg m^2 / s',
-
-	# Force
-	['lb', 'lbs', 'pound', 'pound-force'],      'slug foot / s^2',
-	['ounce-force'],                            'pound-force / 16',
-	['dyne'],                                   'gm centimetre / s^2',
-	['gram-force'],                             'gm g0',
-	['kgf'],                                    'kilo gram-force',
-
-	# Torque
-	['Nm', 'newton-metre'],                     'N m',
-	['ft-lb', 'footpound'],                     'foot pound-force',
-
-	# Impulse
-	['Ns'],                                     'N * s',
-	['pound-second'],                           'pound * s',
-
-	# Pressure
-	['bar'],                                    '1e5 pascal',
-	['torr'],                                   '133.322368 pascal',  #(101325 / 760)
-	['psi'],                                    'pound per inch^2',
-	['atm', 'atmosphere'],                      '101325 pascal',
-	['mmHg'],                                   '133.322 pascal',
-
-	# Density
-	['kg/m^3'],                                 'kg / m^3',
-	['°proof'],                                 '923 kg / m^3',
-	#UK metric https://en.wikipedia.org/wiki/Alcohol_proof (US version is just 2x ABV)
-
-	# Energy
-	['eV', 'electron-volt'],                    '1.60217733e-19 joule',
-	['MeV'],                                    'mega electron-volt',
-	['GeV'],                                    'giga electron-volt',
-	['TeV'],                                    'tera electron-volt',
-	['cal', 'calorie'],                         '4.184 joule',
-	['kcal'],                                   'kilocalorie',
-	['btu', 'british-thermal-unit'],            '1055.056 joule',
-	['therm'],                                  '1.0e5 btu',
-	['erg'],                                    '1.0e-7 joule',
-	['kWh'],                                    'kilowatt hour',
-	['Eₕ', 'E_h', 'Ha'],                        '4.3597447222071e-18 joule',    #Hartree energy
-
-	# Power
-	['us-horsepower', 'us-hp'],                 '550 foot pound-force / s',
-	['PS', 'horsepower', 'hp'],                 '75 kg * g0 * m / s',
-
-	# Current (Base Unit)
-
-	# Potential (Derived Unit)
-
-	# Conductance
-	['mho'],                                    '1 / ohm',
-
-	# Capacitance (Derived Unit)
-
-	# Inductance (Derived Unit)
-
-	# Magnetic_flux
-	['Mx', 'maxwell'],                          '1e-8 weber',
-
-	# Magnetic_field
-	['gauss'],                                  '1e-4 tesla',
-
-	# Temperature
-	['°R', 'Rankine'],                          '5/9 * K',
-	['°F', 'Fahrenheit'],                       '5/9 * K + 459.67',
-
-	# Dose
-	['rad'],									'gray / 100',
-	['rem'],									'sievert / 100',
-
-	# FuelConsumption
-	['m^3/m'],                                  'm^3 / metre',
-	['l/100km'],                                '0.00001 litre / metre',
-
-	# FuelEfficiency
-	['m/m^3'],                                  'metre / m^3',
-	['mpg'],                                    'mile / gallon',
-
-	# Flow
-	['m^3/s'],                                  'm^3 / second',
-	['gpd'],                                    'gallon / day',
-
-	# SpecificEnergy 
-	['J/kg'],                                   'joule / kg',
-	['MJ/kg'],                                  'mega joule / kg',
-
-	# Irradiance 
-	['W/m^2'],                                  'W / m^2',
-
-	# Insolation 
-	['kWh/m^2'],                                'kWh / m^2',
-	['Langley'],                                'cal / 10000 m^2',
-
-	# ThermalResistance 
-	['Km^2/W'],                                 'K m^2 / W',
-	['tog'],                                    '0.1 K m^2 / W',
-
-	# ThermalConductance 
-	['W/m^2K'],                                 'W / m^2 K',
-);
-
-sub InitOddTypes( @_ ) {
-    for @_ -> %p {
-        %odd-type-by-name{%p.key} = %p.value;
-    }
-}
-
-# FIXME - avoid exceptions - after yamls
-InitOddTypes (
-    #mop up a few exceptional types
-    'eV'      => 'Energy',
-    'MeV'     => 'Energy',
-    'GeV'     => 'Energy',
-    'TeV'     => 'Energy',
-    'cal'     => 'Energy',
-    'kcal'    => 'Energy',
-    'btu'     => 'Energy',
-    'erg'     => 'Energy',
-    'kWh'     => 'Energy',
-    'ft-lb'   => 'Torque',
-);
+#InitUnit (
+#	# Dimensionless
+#	['①','(1)','one','unity'],                  '1',  #U-2460 CIRCLED DIGIT ONE
+#	['semi','demi','hemi'],                     '1/2',   # FIXME prefix?
+#	['%','percent'],                            '1/100',
+#	['ABV'],                                    '1',
+#	['pi'],                                     '3.1415926535897932385',
+#
+#	# Angle
+#	['°', 'degree', 'deg', 'º'],                'pi radians / 180',
+#	['ᵍ', 'gon', 'grad'],                       'pi radians / 200',
+#
+#	# Solid Angle
+#	['deg²'],                                   'deg^2',
+#	['sp','spat'],                              '4 pi steradian',
+#
+#	# Time
+#	['min', 'minute'],                          '60 s',
+#	['hr', 'hour'],                             '60 min',
+#	['day'],                                    '24 hr',
+#	['week'],                                   '7 day',
+#	['fortnight'],                              '2 week',
+#	['yr', 'year'],                             '365.25 day',
+#	['month'],                                  'year / 12',    # an average month
+#	['century', 'centuries'],                   '100 yr',
+#	['millenium', 'millenia'],                  '1000 yr',
+#
+#	# Frequency
+#	['cycle'],                                  '1 Hz',
+#	['revolution'],                             '1',
+#	['rpm'],                                    'revolution per minute',
+#
+#	# Length
+#	['km'],				                        'kilometre',
+#	['fm'],				                        'femtometre',   #for 'MeV.fm'
+#	['μ', 'micron'],                            '1e-6 m',
+#	['å', 'angstrom'],                          '1e-10 m',
+#	['au', 'astronomical-unit'],                '1.49598e11 m',
+#	['ly', 'light-year'],                       '9.46e15 m',
+#	['parsec'],                                 '3.083e16 m',
+#	['ft', 'foot', 'feet'],                     '0.3048 m',
+#	['in', 'inch'],                             'ft/12',
+#	['yard'],                                   '3 ft',
+#	['fathom'],                                 '2 yard',
+#	['rod', 'pole', 'perch'],                   '5.5 yard',
+#	['furlong'],                                '40 rod',
+#	['mile'],                                   '5280 ft',
+#	['nmile', 'nautical-mile'],                 '1852 m',
+#	['ca', 'cable'],		                    '185.2 m',
+#	['pica'],                                   'in/6',	#chosen defn not unique
+#	['point'],                                  'pica/12',
+#
+#	# Area
+#	['m^2', 'm2', 'm²'],                        'm^2',
+#	['are'],                                    '100 square metre',
+#	['hectare'],                                '100 are',
+#	['barn'],                                   '1e-28 square metre',
+#	['acre'],                                   '43560 square feet',
+#
+#	# Volume
+#	['m^3', 'm3', 'm³'],                        'm^3',
+#	['l', 'L', 'litre', 'liter'],               'm^3/1000',
+#	['cc'],		                                'cubic centimetre',
+#	['bottle'],                                 '750 millilitre',
+#	['fluidram'],                               '3.5516 millilitre',
+#	['minim'],                                  '0.059194 millilitre',
+#	['alcohol-unit'],                           '10 millilitre',            # of pure alcohol
+#	# setting Imperial (imp-) or US (us-) from $locale
+#	['us-gallon'],                              '3.785411784 litre',
+#	['imp-gallon'],                             '4.54609 litre',
+#	['gallon'],									"1 {$locale}-gallon",
+#	['firkin'],							        '9 gallon',
+#	['barrel'],							        '36 gallon',
+#	['quart'],                                  'gallon/4',
+#	['peck'],                                   '8 quart',
+#	['bushel'],                                 '4 peck',
+#	['fifth'],                                  'us-gallon/5',
+#	['us-pint'],                                'us-gallon/8',
+#	['imp-pint'],                               'imp-gallon/8',
+#	['pint'],									"1 {$locale}-pint",
+#	['cup'],                                    'us-pint/2',
+#	['floz', 'fluid-ounce'],                    'cup/8',
+#	['gill'],                                   '4 fluid-ounce',
+#	['tablespoon', 'tbsp'],                     'fluid-ounce / 2',
+#	['teaspoon', 'tsp'],                        'tablespoon / 3',
+#	['cord'],                                   '128 cubic feet',
+#	['stere'],                                  '1 cubic metre',
+#
+#	# Speed
+#	['m/s'],		                            'm/s',
+#	['mph'],                                    'mile per hour',
+#	['kph'],                                    'kilometre per hour',
+#	['kps'],                                    'kilometre per second',
+#	['fps'],                                    'feet per second',
+#	['knot'],                                   'nmile per hour',
+#
+#	# AngularSpeed
+#	['radians per second'],			            'Hz',  #the SI unit (radians=1)
+#	['revs', 'revolutions per second'],         '2 pi * Hz',
+#	['rpm'],							        '60 revs',
+#
+#	# Acceleration
+#	['m/s^2'],                                  'm/s^2',
+#	['g0', 'earth-gravity'],                    '9.80665 m/s^2',
+#
+#	# Mass
+#	['g', 'gram', 'gm', 'gramme'],              'kg / 1000',
+#	['u', 'atomic-mass-unit', 'Da', 'Dalton'],  '1.6605402e-27 kg',
+#	['metric-ton', 'tonne'],                    '1000 kg',
+#	['grain'],                                  '0.0648 gm',
+#	['lbm', 'pounds-mass'],                     '0.45359237 kg',
+#	['oz', 'ounce'],                            'lbm/16',
+#	['stone'],                                  '14 lbm',
+#	['hundredweight'],                          '100 lbm',
+#	['ton', 'short-ton'],                       '2000 lbm',
+#	['long-ton'],                               '2240 lbm',
+#	['slug'],                                   'lbm g0 s^2/ft',
+#	['dram'],                                   'ounce / 16',
+#	['troy-pound'],                             '0.373 kg',
+#	['troy-ounce'],                             '31.103 gm',
+#	['pennyweight'],                            '1.555 gm',
+#	['scruple'],                                '1.296 gm',
+#	['carat', 'karat'],                         '200 milligram',
+#	['j-point'],                                '2 carat',
+#
+#	# MomentOfInertia
+#	['kg m^2'],                                 'kg m^2',
+#
+#	# Momentum
+#	['kg m/s'],                                 'kg m/s',
+#	['slug ft/s'],                              'slug feet/s',
+#
+#	# AngularMomentum
+#	['kg m^2/s'],                               'kg m^2 / s',
+#
+#	# Force
+#	['lb', 'lbs', 'pound', 'pound-force'],      'slug foot / s^2',
+#	['ounce-force'],                            'pound-force / 16',
+#	['dyne'],                                   'gm centimetre / s^2',
+#	['gram-force'],                             'gm g0',
+#	['kgf'],                                    'kilo gram-force',
+#
+#	# Torque
+#	['Nm', 'newton-metre'],                     'N m',
+#	['ft-lb', 'footpound'],                     'foot pound-force',
+#
+#	# Impulse
+#	['Ns'],                                     'N * s',
+#	['pound-second'],                           'pound * s',
+#
+#	# Pressure
+#	['bar'],                                    '1e5 pascal',
+#	['torr'],                                   '133.322368 pascal',  #(101325 / 760)
+#	['psi'],                                    'pound per inch^2',
+#	['atm', 'atmosphere'],                      '101325 pascal',
+#	['mmHg'],                                   '133.322 pascal',
+#
+#	# Density
+#	['kg/m^3'],                                 'kg / m^3',
+#	['°proof'],                                 '923 kg / m^3',
+#	#UK metric https://en.wikipedia.org/wiki/Alcohol_proof (US version is just 2x ABV)
+#
+#	# Energy
+#	['eV', 'electron-volt'],                    '1.60217733e-19 joule',
+#	['MeV'],                                    'mega electron-volt',
+#	['GeV'],                                    'giga electron-volt',
+#	['TeV'],                                    'tera electron-volt',
+#	['cal', 'calorie'],                         '4.184 joule',
+#	['kcal'],                                   'kilocalorie',
+#	['btu', 'british-thermal-unit'],            '1055.056 joule',
+#	['therm'],                                  '1.0e5 btu',
+#	['erg'],                                    '1.0e-7 joule',
+#	['kWh'],                                    'kilowatt hour',
+#	['Eₕ', 'E_h', 'Ha'],                        '4.3597447222071e-18 joule',    #Hartree energy
+#
+#	# Power
+#	['us-horsepower', 'us-hp'],                 '550 foot pound-force / s',
+#	['PS', 'horsepower', 'hp'],                 '75 kg * g0 * m / s',
+#
+#	# Current (Base Unit)
+#
+#	# Potential (Derived Unit)
+#
+#	# Conductance
+#	['mho'],                                    '1 / ohm',
+#
+#	# Capacitance (Derived Unit)
+#
+#	# Inductance (Derived Unit)
+#
+#	# Magnetic_flux
+#	['Mx', 'maxwell'],                          '1e-8 weber',
+#
+#	# Magnetic_field
+#	['gauss'],                                  '1e-4 tesla',
+#
+#	# Temperature
+#	['°R', 'Rankine'],                          '5/9 * K',
+#	['°F', 'Fahrenheit'],                       '5/9 * K + 459.67',
+#
+#	# Dose
+#	['rad'],									'gray / 100',
+#	['rem'],									'sievert / 100',
+#
+#	# FuelConsumption
+#	['m^3/m'],                                  'm^3 / metre',
+#	['l/100km'],                                '0.00001 litre / metre',
+#
+#	# FuelEfficiency
+#	['m/m^3'],                                  'metre / m^3',
+#	['mpg'],                                    'mile / gallon',
+#
+#	# Flow
+#	['m^3/s'],                                  'm^3 / second',
+#	['gpd'],                                    'gallon / day',
+#
+#	# SpecificEnergy
+#	['J/kg'],                                   'joule / kg',
+#	['MJ/kg'],                                  'mega joule / kg',
+#
+#	# Irradiance
+#	['W/m^2'],                                  'W / m^2',
+#
+#	# Insolation
+#	['kWh/m^2'],                                'kWh / m^2',
+#	['Langley'],                                'cal / 10000 m^2',
+#
+#	# ThermalResistance
+#	['Km^2/W'],                                 'K m^2 / W',
+#	['tog'],                                    '0.1 K m^2 / W',
+#
+#	# ThermalConductance
+#	['W/m^2K'],                                 'W / m^2 K',
+#);
+#
+#sub InitOddTypes( @_ ) {
+#    for @_ -> %p {
+#        %odd-type-by-name{%p.key} = %p.value;
+#    }
+#}
+#
+## FIXME - avoid exceptions - after yamls
+#InitOddTypes (
+#    #mop up a few exceptional types
+#    'eV'      => 'Energy',
+#    'MeV'     => 'Energy',
+#    'GeV'     => 'Energy',
+#    'TeV'     => 'Energy',
+#    'cal'     => 'Energy',
+#    'kcal'    => 'Energy',
+#    'btu'     => 'Energy',
+#    'erg'     => 'Energy',
+#    'kWh'     => 'Energy',
+#    'ft-lb'   => 'Torque',
+#);
 
 if $db {
 say "+++++++++++++++++++";

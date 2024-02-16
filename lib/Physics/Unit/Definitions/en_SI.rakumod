@@ -1,4 +1,4 @@
-use Data::Dump::Tree;
+ use Data::Dump::Tree;
 use YAMLish;
 
 grammar Schema::Core::NoBools is Schema::Core {
@@ -15,9 +15,9 @@ grammar Schema::Core::NoBools is Schema::Core {
 class Physics::Unit::Definitions::en_SI {      # FIXME adjust to is Loader?
     #viz. https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
 
-    my $rcd = '.raph-config';
+    my $raph = '.raph-config';
 
-    has @!parts = <prefix base types>;
+    has @!parts = <prefix base derived>;
 #    has @!parts = <prefix base derived types dims units>;
 
     has %.config;
@@ -27,7 +27,7 @@ class Physics::Unit::Definitions::en_SI {      # FIXME adjust to is Loader?
 
         for @!parts -> $part {
             #e.g. /Unit/Definitions/en_SI/base.yaml
-            %!config{$part} = "$*HOME/$rcd/$path/$part.yaml".IO.slurp.&load-yaml: :schema(Schema::Core::NoBools);
+            %!config{$part} = "$*HOME/$raph/$path/$part.yaml".IO.slurp.&load-yaml: :schema(Schema::Core::NoBools);
         }
     }
 }
