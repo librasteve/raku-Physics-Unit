@@ -264,7 +264,7 @@ class Unit does Maths is export {
             }
         } else {
             #lookup defn in the postfix synonyms
-            for $.dictionary.asyns-by-name.kv -> $k, $v {
+            for $.dictionary.postsyns-by-name.kv -> $k, $v {
                 if $v.grep($.defn) {
                     @.names = @$v;
                 }
@@ -345,28 +345,6 @@ class Unit does Maths is export {
     }
 }
 
-class Unit::Prefix is Unit {
-    method load( %config ) {
-        my @a = |%config<Prefix>;
-
-        for @a -> %h {
-            my ( $code, $name ) = %h<names>;
-
-            my $u = Unit.new;
-            $u.factor:     %h<defn>;            # FIXME - go 'is built'  ?
-            $u.defn:       %h<defn>;
-            $u.names.push: $name;
-            $u.type:       'prefix';
-
-            $.dictionary.prefix-by-name{$name} = $u;
-            $.dictionary.prefix-by-code{$code} = $u;
-            $.dictionary.prefix-to-factor{$name} = %h<defn>;
-
-            say "Initialized Prefix $name" if $db;
-        }
-    }
-}
-
 class Unit::Base {
     has $.dictionary = Dictionary.instance;
 
@@ -401,28 +379,11 @@ class Unit::Base {
             $.dictionary.basenames.push: $u.name;
             
             $.dictionary.postfix-by-name{$u.name} = @synonyms[1];    #extended name as value
-            $.dictionary.asyns-by-name{$u.name} = @synonyms;       #all synonyms as value
+            $.dictionary.postsyns-by-name{$u.name} = @synonyms;       #all synonyms as value
 
             $.dictionary.postfix-by-name;
             say "Initialized Base $names[0]" if $db;
         }
-    }
-}
-
-class Unit::Derived is Unit {
-    method load( %config ) {
-        my @a = |%config<Derived>;
-
-        for @a -> %h {
-            my ($defn, $names) = %h<defn>, %h<names>;
-
-            my @synonyms = |$names;
-
-            $.dictionary.postfix-by-name{@synonyms[0]} = @synonyms[1];
-            $.dictionary.asyns-by-name{@synonyms[0]} = @synonyms;
-        }
-
-        callsame
     }
 }
 
@@ -446,6 +407,45 @@ class Unit::Dims {
     }
 }
 
+class Unit::Derived is Unit {
+    method load( %config ) {
+        my @a = |%config<Derived>;
+
+        for @a -> %h {
+            my ($defn, $names) = %h<defn>, %h<names>;
+
+            my @synonyms = |$names;
+
+            $.dictionary.postfix-by-name{@synonyms[0]} = @synonyms[1];
+            $.dictionary.postsyns-by-name{@synonyms[0]} = @synonyms;
+        }
+
+        callsame
+    }
+}
+
+class Unit::Prefix is Unit {
+    method load( %config ) {
+        my @a = |%config<Prefix>;
+
+        for @a -> %h {
+            my ( $code, $name ) = %h<names>;
+
+            my $u = Unit.new;
+            $u.factor:     %h<defn>;            # FIXME - go 'is built'  ?
+            $u.defn:       %h<defn>;
+            $u.names.push: $name;
+            $u.type:       'prefix';
+
+            $.dictionary.prefix-by-name{$name} = $u;
+            $.dictionary.prefix-by-code{$code} = $u;
+            $.dictionary.prefix-to-factor{$name} = %h<defn>;
+
+            say "Initialized Prefix $name" if $db;
+        }
+    }
+}
+
 class Unit::Postfix {
     has $.dictionary = Dictionary.instance;
 
@@ -456,9 +456,9 @@ class Unit::Postfix {
 
         # replace kg with g
         $.dictionary.postfix-by-name<kg>:delete;
-        $.dictionary.asyns-by-name<kg>:delete;
+        $.dictionary.postsyns-by-name<kg>:delete;
         $.dictionary.postfix-by-name<g> = 'gram';
-        $.dictionary.asyns-by-name<g> = <g gram grams gramme grammes>;
+        $.dictionary.postsyns-by-name<g> = <g gram grams gramme grammes>;
 
         # delete non-declining singletons from %postfix-by-name so that they do not generate unwanted postfixes
         # leave them in %postfix-syns-by-name as we will want the syns for the singletons in do-postfix
@@ -468,11 +468,11 @@ class Unit::Postfix {
         $.dictionary.postfix-by-name<steradian>:delete;
 
         # Angle does not make it to %postfix-syns-by-name ?!
-        $.dictionary.asyns-by-name<°> = <° degree degrees deg degs º>;
+        $.dictionary.postsyns-by-name<°> = <° degree degrees deg degs º>;
 
         # pour in 'l' ie. ml, cl, etc quite common
         $.dictionary.postfix-by-name<l> = 'litre';
-        $.dictionary.asyns-by-name<l> = <l L litre litres liter liters>;
+        $.dictionary.postsyns-by-name<l> = <l L litre litres liter liters>;
 
         # now %postfix-by-name has the right simple-names
         # so now can copy these across and us them to spin up all the combos
@@ -486,12 +486,12 @@ class Unit::Postfix {
                 $.dictionary.postfix-by-name{$combo} = $.dictionary.prefix-by-code{$c} ~ %simple-names{$n};   #eg. 'millilitres' (used by Grammar)
 
                 # set up synonym list for population of Unit object name
-                my $syns = $.dictionary.asyns-by-name{$n};
+                my $syns = $.dictionary.postsyns-by-name{$n};
                 $syns = [ $p X~ @$syns ];   # using @$ to prevent ~ from stringifying the whole array
                 $syns.shift;                # drop eg. 'millil'
                 $syns.unshift: $combo;      # insert eg. 'ml'
 
-                $.dictionary.asyns-by-name{$combo} = $syns;
+                $.dictionary.postsyns-by-name{$combo} = $syns;
             }
         }
     }
@@ -527,7 +527,7 @@ class Dictionary {
     has %.type-to-dims;		    #type => dims vector
 
     has %.postfix-by-name;        #name => extended postfix defn (eg. cm => 'centimetre') to decongest Grammar namespace
-    has %.asyns-by-name;        #name => list of synonyms for every postfix [n, nano] X~ [m, metre, meter, metres, meters]
+    has %.postsyns-by-name;        #name => list of synonyms for every postfix [n, nano] X~ [m, metre, meter, metres, meters]
 
     #    has %.odd-type-by-name;     #mop up a few exceptional types
 
@@ -546,8 +546,10 @@ class Dictionary {
         Unit::Derived.new.load: $load.config<derived>;
         Unit::Prefix.new.load:  $load.config<prefix>;
         
-        
+        # prep for postfix exports
         Unit::Postfix.new.load;
+
+        # load dictionary for non-core units
         Unit.new.load:          $load.config<units>;
 
         if $db {
@@ -622,7 +624,7 @@ sub GetPostfixByName is export {
 sub GetPostfixSynsByName is export {
     my $dictionary := Dictionary.instance;
 
-    return $dictionary.asyns-by-name;
+    return $dictionary.postsyns-by-name;
 }
 sub GetPrototype( Str $type ) is export {     # FIXME make Unit class method (revert to $!dictionary)
     my $dictionary := Dictionary.instance;
