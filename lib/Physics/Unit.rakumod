@@ -33,16 +33,12 @@ my %pwr-superscript = (
     '⁻¹' => -1, '⁻²' => -2, '⁻³' => -3, '⁻⁴' => -4,
 );
 
-#my %defn-by-name;         #name => defn Str of known names incl. affix (values may be dupes)
-#my %syns-by-name; 	       #name => list of synonyms (excl. user defined, incl. plurals)
-#my %unit-by-name;         #name => Unit object cache (when instantiated)
-
 my %affix-by-name;        #name => extended affix defn (eg. cm => 'centimetre') to decongest Grammar namespace
 my %asyns-by-name;        #name => list of synonyms for every affix [n, nano] X~ [m, metre, meter, metres, meters]
 
 #my %type-to-protoname;    #type => prototype name
 #my %type-to-prototype;    #type => prototype Unit object (when instantiated)
-my %type-to-dims;		  #type => dims vector
+#my %type-to-dims;		  #type => dims vector
 
 my %odd-type-by-name;     #mop up a few exceptional types   # FIXME
 
@@ -181,8 +177,8 @@ class Unit does Maths is export {
 
         #2 by looking up dims
         my @d;
-        for %type-to-dims.keys -> $k {
-            push @d, $k if self.dims cmp %type-to-dims{$k} ~~ Same;
+        for $.dictionary.type-to-dims.keys -> $k {
+            push @d, $k if self.dims cmp $.dictionary.type-to-dims{$k} ~~ Same;
         }
         if @d == 0 { return '' }
         if @d == 1 { return @d[0] }
@@ -214,10 +210,10 @@ class Unit does Maths is export {
     #| Manually make NewType when no preset type, eg. m-1
     method NewType( Str $type-name ) {
         for @.names -> $name {
-            $!dictionary.type-to-protoname{$type-name} = $name;
+            $.dictionary.type-to-protoname{$type-name} = $name;
         }
-        $!dictionary.type-to-prototype{$type-name} = self;
-        %type-to-dims{$type-name} = self.dims;
+        $.dictionary.type-to-prototype{$type-name} = self;
+        $.dictionary.type-to-dims{$type-name} = self.dims;
     }
 
     ### output methods ###
@@ -357,7 +353,6 @@ class Unit does Maths is export {
     }
 }
 
-
 class Unit::Prefix is Unit {
     method load( @a ) {
 
@@ -425,8 +420,24 @@ class Unit::Derived is Unit {
     }
 }
 
-class Unit::Types {
+class Unit::Type {
+    has $.dictionary = Dictionary.instance;
 
+    method load( @a ) {
+        for @a -> %h {
+            $.dictionary.type-to-protoname{%h.keys} = %h.values;
+        }
+    }
+}
+
+class Unit::Dims {
+    has $.dictionary = Dictionary.instance;
+
+    method load( @a ) {
+        for @a -> %h {
+            $.dictionary.type-to-dims{%h.keys} = %h.values;
+        }
+    }
 }
 
 class Dictionary {
@@ -450,17 +461,17 @@ class Dictionary {
     has %.prefix-by-code;       #code => Prefix name
     has %.prefix-to-factor;     #name => Prefix factor
 
-    has %.defn-by-name;   #name => defn Str of known names incl. affix (values may be dupes)
-    has %.syns-by-name;   #name => list of synonyms (excl. user defined, incl. plurals)
-    has %.unit-by-name;   #name => Unit object cache (when instantiated)
-    #
+    has %.defn-by-name;         #name => defn Str of known names incl. affix (values may be dupes)
+    has %.syns-by-name;         #name => list of synonyms (excl. user defined, incl. plurals)
+    has %.unit-by-name;         #name => Unit object cache (when instantiated)
+
     #    has %.affix-by-name;        #name => extended affix defn (eg. cm => 'centimetre') to decongest Grammar namespace
     #    has %.asyns-by-name;        #name => list of synonyms for every affix [n, nano] X~ [m, metre, meter, metres, meters]
-    #
+
     has %.type-to-protoname;    #type => prototype name
     has %.type-to-prototype;    #type => prototype Unit object (when instantiated)
-    #    has %.type-to-dims;		  #type => dims vector
-    #
+    has %.type-to-dims;		    #type => dims vector
+
     #    has %.odd-type-by-name;     #mop up a few exceptional types
 
     submethod load {
@@ -471,9 +482,12 @@ class Dictionary {
 
         Unit::Prefix.new.load:  $load.config<prefix>;
         Unit::Base.new.load:    $load.config<base>;
-
-        say $load.config<derived>;
         Unit::Derived.new.load: $load.config<derived>;
+        Unit::Type.new.load:    $load.config<types>;
+        Unit::Dims.new.load:    $load.config<dims>;
+
+        say $load.config<dims>;
+
     }
 
     method get-prefix(:$name) {       # type as Name?
@@ -774,23 +788,14 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
 
 ######## Initialization ########
 
-#sub InitDerivedUnit( @_ ) {
-#    InitUnit( @_, :derived )
+
+#sub InitTypeDims( @_ ) {
+#    my $dictionary = Dictionary.instance;
+#
+#    for @_ -> %p {
+#        $dictionary.type-to-dims{%p.key} = %p.value;
+#    }
 #}
-
-sub InitTypes( @_ )  {
-    my $dictionary = Dictionary.instance;
-
-    for @_ -> %p {
-        $dictionary.type-to-protoname{%p.key} = %p.value;
-    }
-}
-
-sub InitTypeDims( @_ ) {
-    for @_ -> %p {
-        %type-to-dims{%p.key} = %p.value;
-    }
-}
 
 sub InitAffixUnit {
     my $dictionary := Dictionary.instance;
@@ -880,126 +885,101 @@ sub InitUnit( @_ , :$derived ) is export {
 
 ######## Unit Data ########
 
-#InitDerivedUnit (
-#	#SI Derived Units with special names & symbols
-#	['sr', 'steradian'],                    'radian^2',
-#	['Hz', 'hertz'],                        '1 / s',
-#	['N',  'newton'],                       'kg m / s^2',
-#	['Pa', 'pascal'],                       'N / m^2',
-#	['J',  'joule'],                        'kg m^2 / s^2',
-#	['W',  'watt'],                         'kg m^2 / s^3',
-#	['C',  'coulomb'],                      'A s',
-#	['V',  'volt'],                         'kg m^2 / A s^3',
-#	['F',  'farad'],                        'A^2 s^4 / kg m^2',
-#	['Ω',  'ohm'],                          'kg m^2 / A^2 s^3',
-#	['S',  'siemens'],                      'A^2 s^3 / kg m^2',
-#	['Wb', 'weber'],                        'kg m^2 / A s^2',
-#	['T',  'tesla'],                        'kg / A s^2',
-#	['H',  'henry'],                        'kg m^2 / A^2 s^2',
-#	['°C', 'celsius', 'Centigrade'],        'K + 273.15',
-#	['lm', 'lumen'],                        'cd sr',
-#	['lx', 'lux'],                          'm^-2 cd',
-#	['Bq', 'becquerel'],                    '1 Hz',
-#	['Gy', 'gray'],                         'J / kg',
-#	['Sv', 'sievert'],                      'J / kg',
-#	['kat','katal'],                        'mol s^-1',
+#InitTypes (
+#	#sets name of prototype unit
+#    'Dimensionless'      => 'unity',
+#    'Angle'              => 'radian',
+#    'AngularSpeed'		 => 'radians per second',
+#    'SolidAngle'         => 'steradian',
+#    'Frequency'          => 'hertz',
+#    'Area'               => 'm^2',
+#    'Volume'             => 'm^3',
+#    'Speed'              => 'm/s',
+#    'Acceleration'       => 'm/s^2',
+#    'Momentum'           => 'kg m/s',
+#    'Force'              => 'newton',
+#    'Torque'             => 'Nm',
+#    'Impulse'            => 'Ns',
+#    'MomentOfInertia'    => 'kg m^2',
+#    'AngularMomentum'    => 'kg m^2/s',
+#    'Pressure'           => 'pascal',
+#    'Density'			 => 'kg/m^3',
+#    'Energy'             => 'joule',
+#    'Power'              => 'watt',
+#    'Charge'             => 'coulomb',
+#    'Potential'			 => 'volt',
+#    'Resistance'         => 'ohm',
+#    'Conductance'        => 'siemens',
+#    'Capacitance'        => 'farad',
+#    'Inductance'         => 'henry',
+#    'MagneticField'      => 'tesla',
+#    'MagneticFlux'       => 'weber',
+#    'LuminousFlux'       => 'lumen',
+#    'Illuminance'        => 'lux',
+#    'Radioactivity'      => 'becquerel',
+#    'Dose'               => 'gray',
+#    'CatalyticActivity'  => 'kat',
+#    'FuelConsumption'    => 'm^3/m',
+#    'FuelEfficiency'     => 'm/m^3',
+#	'Flow'               => 'm^3/s',
+#	'SpecificEnergy'     => 'J/kg',
+#    'Irradiance'         => 'W/m^2',
+#    'Insolation'         => 'kWh/m^2',
+#    'ThermalResistance'  => 'Km^2/W',
+#    'ThermalConductance' => 'W/m^2K'
 #);
 
-InitTypes (
-	#sets name of prototype unit
-    'Dimensionless'      => 'unity',
-    'Angle'              => 'radian',
-    'AngularSpeed'		 => 'radians per second',
-    'SolidAngle'         => 'steradian',
-    'Frequency'          => 'hertz',
-    'Area'               => 'm^2',
-    'Volume'             => 'm^3',
-    'Speed'              => 'm/s',
-    'Acceleration'       => 'm/s^2',
-    'Momentum'           => 'kg m/s',
-    'Force'              => 'newton',
-    'Torque'             => 'Nm',
-    'Impulse'            => 'Ns',
-    'MomentOfInertia'    => 'kg m^2',
-    'AngularMomentum'    => 'kg m^2/s',
-    'Pressure'           => 'pascal',
-    'Density'			 => 'kg/m^3',
-    'Energy'             => 'joule',
-    'Power'              => 'watt',
-    'Charge'             => 'coulomb',
-    'Potential'			 => 'volt',
-    'Resistance'         => 'ohm',
-    'Conductance'        => 'siemens',
-    'Capacitance'        => 'farad',
-    'Inductance'         => 'henry',
-    'MagneticField'      => 'tesla',
-    'MagneticFlux'       => 'weber',
-    'LuminousFlux'       => 'lumen',
-    'Illuminance'        => 'lux',
-    'Radioactivity'      => 'becquerel',
-    'Dose'               => 'gray',
-    'CatalyticActivity'  => 'kat',
-    'FuelConsumption'    => 'm^3/m',
-    'FuelEfficiency'     => 'm/m^3',
-	'Flow'               => 'm^3/s',
-	'SpecificEnergy'     => 'J/kg',
-    'Irradiance'         => 'W/m^2',
-    'Insolation'         => 'kWh/m^2',
-    'ThermalResistance'  => 'Km^2/W',
-    'ThermalConductance' => 'W/m^2K'
-);
-
-InitTypeDims (
-	#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
-	#                          (L,M,T,I,Θ,N,J,A)  [A=Angle]
-	'Dimensionless'         => (0,0,0,0,0,0,0,0),
-	'Length'			    => (1,0,0,0,0,0,0,0),
-	'Mass'		            => (0,1,0,0,0,0,0,0),
-	'Time'				    => (0,0,1,0,0,0,0,0),
-	'Current'			    => (0,0,0,1,0,0,0,0),
-	'Temperature'		    => (0,0,0,0,1,0,0,0),
-	'Substance'			    => (0,0,0,0,0,1,0,0),
-	'Luminosity'		    => (0,0,0,0,0,0,1,0),
-	'Angle'			        => (0,0,0,0,0,0,0,1),
-	'AngularSpeed'		    => (0,0,-1,0,0,0,0,1),  #FIXME maybe A=0 (see also disambiguate)
-	'SolidAngle'		    => (0,0,0,0,0,0,0,2),
-	'Frequency'			    => (0,0,-1,0,0,0,0,0),
-	'Area'				    => (2,0,0,0,0,0,0,0),
-	'Volume'			    => (3,0,0,0,0,0,0,0),
-	'Speed'				    => (1,0,-1,0,0,0,0,0),
-	'Acceleration'		    => (1,0,-2,0,0,0,0,0),
-	'Momentum'			    => (1,1,-1,0,0,0,0,0),
-	'Force'				    => (1,1,-2,0,0,0,0,0),
-	'Torque'			    => (2,1,-2,0,0,0,0,0),
-	'Impulse'			    => (1,1,-1,0,0,0,0,0),
-	'MomentOfInertia'	    => (2,1,0,0,0,0,0,0),
-	'AngularMomentum'	    => (2,1,-1,0,0,0,0,0),
-	'Pressure'			    => (-1,1,-2,0,0,0,0,0),
-	'Density'			    => (-3,1,0,0,0,0,0,0),
-	'Energy'			    => (2,1,-2,0,0,0,0,0),
-	'Power'				    => (2,1,-3,0,0,0,0,0),
-	'Charge'			    => (0,0,1,1,0,0,0,0),
-	'Potential'			    => (2,1,-3,-1,0,0,0,0),
-	'Resistance'		    => (2,1,-3,-2,0,0,0,0),
-	'Conductance'		    => (-2,-1,3,2,0,0,0,0),
-	'Capacitance'		    => (-2,-1,4,2,0,0,0,0),
-	'Inductance'		    => (2,1,-2,-2,0,0,0,0),
-	'MagneticField'	        => (0,1,-2,-1,0,0,0,0),
-	'MagneticFlux'		    => (2,1,-2,-1,0,0,0,0),
-	'LuminousFlux'		    => (0,0,0,0,0,0,1,2),
-	'Illuminance'		    => (-2,0,0,0,0,0,1,0),
-	'Radioactivity'		    => (0,0,-1,0,0,0,0,0),
-	'Dose'				    => (2,0,-2,0,0,0,0,0),
-	'CatalyticActivity'     => (0,0,-1,0,0,1,0,0),
-	'FuelConsumption'       => (2,0,0,0,0,0,0,0),
-	'FuelEfficiency'        => (-2,0,0,0,0,0,0,0),
-	'Flow'                  => (3,0,-1,0,0,0,0,0),
-	'SpecificEnergy'        => (2,0,-2,0,0,0,0,0),
-	'Irradiance'            => (0,1,-3,0,0,0,0,0),
-	'Insolation'            => (0,1,-2,0,0,0,0,0),
-	'ThermalResistance'     => (0,-1,3,0,1,0,0,0),
-	'ThermalConductance'    => (0,1,-3,0,-1,0,0,0),
-);
+#InitTypeDims (
+#	#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
+#	#                          (L,M,T,I,Θ,N,J,A)  [A=Angle]
+#	'Dimensionless'         => (0,0,0,0,0,0,0,0),
+#	'Length'			    => (1,0,0,0,0,0,0,0),
+#	'Mass'		            => (0,1,0,0,0,0,0,0),
+#	'Time'				    => (0,0,1,0,0,0,0,0),
+#	'Current'			    => (0,0,0,1,0,0,0,0),
+#	'Temperature'		    => (0,0,0,0,1,0,0,0),
+#	'Substance'			    => (0,0,0,0,0,1,0,0),
+#	'Luminosity'		    => (0,0,0,0,0,0,1,0),
+#	'Angle'			        => (0,0,0,0,0,0,0,1),
+#	'AngularSpeed'		    => (0,0,-1,0,0,0,0,1),  #FIXME maybe A=0 (see also disambiguate)
+#	'SolidAngle'		    => (0,0,0,0,0,0,0,2),
+#	'Frequency'			    => (0,0,-1,0,0,0,0,0),
+#	'Area'				    => (2,0,0,0,0,0,0,0),
+#	'Volume'			    => (3,0,0,0,0,0,0,0),
+#	'Speed'				    => (1,0,-1,0,0,0,0,0),
+#	'Acceleration'		    => (1,0,-2,0,0,0,0,0),
+#	'Momentum'			    => (1,1,-1,0,0,0,0,0),
+#	'Force'				    => (1,1,-2,0,0,0,0,0),
+#	'Torque'			    => (2,1,-2,0,0,0,0,0),
+#	'Impulse'			    => (1,1,-1,0,0,0,0,0),
+#	'MomentOfInertia'	    => (2,1,0,0,0,0,0,0),
+#	'AngularMomentum'	    => (2,1,-1,0,0,0,0,0),
+#	'Pressure'			    => (-1,1,-2,0,0,0,0,0),
+#	'Density'			    => (-3,1,0,0,0,0,0,0),
+#	'Energy'			    => (2,1,-2,0,0,0,0,0),
+#	'Power'				    => (2,1,-3,0,0,0,0,0),
+#	'Charge'			    => (0,0,1,1,0,0,0,0),
+#	'Potential'			    => (2,1,-3,-1,0,0,0,0),
+#	'Resistance'		    => (2,1,-3,-2,0,0,0,0),
+#	'Conductance'		    => (-2,-1,3,2,0,0,0,0),
+#	'Capacitance'		    => (-2,-1,4,2,0,0,0,0),
+#	'Inductance'		    => (2,1,-2,-2,0,0,0,0),
+#	'MagneticField'	        => (0,1,-2,-1,0,0,0,0),
+#	'MagneticFlux'		    => (2,1,-2,-1,0,0,0,0),
+#	'LuminousFlux'		    => (0,0,0,0,0,0,1,2),
+#	'Illuminance'		    => (-2,0,0,0,0,0,1,0),
+#	'Radioactivity'		    => (0,0,-1,0,0,0,0,0),
+#	'Dose'				    => (2,0,-2,0,0,0,0,0),
+#	'CatalyticActivity'     => (0,0,-1,0,0,1,0,0),
+#	'FuelConsumption'       => (2,0,0,0,0,0,0,0),
+#	'FuelEfficiency'        => (-2,0,0,0,0,0,0,0),
+#	'Flow'                  => (3,0,-1,0,0,0,0,0),
+#	'SpecificEnergy'        => (2,0,-2,0,0,0,0,0),
+#	'Irradiance'            => (0,1,-3,0,0,0,0,0),
+#	'Insolation'            => (0,1,-2,0,0,0,0,0),
+#	'ThermalResistance'     => (0,-1,3,0,1,0,0,0),
+#	'ThermalConductance'    => (0,1,-3,0,-1,0,0,0),
+#);
 
 InitAffixUnit;
 #Load SI Prefix code / Unit combos to data map hashes for postfix operators

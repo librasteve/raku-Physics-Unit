@@ -19,7 +19,7 @@ dd $u;
 
 #dd ListTypes;
 #dd ListUnits;
-dd ListDefns;
+#dd ListDefns;
 #dd ListSyns;
 
 die;

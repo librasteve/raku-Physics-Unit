@@ -3,44 +3,44 @@
 #SI Types
 
 # Format key:
-#- {Type:                  'prototype unit'}
-- {Dimensionless:          'unity'}
-- {Angle:                  'radian'}
-- {AngularSpeed:           'radians per second'}
-- {SolidAngle:             'steradian'}
-- {Frequency:              'hertz'}
-- {Area:                   'm^2'}
-- {Volume:                 'm^3'}
-- {Speed:                  'm/s'}
-- {Acceleration:           'm/s^2'}
-- {Momentum:               'kg m/s'}
-- {Force:                  'newton'}
-- {Torque:                 'Nm'}
-- {Impulse:                'Ns'}
-- {MomentOfInertia:        'kg m^2'}
-- {AngularMomentum:        'kg m^2/s'}
-- {Pressure:               'pascal'}
-- {Density:                'kg/m^3'}
-- {Energy:                 'joule'}
-- {Power:                  'watt'}
-- {Charge:                 'coulomb'}
-- {Potential:              'volt'}
-- {Resistance:             'ohm'}
-- {Conductance:            'siemens'}
-- {Capacitance:            'farad'}
-- {Inductance:             'henry'}
-- {MagneticField:          'tesla'}
-- {MagneticFlux:           'weber'}
-- {LuminousFlux:           'lumen'}
-- {Illuminance:            'lux'}
-- {Radioactivity:          'becquerel'}
-- {Dose:                   'gray'}
-- {CatalyticActivity:      'kat'}
-- {FuelConsumption:        'm^3/m'}
-- {FuelEfficiency:         'm/m^3'}
-- {Flow:                   'm^3/s'}
-- {SpecificEnergy:         'J/kg'}
-- {Irradiance:             'W/m^2'}
-- {Insolation:             'kWh/m^2'}
-- {ThermalResistance:      'Km^2/W'}
-- {ThermalConductance:     'W/m^2K'}
+#- Type:                  'prototype unit'
+- Dimensionless:          'unity'
+- Angle:                  'radian'
+- AngularSpeed:           'radians per second'
+- SolidAngle:             'steradian'
+- Frequency:              'hertz'
+- Area:                   'm^2'
+- Volume:                 'm^3'
+- Speed:                  'm/s'
+- Acceleration:           'm/s^2'
+- Momentum:               'kg m/s'
+- Force:                  'newton'
+- Torque:                 'Nm'
+- Impulse:                'Ns'
+- MomentOfInertia:        'kg m^2'
+- AngularMomentum:        'kg m^2/s'
+- Pressure:               'pascal'
+- Density:                'kg/m^3'
+- Energy:                 'joule'
+- Power:                  'watt'
+- Charge:                 'coulomb'
+- Potential:              'volt'
+- Resistance:             'ohm'
+- Conductance:            'siemens'
+- Capacitance:            'farad'
+- Inductance:             'henry'
+- MagneticField:          'tesla'
+- MagneticFlux:           'weber'
+- LuminousFlux:           'lumen'
+- Illuminance:            'lux'
+- Radioactivity:          'becquerel'
+- Dose:                   'gray'
+- CatalyticActivity:      'kat'
+- FuelConsumption:        'm^3/m'
+- FuelEfficiency:         'm/m^3'
+- Flow:                   'm^3/s'
+- SpecificEnergy:         'J/kg'
+- Irradiance:             'W/m^2'
+- Insolation:             'kWh/m^2'
+- ThermalResistance:      'Km^2/W'
+- ThermalConductance:     'W/m^2K'
