@@ -17,12 +17,13 @@ use Physics::Unit;
 my $u = GetUnit <ohm>;
 dd $u;
 
+#dd GetAffixByName;
 #dd ListTypes;
 #dd ListUnits;
 #dd ListDefns;
 #dd ListSyns;
 
-die;
+#die;
 #say $u.WHICH;   #Physics::Unit::Unit|4267563835920   #PU4267563835920
 
 
