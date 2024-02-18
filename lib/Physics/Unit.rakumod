@@ -788,15 +788,6 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
 
 ######## Initialization ########
 
-
-#sub InitTypeDims( @_ ) {
-#    my $dictionary = Dictionary.instance;
-#
-#    for @_ -> %p {
-#        $dictionary.type-to-dims{%p.key} = %p.value;
-#    }
-#}
-
 sub InitAffixUnit {
     my $dictionary := Dictionary.instance;
 
@@ -884,102 +875,6 @@ sub InitUnit( @_ , :$derived ) is export {
 }
 
 ######## Unit Data ########
-
-#InitTypes (
-#	#sets name of prototype unit
-#    'Dimensionless'      => 'unity',
-#    'Angle'              => 'radian',
-#    'AngularSpeed'		 => 'radians per second',
-#    'SolidAngle'         => 'steradian',
-#    'Frequency'          => 'hertz',
-#    'Area'               => 'm^2',
-#    'Volume'             => 'm^3',
-#    'Speed'              => 'm/s',
-#    'Acceleration'       => 'm/s^2',
-#    'Momentum'           => 'kg m/s',
-#    'Force'              => 'newton',
-#    'Torque'             => 'Nm',
-#    'Impulse'            => 'Ns',
-#    'MomentOfInertia'    => 'kg m^2',
-#    'AngularMomentum'    => 'kg m^2/s',
-#    'Pressure'           => 'pascal',
-#    'Density'			 => 'kg/m^3',
-#    'Energy'             => 'joule',
-#    'Power'              => 'watt',
-#    'Charge'             => 'coulomb',
-#    'Potential'			 => 'volt',
-#    'Resistance'         => 'ohm',
-#    'Conductance'        => 'siemens',
-#    'Capacitance'        => 'farad',
-#    'Inductance'         => 'henry',
-#    'MagneticField'      => 'tesla',
-#    'MagneticFlux'       => 'weber',
-#    'LuminousFlux'       => 'lumen',
-#    'Illuminance'        => 'lux',
-#    'Radioactivity'      => 'becquerel',
-#    'Dose'               => 'gray',
-#    'CatalyticActivity'  => 'kat',
-#    'FuelConsumption'    => 'm^3/m',
-#    'FuelEfficiency'     => 'm/m^3',
-#	'Flow'               => 'm^3/s',
-#	'SpecificEnergy'     => 'J/kg',
-#    'Irradiance'         => 'W/m^2',
-#    'Insolation'         => 'kWh/m^2',
-#    'ThermalResistance'  => 'Km^2/W',
-#    'ThermalConductance' => 'W/m^2K'
-#);
-
-#InitTypeDims (
-#	#viz https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
-#	#                          (L,M,T,I,Θ,N,J,A)  [A=Angle]
-#	'Dimensionless'         => (0,0,0,0,0,0,0,0),
-#	'Length'			    => (1,0,0,0,0,0,0,0),
-#	'Mass'		            => (0,1,0,0,0,0,0,0),
-#	'Time'				    => (0,0,1,0,0,0,0,0),
-#	'Current'			    => (0,0,0,1,0,0,0,0),
-#	'Temperature'		    => (0,0,0,0,1,0,0,0),
-#	'Substance'			    => (0,0,0,0,0,1,0,0),
-#	'Luminosity'		    => (0,0,0,0,0,0,1,0),
-#	'Angle'			        => (0,0,0,0,0,0,0,1),
-#	'AngularSpeed'		    => (0,0,-1,0,0,0,0,1),  #FIXME maybe A=0 (see also disambiguate)
-#	'SolidAngle'		    => (0,0,0,0,0,0,0,2),
-#	'Frequency'			    => (0,0,-1,0,0,0,0,0),
-#	'Area'				    => (2,0,0,0,0,0,0,0),
-#	'Volume'			    => (3,0,0,0,0,0,0,0),
-#	'Speed'				    => (1,0,-1,0,0,0,0,0),
-#	'Acceleration'		    => (1,0,-2,0,0,0,0,0),
-#	'Momentum'			    => (1,1,-1,0,0,0,0,0),
-#	'Force'				    => (1,1,-2,0,0,0,0,0),
-#	'Torque'			    => (2,1,-2,0,0,0,0,0),
-#	'Impulse'			    => (1,1,-1,0,0,0,0,0),
-#	'MomentOfInertia'	    => (2,1,0,0,0,0,0,0),
-#	'AngularMomentum'	    => (2,1,-1,0,0,0,0,0),
-#	'Pressure'			    => (-1,1,-2,0,0,0,0,0),
-#	'Density'			    => (-3,1,0,0,0,0,0,0),
-#	'Energy'			    => (2,1,-2,0,0,0,0,0),
-#	'Power'				    => (2,1,-3,0,0,0,0,0),
-#	'Charge'			    => (0,0,1,1,0,0,0,0),
-#	'Potential'			    => (2,1,-3,-1,0,0,0,0),
-#	'Resistance'		    => (2,1,-3,-2,0,0,0,0),
-#	'Conductance'		    => (-2,-1,3,2,0,0,0,0),
-#	'Capacitance'		    => (-2,-1,4,2,0,0,0,0),
-#	'Inductance'		    => (2,1,-2,-2,0,0,0,0),
-#	'MagneticField'	        => (0,1,-2,-1,0,0,0,0),
-#	'MagneticFlux'		    => (2,1,-2,-1,0,0,0,0),
-#	'LuminousFlux'		    => (0,0,0,0,0,0,1,2),
-#	'Illuminance'		    => (-2,0,0,0,0,0,1,0),
-#	'Radioactivity'		    => (0,0,-1,0,0,0,0,0),
-#	'Dose'				    => (2,0,-2,0,0,0,0,0),
-#	'CatalyticActivity'     => (0,0,-1,0,0,1,0,0),
-#	'FuelConsumption'       => (2,0,0,0,0,0,0,0),
-#	'FuelEfficiency'        => (-2,0,0,0,0,0,0,0),
-#	'Flow'                  => (3,0,-1,0,0,0,0,0),
-#	'SpecificEnergy'        => (2,0,-2,0,0,0,0,0),
-#	'Irradiance'            => (0,1,-3,0,0,0,0,0),
-#	'Insolation'            => (0,1,-2,0,0,0,0,0),
-#	'ThermalResistance'     => (0,-1,3,0,1,0,0,0),
-#	'ThermalConductance'    => (0,1,-3,0,-1,0,0,0),
-#);
 
 InitAffixUnit;
 #Load SI Prefix code / Unit combos to data map hashes for postfix operators
