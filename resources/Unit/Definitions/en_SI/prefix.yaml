@@ -4,7 +4,10 @@
 #avoid 1e2 format to encourage Rats
 
 # Format key:
+#Prefix:
 #- {names: [symbol, synonym-one  ...], defn: 'definition string'}
+
+Prefix:
 - {names: [da, deka],     defn: 10}
 - {names: [h, hecto],     defn: 100}
 - {names: [k, kilo],      defn: 1000}

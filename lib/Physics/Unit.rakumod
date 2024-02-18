@@ -346,7 +346,8 @@ class Unit does Maths is export {
 }
 
 class Unit::Prefix is Unit {
-    method load( @a ) {
+    method load( %config ) {
+        my @a = |%config<Prefix>;
 
         for @a -> %h {
             my ( $code, $name ) = %h<names>;
@@ -407,10 +408,6 @@ class Unit::Base is Unit {
 }
 
 class Unit::Derived is Unit {
-#    method load( @a ) {
-#        for @a -> %h {
-#            my ($defn, $names) = %h<defn>, %h<names>;
-
     method load( %config ) {
         my @a = |%config<Derived>;
 

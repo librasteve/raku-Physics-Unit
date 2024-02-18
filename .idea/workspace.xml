@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Load wip Unit ok">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/spike6.raku" beforeDir="false" afterPath="$PROJECT_DIR$/bin/spike6.raku" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/Unit/Definitions/en_SI/units.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/resources/Unit/Definitions/en_SI/units.yaml" afterDir="false" />
-    </list>
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Load ok" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -240,7 +235,14 @@
       <option name="project" value="LOCAL" />
       <updated>1708236357249</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="Load ok">
+      <created>1708243015072</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1708243015072</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -279,7 +281,8 @@
     <MESSAGE value="Load wip Unit::Dims ok" />
     <MESSAGE value="Load wip Unit::Affix ok" />
     <MESSAGE value="Load wip Unit ok" />
-    <option name="LAST_COMMIT_MESSAGE" value="Load wip Unit ok" />
+    <MESSAGE value="Load ok" />
+    <option name="LAST_COMMIT_MESSAGE" value="Load ok" />
   </component>
   <component name="edument.perl6idea.pm.RakuPackageManagerManager">
     <pmList />
