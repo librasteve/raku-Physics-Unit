@@ -17,7 +17,7 @@ class Physics::Unit::Definitions::en_SI {      # FIXME adjust to is Loader?
 
     my $raph = '.raph-config';
 
-    has @!parts = <prefix base derived types dims units>;
+    has @!parts = <base types dims derived prefix units>;
 
     has %.config;
 

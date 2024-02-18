@@ -14,7 +14,7 @@ use Physics::Unit;
 #]
 
 
-my $u = GetUnit <ohm>;
+my $u = GetUnit 'mho';
 dd $u;
 
 #dd GetAffixByName;

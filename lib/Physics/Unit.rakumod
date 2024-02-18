@@ -367,7 +367,9 @@ class Unit::Prefix is Unit {
     }
 }
 
-class Unit::Base is Unit {
+class Unit::Base {
+    has $.dictionary = Dictionary.instance;
+
     method load( @a ) {
 
         my $i = 0;
@@ -535,11 +537,11 @@ class Dictionary {
         require Physics::Unit::Definitions::en_SI;
         my $load = Physics::Unit::Definitions::en_SI.new;
 
-        Unit::Prefix.new.load:  $load.config<prefix>;
         Unit::Base.new.load:    $load.config<base>;
-        Unit::Derived.new.load: $load.config<derived>;
         Unit::Type.new.load:    $load.config<types>;
         Unit::Dims.new.load:    $load.config<dims>;
+        Unit::Derived.new.load: $load.config<derived>;
+        Unit::Prefix.new.load:  $load.config<prefix>;
         Unit::Affix.new.load;
         Unit.new.load:          $load.config<units>;
 
