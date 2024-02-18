@@ -23,7 +23,7 @@ dd $u;
 #dd ListDefns;
 #dd ListSyns;
 
-#die;
+die;
 #say $u.WHICH;   #Physics::Unit::Unit|4267563835920   #PU4267563835920
 
 

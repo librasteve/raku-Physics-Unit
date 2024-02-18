@@ -2,7 +2,7 @@ unit module Physics::Unit:ver<1.1.26>:auth<Steve Roe (librasteve@furnival.net)>;
 
 use Data::Dump::Tree;
 
-my $db = 0;               #debug
+my $db = 0;       #debug
 
 #some units have the same dimensions but are different types - type hints steer type inference
 our %type-hints = %(
@@ -21,7 +21,6 @@ $locale = ($_ ~~ /en_US/) ?? 'us' !! $locale with %*ENV<RAKULANG>;
 
 constant \preload = 0;		#Preload All Units ie. for debug (precomp load 1.6s otherwise ~60s)
 constant \NumBases = 8;
-#my Str @BaseNames;			#SI Base Unit names
 
 #Power synonyms
 my %pwr-preword   = ( square  => 2, sq => 2, cubic => 3, cu => 3 );
@@ -41,7 +40,6 @@ my %odd-type-by-name;     #mop up a few exceptional types   # FIXME
 # 1 interpose Dictionary service
 #   -prefix base derived (affix) types dims (odd) units
 # externailze all but Unit
-# drop ##s
 # appenders
 # FIXME s
 
@@ -304,7 +302,7 @@ class Unit does Maths is export {
 
     method load( %config ) {
 
-        #| just ignore the outer keys
+        #| just ignore the outer keys FIXME autoload Measure classes
         my @a;
         for %config.keys -> $k {
             @a.append: |%config{$k};
@@ -402,8 +400,8 @@ class Unit::Base is Unit {
             $.dictionary.affix-by-name{$u.name} = @synonyms[1];    #extended name as value
             $.dictionary.asyns-by-name{$u.name} = @synonyms;       #all synonyms as value
 
+            $.dictionary.affix-by-name;
             say "Initialized Base $names[0]" if $db;
-            #iamerejh
         }
     }
 }
@@ -453,7 +451,7 @@ class Unit::Affix {
     has $.dictionary = Dictionary.instance;
 
     #Load SI Prefix code / Unit combos to data map hashes for postfix operators
-    method load( @a ) {
+    method load {
         # so far %affix-by-name has been initialized with base and derived unit names
         # redo THIS!!! ^^^
 
@@ -545,6 +543,7 @@ class Dictionary {
         Unit::Derived.new.load: $load.config<derived>;
         Unit::Type.new.load:    $load.config<types>;
         Unit::Dims.new.load:    $load.config<dims>;
+        Unit::Affix.new.load;
         Unit.new.load:          $load.config<units>;
 
         if $db {
@@ -593,8 +592,7 @@ sub ListDefns is export {       # FIXME make Unit class method (revert to $!dict
 sub ListUnits is export {       # FIXME make Unit class method (revert to $!dictionary)
     my $dictionary := Dictionary.instance;
 
-    $dictionary.unit-by-name;
-    #	return sort keys $dictionary.defn-by-name;
+    return sort keys $dictionary.defn-by-name;
 }
 sub ListTypes is export {       # FIXME make Unit class method (revert to $!dictionary)
     my $dictionary := Dictionary.instance;
@@ -709,6 +707,8 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
     my $dictionary := Dictionary.instance;
 
     $defn .= trim;
+
+    $defn .= subst('%LOCALE%', $locale);
 
 	#| preprocess affix units to extended defn - eg. cm to centimetre
 	$defn = $dictionary.affix-by-name{$defn} // $defn;

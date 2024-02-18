@@ -2,6 +2,10 @@
 
 #SI Units
 
+# %LOCALE% is substituted to 'us' or 'imp' gallons, pints, mpg etc.
+
+# Where a Type has no new items, it must be commented out
+
 # Format key:
 # Type1:
 #- {names: [symbol, synonym-one  ...], defn: 'definition string'}
@@ -15,7 +19,7 @@ Dimensionless:
   - {names: [①, (1), one, unity],        defn: '1'}          #U-2460 CIRCLED DIGIT ONE
   - {names: [semi, demi, hemi],          defn: '1/2'}         # FIXME prefix?
   - {names: ['%' , percent],             defn: '1/100'}
-  - {names: [ABV],                       defn: '1/100'}       # FIXME 1/100?
+  - {names: [ABV],                       defn: '1/100'}
   - {names: [pi],                        defn: '3.1415926535897932385'}
 
 Angle:
@@ -79,7 +83,7 @@ Volume:
   - {names: [alcohol-unit],              defn: '10 millilitre'}            # of pure alcohol
   - {names: [us-gallon],                 defn: '3.785411784 litre'}
   - {names: [imp-gallon],                defn: '4.54609 litre'}
-  - {names: [gallon],                    defn: '1 {$locale}-gallon'}
+  - {names: [gallon],                    defn: '1 %LOCALE%-gallon'}
   - {names: [firkin],                    defn: '9 gallon'}
   - {names: [barrel],                    defn: '36 gallon'}
   - {names: [quart],                     defn: 'gallon/4'}
@@ -88,7 +92,7 @@ Volume:
   - {names: [fifth],                     defn: 'us-gallon/5'}
   - {names: [us-pint],                   defn: 'us-gallon/8'}
   - {names: [imp-pint],                  defn: 'imp-gallon/8'}
-  - {names: [pint],                      defn: '1 {$locale}-pint'}
+  - {names: [pint],                      defn: '1 %LOCALE%-pint'}
   - {names: [cup],                       defn: 'us-pint/2'}
   - {names: [floz, fluid-ounce],         defn: 'cup/8'}
   - {names: [gill],                      defn: '4 fluid-ounce'}
@@ -187,16 +191,16 @@ Power:
   - {names: [us-horsepower, us-hp],      defn: '550 foot pound-force / s'}
   - {names: [PS, horsepower, hp],        defn: '75 kg * g0 * m / s'}
 
-Current (Base Unit):
+#Current:
 
-Potential (Derived Unit):
+#Potential:
 
 Conductance:
   - {names: [mho],                       defn: '1 / ohm'}
 
-Capacitance (Derived Unit):
+#Capacitance:
 
-Inductance (Derived Unit):
+#Inductance:
 
 Magnetic_flux:
   - {names: [Mx, maxwell],               defn: '1e-8 weber'}
