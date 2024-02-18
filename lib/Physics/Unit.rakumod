@@ -38,7 +38,7 @@ my %odd-type-by-name;     #mop up a few exceptional types   # FIXME
 
 # todo
 # 1 interpose Dictionary service
-#   -prefix base derived (affix) types dims (odd) units
+#   -prefix base derived (postfix) types dims (odd) units
 # externailze all but Unit
 # appenders
 # FIXME s
@@ -263,7 +263,7 @@ class Unit does Maths is export {
                 @.names = @new-names;
             }
         } else {
-            #lookup defn in the affix synonyms
+            #lookup defn in the postfix synonyms
             for $.dictionary.asyns-by-name.kv -> $k, $v {
                 if $v.grep($.defn) {
                     @.names = @$v;
@@ -400,10 +400,10 @@ class Unit::Base {
 
             $.dictionary.basenames.push: $u.name;
             
-            $.dictionary.affix-by-name{$u.name} = @synonyms[1];    #extended name as value
+            $.dictionary.postfix-by-name{$u.name} = @synonyms[1];    #extended name as value
             $.dictionary.asyns-by-name{$u.name} = @synonyms;       #all synonyms as value
 
-            $.dictionary.affix-by-name;
+            $.dictionary.postfix-by-name;
             say "Initialized Base $names[0]" if $db;
         }
     }
@@ -418,7 +418,7 @@ class Unit::Derived is Unit {
 
             my @synonyms = |$names;
 
-            $.dictionary.affix-by-name{@synonyms[0]} = @synonyms[1];
+            $.dictionary.postfix-by-name{@synonyms[0]} = @synonyms[1];
             $.dictionary.asyns-by-name{@synonyms[0]} = @synonyms;
         }
 
@@ -446,44 +446,44 @@ class Unit::Dims {
     }
 }
 
-class Unit::Affix {
+class Unit::Postfix {
     has $.dictionary = Dictionary.instance;
 
     #Load SI Prefix code / Unit combos to data map hashes for postfix operators
     method load {
-        # so far %affix-by-name has been initialized with base and derived unit names
+        # so far %postfix-by-name has been initialized with base and derived unit names
         # redo THIS!!! ^^^
 
         # replace kg with g
-        $.dictionary.affix-by-name<kg>:delete;
+        $.dictionary.postfix-by-name<kg>:delete;
         $.dictionary.asyns-by-name<kg>:delete;
-        $.dictionary.affix-by-name<g> = 'gram';
+        $.dictionary.postfix-by-name<g> = 'gram';
         $.dictionary.asyns-by-name<g> = <g gram grams gramme grammes>;
 
-        # delete non-declining singletons from %affix-by-name so that they do not generate unwanted postfixes
-        # leave them in %affix-syns-by-name as we will want the syns for the singletons in do-postfix
-        #$.dictionary.affix-by-name<°>:delete;   (Angle does not make it to %affix-by-name)
-        $.dictionary.affix-by-name<°C>:delete;
-        $.dictionary.affix-by-name<radian>:delete;
-        $.dictionary.affix-by-name<steradian>:delete;
+        # delete non-declining singletons from %postfix-by-name so that they do not generate unwanted postfixes
+        # leave them in %postfix-syns-by-name as we will want the syns for the singletons in do-postfix
+        #$.dictionary.postfix-by-name<°>:delete;   (Angle does not make it to %postfix-by-name)
+        $.dictionary.postfix-by-name<°C>:delete;
+        $.dictionary.postfix-by-name<radian>:delete;
+        $.dictionary.postfix-by-name<steradian>:delete;
 
-        # Angle does not make it to %affix-syns-by-name ?!
+        # Angle does not make it to %postfix-syns-by-name ?!
         $.dictionary.asyns-by-name<°> = <° degree degrees deg degs º>;
 
         # pour in 'l' ie. ml, cl, etc quite common
-        $.dictionary.affix-by-name<l> = 'litre';
+        $.dictionary.postfix-by-name<l> = 'litre';
         $.dictionary.asyns-by-name<l> = <l L litre litres liter liters>;
 
-        # now %affix-by-name has the right simple-names
+        # now %postfix-by-name has the right simple-names
         # so now can copy these across and us them to spin up all the combos
-        my %simple-names = $.dictionary.affix-by-name;
+        my %simple-names = $.dictionary.postfix-by-name;
 
         for %simple-names.keys -> $n {
             for $.dictionary.prefix-by-code.kv -> $c, $p {
 
                 # combine short keys and values, then extend both codes & names to decongest namespace
                 my $combo = $c ~ $n;                                                #eg. 'ml' (used by custom Postfix op)
-                $.dictionary.affix-by-name{$combo} = $.dictionary.prefix-by-code{$c} ~ %simple-names{$n};   #eg. 'millilitres' (used by Grammar)
+                $.dictionary.postfix-by-name{$combo} = $.dictionary.prefix-by-code{$c} ~ %simple-names{$n};   #eg. 'millilitres' (used by Grammar)
 
                 # set up synonym list for population of Unit object name
                 my $syns = $.dictionary.asyns-by-name{$n};
@@ -518,7 +518,7 @@ class Dictionary {
     has %.prefix-by-code;       #code => Prefix name
     has %.prefix-to-factor;     #name => Prefix factor
 
-    has %.defn-by-name;         #name => defn Str of known names incl. affix (values may be dupes)
+    has %.defn-by-name;         #name => defn Str of known names incl. postfix (values may be dupes)
     has %.syns-by-name;         #name => list of synonyms (excl. user defined, incl. plurals)
     has %.unit-by-name;         #name => Unit object cache (when instantiated)
 
@@ -526,8 +526,8 @@ class Dictionary {
     has %.type-to-prototype;    #type => prototype Unit object (when instantiated)
     has %.type-to-dims;		    #type => dims vector
 
-    has %.affix-by-name;        #name => extended affix defn (eg. cm => 'centimetre') to decongest Grammar namespace
-    has %.asyns-by-name;        #name => list of synonyms for every affix [n, nano] X~ [m, metre, meter, metres, meters]
+    has %.postfix-by-name;        #name => extended postfix defn (eg. cm => 'centimetre') to decongest Grammar namespace
+    has %.asyns-by-name;        #name => list of synonyms for every postfix [n, nano] X~ [m, metre, meter, metres, meters]
 
     #    has %.odd-type-by-name;     #mop up a few exceptional types
 
@@ -537,12 +537,17 @@ class Dictionary {
         require Physics::Unit::Definitions::en_SI;
         my $load = Physics::Unit::Definitions::en_SI.new;
 
+        # core type info
         Unit::Base.new.load:    $load.config<base>;
         Unit::Type.new.load:    $load.config<types>;
         Unit::Dims.new.load:    $load.config<dims>;
+        
+        # unit children
         Unit::Derived.new.load: $load.config<derived>;
         Unit::Prefix.new.load:  $load.config<prefix>;
-        Unit::Affix.new.load;
+        
+        
+        Unit::Postfix.new.load;
         Unit.new.load:          $load.config<units>;
 
         if $db {
@@ -609,12 +614,12 @@ sub GetPrefixToFactor is export {
 
     return $dictionary.prefix-to-factor;
 }
-sub GetAffixByName is export {
+sub GetPostfixByName is export {
     my $dictionary := Dictionary.instance;
 
-    return $dictionary.affix-by-name;
+    return $dictionary.postfix-by-name;
 }
-sub GetAffixSynsByName is export {
+sub GetPostfixSynsByName is export {
     my $dictionary := Dictionary.instance;
 
     return $dictionary.asyns-by-name;
@@ -709,8 +714,8 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
 
     $defn .= subst('%LOCALE%', $locale);
 
-	#| preprocess affix units to extended defn - eg. cm to centimetre
-	$defn = $dictionary.affix-by-name{$defn} // $defn;
+	#| preprocess postfix units to extended defn - eg. cm to centimetre
+	$defn = $dictionary.postfix-by-name{$defn} // $defn;
 
     #| rm compound names from element unit-name match candidates (to force regen of dmix)
     my $unit-names       = $dictionary.defn-by-name.keys.grep({! /<[\s*^./]>/}).join('|');
