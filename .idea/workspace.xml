@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Load ok" />
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Rename Affix =&gt; Postfix">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/META6.json" beforeDir="false" afterPath="$PROJECT_DIR$/META6.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/spike6.raku" beforeDir="false" afterPath="$PROJECT_DIR$/bin/spike6.raku" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -12,6 +17,11 @@
   </component>
   <component name="ComposerSettings">
     <execution />
+  </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints>
+      <file url="file://$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" />
+    </disable_hints>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -242,7 +252,49 @@
       <option name="project" value="LOCAL" />
       <updated>1708243015072</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="Prefix, Derived, Units all Unit">
+      <created>1708247053791</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1708247053791</updated>
+    </task>
+    <task id="LOCAL-00024" summary="Add Build.pm">
+      <created>1708247074084</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1708247074084</updated>
+    </task>
+    <task id="LOCAL-00025" summary="Add Comma config">
+      <created>1708247090393</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1708247090393</updated>
+    </task>
+    <task id="LOCAL-00026" summary="Reorder load">
+      <created>1708247805061</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1708247805061</updated>
+    </task>
+    <task id="LOCAL-00027" summary="Rename Affix =&gt; Postfix">
+      <created>1708248196104</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1708248196104</updated>
+    </task>
+    <task id="LOCAL-00028" summary="Rename Affix =&gt; Postfix">
+      <created>1708248631967</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1708248631967</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -260,8 +312,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="t -&gt; rakutest" />
-    <MESSAGE value="wip loader arch" />
     <MESSAGE value="wip yaml ok" />
     <MESSAGE value="wip yaml debool" />
     <MESSAGE value="wip yaml types &amp; dims" />
@@ -282,7 +332,23 @@
     <MESSAGE value="Load wip Unit::Affix ok" />
     <MESSAGE value="Load wip Unit ok" />
     <MESSAGE value="Load ok" />
-    <option name="LAST_COMMIT_MESSAGE" value="Load ok" />
+    <MESSAGE value="Prefix, Derived, Units all Unit" />
+    <MESSAGE value="Add Build.pm" />
+    <MESSAGE value="Add Comma config" />
+    <MESSAGE value="Reorder load" />
+    <MESSAGE value="Rename Affix =&gt; Postfix" />
+    <option name="LAST_COMMIT_MESSAGE" value="Rename Affix =&gt; Postfix" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="perl6LineBreakpoint">
+          <url>file://$PROJECT_DIR$/lib/Physics/Unit.rakumod</url>
+          <line>271</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="edument.perl6idea.pm.RakuPackageManagerManager">
     <pmList />

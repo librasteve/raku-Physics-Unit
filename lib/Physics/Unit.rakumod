@@ -1,6 +1,7 @@
 unit module Physics::Unit:ver<1.1.26>:auth<Steve Roe (librasteve@furnival.net)>; #viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
 use Data::Dump::Tree;
+use Physics::Unit::Maths;
 
 my $db = 0;       #debug
 
@@ -46,100 +47,7 @@ my %odd-type-by-name;     #mop up a few exceptional types   # FIXME
 class Unit { ... }
 class Dictionary { ... }
 
-######## Classes & Roles ########
-
-role Maths {
-    ### mathematical methods ###
-    multi method times( Real $t ) {
-        self.factor: self.factor * $t;
-        return self
-    }
-    multi method times( Unit $t ) {
-        self.factor: self.factor * $t.factor;
-        self.dims >>+=<< $t.dims;
-        self.dmix = ( self.dmix (+) $t.dmix ).MixHash;
-        self.type: '';
-        return self
-    }
-    method invert {
-        self.factor: 1 / self.factor;
-        self.dims = -<< self.dims;
-        self.dmix = ( ∅ (-) self.dmix ).MixHash;
-        return self
-    }
-    multi method share( Real $d ) {
-        self.factor: self.factor / $d;
-        return self
-    }
-    multi method share( Unit $d ) {
-        my $u = GetUnit($d).clone;
-        self.times: $u.invert;
-        return self
-    }
-    method raise( $d, $e ) {
-        #raise a one-element unit ($e) to power of $d digits
-        self.factor: self.factor ** $d;
-        self.dims >>*=>> $d;
-
-        #    my $e-can = %syns-by-name{$e}[0];		#lookup the canonical name
-        my $e-can = $.dictionary.get-syns(name => $e)[0];		#lookup the canonical name
-        self.dmix{$e-can} = $d;
-        return self
-    }
-
-    #### convert & compare methods ####
-
-    #| used to provide shortest name
-    #| note the equal factor constraint
-    #| should be private (when sub are folded in)
-    method same-dims( Unit $u ) {
-        return 0 unless $u.dmix  eqv self.dmix;
-        return 0 unless $u.factor == self.factor;
-        return 1
-    }
-
-    #| used by Measure cmp
-    #| maybe rename to method cmp?
-    method same-unit( Unit $u ) {
-        return 0 unless $u.dims  eqv self.dims;
-        return 0 unless $u.factor == self.factor;
-        return 1
-    }
-
-    ### Units part of Measure operations ###
-    method multiply( Unit $r ) {
-        my $l = self.clone;
-        my $x = $l.times( $r );
-        my $t = $x.type( :just1 );		    #occasionally can be > one type
-        my $p = GetPrototype( $t );
-        return( $t, $p )
-    }
-    method divide( Unit $r ) {
-        my $l = self.clone;
-        my $x = $l.share( $r );
-        my $t = $x.type( :just1 );		    #occasionally can be > one type
-        my $p = GetPrototype( $t );
-        return( $t, $p )
-    }
-    method root-extract( Int $n where 1 <= * <= 4 ) {
-        #only when all dims divisible by root
-        my $l = self.clone;
-        die "rebase failed" unless $l.factor == 1;
-        $l.defn: '';
-        $l.type: '';
-        $l.dims = $l.dims.map({($_/$n).Int});
-
-        for $l.dmix.kv -> $k,$v {
-            $l.dmix{$k} = $v/$n
-        }
-
-        my $t = $l.type( :just1 );		    #occasionally can be > one type
-        my $p = GetPrototype( $t );
-        return( $t, $p )
-    }
-}
-
-class Unit does Maths is export {
+class Unit does Physics::Unit::Maths[Unit] is export {
     has $.dictionary = Dictionary.instance;
 
     has Real $!factor = 1;
@@ -183,7 +91,7 @@ class Unit does Maths is export {
     multi method new( :$defn!, :@names ) {
         my $n = CreateUnit( $defn );
         $n.SetNames: @names;
-        $n.SetType();
+#        $n.SetType();
         return $n
     }
 
@@ -194,7 +102,7 @@ class Unit does Maths is export {
     multi method new( Unit:D $u: @names ) {
         my $n = $u.clone;
         $n.SetNames: @names;
-        $n.SetType();
+#        $n.SetType();
         return $n
     }
 
@@ -277,25 +185,32 @@ class Unit does Maths is export {
 
         say "SetNames: {@.names}" if $db;
     }
-    method SetType( $t? ) {
-        for @.names -> $n {
-            #set up this Unit as a prototype
-            for $.dictionary.type-to-protoname -> %p {
-                if %p.value eq $n {
-                    $.type: %p.key;
-                    $.dictionary.type-to-prototype{$!type} = self;
-                }
-            }
-            #mop up any odd types
-            for %odd-type-by-name -> %p {
-                if %p.key eq $n {
-                    $.type: %p.value;
-                }
-            }
-        }
 
-        say "SetType: $.type" if $db;
-    }
+    ##iamerejh disentangle "SetType"
+
+#    method SetType( $t? ) {
+#        say "================";
+#        say $t;
+#        say @.names;
+#
+#        for @.names -> $n {
+#            #set up this Unit as a prototype
+#            for $.dictionary.type-to-protoname -> %p {
+#                if %p.value eq $n {
+#                    $.type: %p.key;
+#                    $.dictionary.type-to-prototype{$!type} = self;
+#                }
+#            }
+#            #mop up any odd types
+#            for %odd-type-by-name -> %p {
+#                if %p.key eq $n {
+#                    $.type: %p.value;
+#                }
+#            }
+#        }
+#
+#        say "SetType: $.type" if $db;
+#    }
     method CheckChange {
         warn "You're not allowed to change named units!" if self.name;
     }
@@ -342,6 +257,15 @@ class Unit does Maths is export {
                 Unit.new(defn => $defn, names => [|$names]);
             }
         }
+    }
+
+    #iamerejh
+    method get-prototype( $t ) {
+        GetPrototype( $t );
+    }
+
+    method get-unit( $d ) {
+        GetUnit( $d );
     }
 }
 

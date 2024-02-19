@@ -14,7 +14,7 @@ use Physics::Unit;
 #]
 
 
-my $u = GetUnit 'mho';
+my $u = GetUnit 'cal';
 dd $u;
 
 #dd GetAffixByName;
