@@ -46,19 +46,19 @@ class Dictionary { ... }
 class Unit does Physics::Unit::Maths[Unit] is export {
     has $.dictionary = Dictionary.instance;
 
-    has Real $!factor = 1;
-    has Real $!offset = 0;
-    has Str  $!defn   = '';
-    has Str  $!type;
-    has Str  @.names is rw = [];
-    has Int  @.dims = 0 xx NumBases;
+    has Real    $!factor = 1;
+    has Real    $!offset = 0;
+    has Str     $!defn   = '';     # FIXME default?
+    has Str     $!type;            # FIXME default?
+    has Str     @.names is rw = [];
+    has Int     @.dims = 0 xx NumBases;
     has MixHash $.dmix is rw = ∅.MixHash;
 
     ### accessor methods ###		    #use 'self.attr: 42' not 'self.attr = 42'
-    multi method factor($f) { self.CheckChange; $!factor = $f }
+    multi method factor($f) { self.check-change; $!factor = $f }
     multi method factor     { $!factor }
 
-    multi method offset($o) { self.CheckChange; $!offset = $o }
+    multi method offset($o) { self.check-change; $!offset = $o }
     multi method offset     { $!offset }
 
     multi method defn($d)   { $!defn = $d.Str }
@@ -82,14 +82,46 @@ class Unit does Physics::Unit::Maths[Unit] is export {
         #3 by looking up dims
         my @d;
         for $.dictionary.type-to-dims.keys -> $k {
-            push @d, $k if self.dims cmp $.dictionary.type-to-dims{$k} ~~ Same;
+            push @d, $k if self.dims eqv $.dictionary.type-to-dims{$k};
         }
         say "Implicit types: {@d}" if $db;
 
         if @d == 0 { return '' }
         if @d == 1 { return @d[0] }
-#        if $just1  { return type-hint(@d) // die 'Cannot resolve to just1 type, please set one in %type-hint' }
         if @d > 1  { return type-hint(@d) }
+    }
+
+    # FIXME meld these with accessors
+    # FIXME write dictionary somehow
+    ### behavioural methods ###
+    method SetNames( @new-names ) {
+        if @new-names.so {
+            #      if %syns-by-name{@new-names[0]} -> @syns {
+            if $!dictionary.get-syns(name => @new-names[0]) -> @syns {
+                #predefined Unit, assign synonyms
+                @.names = @syns;
+            } else {
+                #user defined Unit, assign names provided
+                @.names = @new-names;
+            }
+        } else {
+            #lookup defn in the postfix synonyms
+            for $.dictionary.postsyns-by-name.kv -> $k, $v {
+                if $v.grep($.defn) {
+                    @.names = @$v;
+                }
+            }
+            #otherwise, just assign defn
+            @.names = [$.defn] unless @.names;
+        }
+        @.names.map( { $.dictionary.defn-by-name{$_} = self.defn } );
+        @.names.map( { $.dictionary.unit-by-name{$_} = self } );
+
+        say "SetNames: {@.names}" if $db;
+    }
+
+    method check-change {
+        warn "You're not allowed to change units once they are named!" if self.name;
     }
 
     ### new & clone methods ###
@@ -111,7 +143,8 @@ class Unit does Physics::Unit::Maths[Unit] is export {
         return $n
     }
 
-    #| Manually make NewType when no preset type, eg. m-1
+    #| Manually attach NewType when no preset type, eg. m-1
+    #| FIXME - put in Type class (reverse args)
     method NewType( Str $type-name ) {
         for @.names -> $name {
             $.dictionary.type-to-protoname{$type-name} = $name;
@@ -161,39 +194,6 @@ class Unit does Physics::Unit::Maths[Unit] is export {
       dims => [{@.dims.join(',')}], dmix => {$.dmix.raku}, names => [{@.names.map( ->$n {"'$n'"}).join(',')}] );
     END
   }
-
-    # FIXME meld these with accessors
-    # FIXME write dictionary somehow
-    ### behavioural methods ###
-    method SetNames( @new-names ) {
-        if @new-names.so {
-            #      if %syns-by-name{@new-names[0]} -> @syns {
-            if $!dictionary.get-syns(name => @new-names[0]) -> @syns {
-                #predefined Unit, assign synonyms
-                @.names = @syns;
-            } else {
-                #user defined Unit, assign names provided
-                @.names = @new-names;
-            }
-        } else {
-            #lookup defn in the postfix synonyms
-            for $.dictionary.postsyns-by-name.kv -> $k, $v {
-                if $v.grep($.defn) {
-                    @.names = @$v;
-                }
-            }
-            #otherwise, just assign defn
-            @.names = [$.defn] unless @.names;
-        }
-        @.names.map( { $.dictionary.defn-by-name{$_} = self.defn } );
-        @.names.map( { $.dictionary.unit-by-name{$_} = self } );
-
-        say "SetNames: {@.names}" if $db;
-    }
-
-    method CheckChange {
-        warn "You're not allowed to change named units!" if self.name;
-    }
 
     method load( %config ) {
 
@@ -414,8 +414,8 @@ class Dictionary {
         }
         $instance;
     }
-    ###
 
+    ### Attributes ###
     has @.basenames;
     
     has %.prefix-by-name;       #name => Prefix object
@@ -428,10 +428,10 @@ class Dictionary {
 
     has %.type-to-protoname;    #type => prototype name
     has %.type-to-prototype;    #type => prototype Unit object (when instantiated)
-    has %.type-to-dims;		    #type => dims vector
+    has Array[Int]() %.type-to-dims;		    #type => dims vector
 
-    has %.postfix-by-name;        #name => extended postfix defn (eg. cm => 'centimetre') to decongest Grammar namespace
-    has %.postsyns-by-name;        #name => list of synonyms for every postfix [n, nano] X~ [m, metre, meter, metres, meters]
+    has %.postfix-by-name;      #name => extended postfix defn (eg. cm => 'centimetre') to decongest Grammar namespace
+    has %.postsyns-by-name;     #name => list of synonyms for every postfix [n, nano] X~ [m, metre, meter, metres, meters]
 
     submethod load {
         # FIXME - load general config & inject to loader

@@ -327,7 +327,21 @@
       <option name="project" value="LOCAL" />
       <updated>1708365969476</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="revert odd type exceptions">
+      <created>1708366497388</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1708366497388</updated>
+    </task>
+    <task id="LOCAL-00035" summary="drop odd type exceptions">
+      <created>1708366549501</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1708366549501</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -345,7 +359,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="drop Unit.type option 2" />
     <MESSAGE value="drop Session, Dictionary is Singleton" />
     <MESSAGE value="Loader wip prefixes" />
     <MESSAGE value="Loader ok prefixes" />
@@ -369,6 +382,7 @@
     <MESSAGE value="Clarify set type" />
     <MESSAGE value="drop just1" />
     <MESSAGE value="drop ft-lb" />
+    <MESSAGE value="revert odd type exceptions" />
     <MESSAGE value="drop odd type exceptions" />
     <option name="LAST_COMMIT_MESSAGE" value="drop odd type exceptions" />
   </component>
@@ -377,7 +391,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="perl6LineBreakpoint">
           <url>file://$PROJECT_DIR$/lib/Physics/Unit.rakumod</url>
-          <line>255</line>
+          <line>254</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
