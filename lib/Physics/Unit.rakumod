@@ -33,13 +33,10 @@ my %pwr-superscript = (
     '⁻¹' => -1, '⁻²' => -2, '⁻³' => -3, '⁻⁴' => -4,
 );
 
-my %odd-type-by-name;     #mop up a few exceptional types   # FIXME
 
 #-------------------------- NEW SHIT
 
 # todo
-# 1 interpose Dictionary service
-#   -prefix base derived (postfix) types dims (odd) units
 # externailze all but Unit
 # appenders
 # FIXME s
@@ -435,8 +432,6 @@ class Dictionary {
 
     has %.postfix-by-name;        #name => extended postfix defn (eg. cm => 'centimetre') to decongest Grammar namespace
     has %.postsyns-by-name;        #name => list of synonyms for every postfix [n, nano] X~ [m, metre, meter, metres, meters]
-
-    #    has %.odd-type-by-name;     #mop up a few exceptional types
 
     submethod load {
         # FIXME - load general config & inject to loader
