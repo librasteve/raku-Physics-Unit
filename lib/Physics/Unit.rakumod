@@ -33,10 +33,13 @@ my %pwr-superscript = (
     '⁻¹' => -1, '⁻²' => -2, '⁻³' => -3, '⁻⁴' => -4,
 );
 
+my %odd-type-by-name;     #mop up a few exceptional types   # FIXME
 
 #-------------------------- NEW SHIT
 
 # todo
+# 1 interpose Dictionary service
+#   -prefix base derived (postfix) types dims (odd) units
 # externailze all but Unit
 # appenders
 # FIXME s
@@ -89,6 +92,7 @@ class Unit does Physics::Unit::Maths[Unit] is export {
 
         if @d == 0 { return '' }
         if @d == 1 { return @d[0] }
+#        if $just1  { return type-hint(@d) // die 'Cannot resolve to just1 type, please set one in %type-hint' }
         if @d > 1  { return type-hint(@d) }
     }
 
@@ -433,6 +437,8 @@ class Dictionary {
     has %.postfix-by-name;        #name => extended postfix defn (eg. cm => 'centimetre') to decongest Grammar namespace
     has %.postsyns-by-name;        #name => list of synonyms for every postfix [n, nano] X~ [m, metre, meter, metres, meters]
 
+    #    has %.odd-type-by-name;     #mop up a few exceptional types
+
     submethod load {
         # FIXME - load general config & inject to loader
 
@@ -767,5 +773,30 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
       die "Couldn't parse defn Str $defn";
     }
 }
+
+######## Initialization ########
+
+######## Unit Data ########
+
+#sub InitOddTypes( @_ ) {
+#    for @_ -> %p {
+#        %odd-type-by-name{%p.key} = %p.value;
+#    }
+#}
+#
+## FIXME - avoid exceptions - after yamls
+#InitOddTypes (
+#    #mop up a few exceptional types
+#    'eV'      => 'Energy',
+#    'MeV'     => 'Energy',
+#    'GeV'     => 'Energy',
+#    'TeV'     => 'Energy',
+#    'cal'     => 'Energy',
+#    'kcal'    => 'Energy',
+#    'btu'     => 'Energy',
+#    'erg'     => 'Energy',
+#    'kWh'     => 'Energy',
+#    'ft-lb'   => 'Torque',
+#);
 
 #EOF
