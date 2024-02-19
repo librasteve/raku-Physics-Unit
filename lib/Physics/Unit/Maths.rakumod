@@ -61,14 +61,14 @@ role Physics::Unit::Maths[::Unit] {
     method multiply( Unit $r ) {
         my $l = self.clone;
         my $x = $l.times( $r );
-        my $t = $x.type( :just1 );		    #occasionally can be > one type
+        my $t = $x.type;
         my $p = self.get-prototype( $t );
         return( $t, $p )
     }
     method divide( Unit $r ) {
         my $l = self.clone;
         my $x = $l.share( $r );
-        my $t = $x.type( :just1 );		    #occasionally can be > one type
+        my $t = $x.type;
         my $p = self.get-prototype( $t );
         return( $t, $p )
     }
@@ -84,7 +84,7 @@ role Physics::Unit::Maths[::Unit] {
             $l.dmix{$k} = $v/$n
         }
 
-        my $t = $l.type( :just1 );		    #occasionally can be > one type
+        my $t = $l.type;
         my $p = self.get-prototype( $t );
         return( $t, $p )
     }

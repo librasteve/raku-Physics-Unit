@@ -51,7 +51,7 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     has $.dictionary = Dictionary.instance;
 
     has Real $!factor = 1;
-    has Real $!offset = 0;				#ie. for K <=> °C
+    has Real $!offset = 0;
     has Str  $!defn   = '';
     has Str  $!type;
     has Str  @.names is rw = [];
@@ -69,9 +69,10 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     multi method defn       { $!defn }
 
     multi method type($t)   { $!type = $t.Str }
-    multi method type(:$just1) {
+    multi method type       {
 
-        #1 type has been explicitly set ... eg. Prefix or to avoid ambiguous state
+        #1 type has been explicitly set
+        #eg. Prefix or explicitly to avoid ambiguous state
         return $!type if $!type;
 
         #2 by checking symbol against prototype dictionary
@@ -91,7 +92,6 @@ class Unit does Physics::Unit::Maths[Unit] is export {
 
         if @d == 0 { return '' }
         if @d == 1 { return @d[0] }
-        if $just1  { return type-hint(@d) // die 'Cannot resolve to just1 type, please set one in %type-hint' }
         if @d > 1  { return type-hint(@d) }
     }
 
@@ -101,7 +101,6 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     multi method new( :$defn!, :@names ) {
         my $n = CreateUnit( $defn );
         $n.SetNames: @names;
-#        $n.SetType();
         return $n
     }
 
@@ -112,7 +111,6 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     multi method new( Unit:D $u: @names ) {
         my $n = $u.clone;
         $n.SetNames: @names;
-#        $n.SetType();
         return $n
     }
 
@@ -628,7 +626,6 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
     my $dictionary := Dictionary.instance;
 
     $defn .= trim;
-
     $defn .= subst('%LOCALE%', $locale);
 
 	#| preprocess postfix units to extended defn - eg. cm to centimetre
@@ -726,17 +723,17 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
       }
 
       #| make both unit and defn from prefix-name matches
-      method prefix-name($/)	{
+      method prefix-name($/) {
         my $unit = $<name>.made<unit>;
         my $defn = $<name>.made<defn>;
         my $pfix = $<prefix>.made<unit>;
         $unit.times($pfix) if $pfix;
         make %( defn => $defn, unit => $unit );
       }
-      method prefix($/)		{
+      method prefix($/)	{
         make %( unit => GetUnit($/.Str).clone );
       }
-      method name($/)			{
+      method name($/) {
         my $defn=$/.Str;
         my $unit=GetUnit($defn).clone;
         $unit.dmix=∅.MixHash;
