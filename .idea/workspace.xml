@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="drop odd type exceptions">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Array[Int]() %.type-to-dims">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
     </list>
@@ -341,7 +341,14 @@
       <option name="project" value="LOCAL" />
       <updated>1708366549501</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="Array[Int]() %.type-to-dims">
+      <created>1708367873878</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1708367873878</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -359,7 +366,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="drop Session, Dictionary is Singleton" />
     <MESSAGE value="Loader wip prefixes" />
     <MESSAGE value="Loader ok prefixes" />
     <MESSAGE value="Loader ok prefixes (drop old)" />
@@ -384,7 +390,8 @@
     <MESSAGE value="drop ft-lb" />
     <MESSAGE value="revert odd type exceptions" />
     <MESSAGE value="drop odd type exceptions" />
-    <option name="LAST_COMMIT_MESSAGE" value="drop odd type exceptions" />
+    <MESSAGE value="Array[Int]() %.type-to-dims" />
+    <option name="LAST_COMMIT_MESSAGE" value="Array[Int]() %.type-to-dims" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

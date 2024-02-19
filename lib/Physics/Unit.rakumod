@@ -54,7 +54,8 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     has Int     @.dims = 0 xx NumBases;
     has MixHash $.dmix is rw = ∅.MixHash;
 
-    ### accessor methods ###		    #use 'self.attr: 42' not 'self.attr = 42'
+    ### accessor methods ###
+    # i.e. use 'self.attr: 42' not 'self.attr = 42'
     multi method factor($f) { self.check-change; $!factor = $f }
     multi method factor     { $!factor }
 
@@ -67,29 +68,36 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     multi method type($t)   { $!type = $t.Str }
     multi method type       {
 
-        #1 type has been explicitly set
-        #eg. Prefix or explicitly to avoid ambiguous state
-        return $!type if $!type;
+        #1 type has been set
+        #eg. on Prefix.load or explicitly to avoid ambiguous state
+        return when $!type;
 
-        #2 by checking symbol against prototype dictionary
-        for $.dictionary.type-to-protoname.kv -> $k, $v {
-            if @.names[0].defined && @.names[0] eq $v {
-                say "Prototype match: $k" if $db;
-                return $k;
+        #2 check if symbol (if set) is a prototype
+        with @!names.first {
+            for $.dictionary.type-to-protoname.kv -> $k, $v {
+                return $k when $v;
             }
         }
 
-        #3 by looking up dims
-        my @d;
-        for $.dictionary.type-to-dims.keys -> $k {
-            push @d, $k if self.dims eqv $.dictionary.type-to-dims{$k};
+        #3 look up type from dims
+        sub dim-types( @a ) {
+            given @a {
+                when * == 0 { '' }
+                when * == 1 { .first }
+                default { .&type-hint }
+            }
         }
-        say "Implicit types: {@d}" if $db;
 
-        if @d == 0 { return '' }
-        if @d == 1 { return @d[0] }
-        if @d > 1  { return type-hint(@d) }
+        dim-types gather {
+            for $.dictionary.type-to-dims.kv -> $k, $v {
+                take $k if self.dims eqv $v;
+            }
+        }
+
     }
+
+#    multi method names(@n)  { @!names = @n }
+#    multi method names      { @!names }
 
     # FIXME meld these with accessors
     # FIXME write dictionary somehow
