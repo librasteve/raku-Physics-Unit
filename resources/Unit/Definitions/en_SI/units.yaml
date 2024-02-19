@@ -157,7 +157,6 @@ Force:
 
 Torque:
   - {names: [Nm, newton-metre],          defn: 'N m'}
-  - {names: [ft-lb, footpound],          defn: 'foot pound-force'}
 
 Impulse:
   - {names: [Ns],                        defn: 'N * s'}

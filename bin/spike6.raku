@@ -14,11 +14,12 @@ use Physics::Unit;
 #]
 
 
+#my $u = GetUnit 'ft-lb'; $u.type: 'Torque';
 my $u = GetUnit 'Nm';
 dd $u;
 
-say ListTypeNames;
-say ListPrototypes;
+#say ListTypeNames;
+#say ListPrototypes;
 
 die;
 

@@ -773,29 +773,4 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
     }
 }
 
-######## Initialization ########
-
-######## Unit Data ########
-
-#sub InitOddTypes( @_ ) {
-#    for @_ -> %p {
-#        %odd-type-by-name{%p.key} = %p.value;
-#    }
-#}
-#
-## FIXME - avoid exceptions - after yamls
-#InitOddTypes (
-#    #mop up a few exceptional types
-#    'eV'      => 'Energy',
-#    'MeV'     => 'Energy',
-#    'GeV'     => 'Energy',
-#    'TeV'     => 'Energy',
-#    'cal'     => 'Energy',
-#    'kcal'    => 'Energy',
-#    'btu'     => 'Energy',
-#    'erg'     => 'Energy',
-#    'kWh'     => 'Energy',
-#    'ft-lb'   => 'Torque',
-#);
-
 #EOF
