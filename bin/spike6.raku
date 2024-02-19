@@ -14,16 +14,20 @@ use Physics::Unit;
 #]
 
 
-my $u = GetUnit 'cal';
+my $u = GetUnit 'Nm';
 dd $u;
 
+say ListTypeNames;
+say ListPrototypes;
+
+die;
+
 #dd GetAffixByName;
-#dd ListTypes;
+#dd GetPrototype('Torque');
 #dd ListUnits;
 #dd ListDefns;
 #dd ListSyns;
 
-die;
 #say $u.WHICH;   #Physics::Unit::Unit|4267563835920   #PU4267563835920
 
 
@@ -56,7 +60,7 @@ my $u3 = GetUnit( 'kg m^2/s^2' );
 say ~$u3;
 say "compare $u1, $u2... " ~ $u2.same-dims($u1);
 
-put ListTypes;
+put ListTypeNames;
 #put ListUnits;
 
 #`[[

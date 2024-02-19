@@ -1,21 +1,16 @@
 #!/usr/bin/env raku
 use lib '../lib';
 
-use Data::Dump::Tree;
-
 use Physics::Unit;
 
 #SYNOPSIS
 
+dd GetUnit <m>;
 #`[
   Unit.new( factor => 1, offset => 0, defn => 'm', type => Length, dims => [1,0,0,0,0,0,0,0],
   dmix => ("m"=>1).MixHash, names => ['m','metre','meter','metres','meters'] );
 #]
 
-
-dd GetUnit <m>;
-
-die;
 
 # Define your own Unit named "ff"
 my $ff = Unit.new( defn => 'furlong / fortnight', names => ['ff'] );
@@ -50,7 +45,7 @@ a. Definition can be shared with several unit names - thus J and Nm can remain d
 b. GetUnit first tries name match, then calls CreateUnit to try definition match
 c. Matching names is exact; definitions is loose
 d. Defn matches dimension Mix (shallow) - thus 'kg m^2 / s^2' and 'N m' do remain distinct
-e. Long strings (eg. 'kg m^2/s^2') auto reduce to SI derived units (eg. 'J') [if Unit already instaniated]
+e. Long strings (eg. 'kg m^2/s^2') auto reduce to SI derived units (eg. 'J') [if Unit already instantiated]
 f. Override with Unit.new(defn=>'kg m^2/s^2', names=>['kg m^2/s^2']);
 
 Behaviours

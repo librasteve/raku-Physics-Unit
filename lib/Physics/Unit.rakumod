@@ -71,18 +71,28 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     multi method type($t)   { $!type = $t.Str }
     multi method type(:$just1) {
 
-        #1 type has been explicitly set ... eg. prefix or to avoid ambiguous state
+        #1 type has been explicitly set ... eg. Prefix or to avoid ambiguous state
         return $!type if $!type;
 
-        #2 by looking up dims
+        #2 by checking symbol against prototype dictionary
+        for $.dictionary.type-to-protoname.kv -> $k, $v {
+            if @.names[0].defined && @.names[0] eq $v {
+                say "Prototype match: $k" if $db;
+                return $k;
+            }
+        }
+
+        #3 by looking up dims
         my @d;
         for $.dictionary.type-to-dims.keys -> $k {
             push @d, $k if self.dims cmp $.dictionary.type-to-dims{$k} ~~ Same;
         }
+        say "Implicit types: {@d}" if $db;
+
         if @d == 0 { return '' }
         if @d == 1 { return @d[0] }
         if $just1  { return type-hint(@d) // die 'Cannot resolve to just1 type, please set one in %type-hint' }
-        if @d > 1  { return @d.sort }
+        if @d > 1  { return type-hint(@d) }
     }
 
     ### new & clone methods ###
@@ -186,31 +196,6 @@ class Unit does Physics::Unit::Maths[Unit] is export {
         say "SetNames: {@.names}" if $db;
     }
 
-    ##iamerejh disentangle "SetType"
-
-#    method SetType( $t? ) {
-#        say "================";
-#        say $t;
-#        say @.names;
-#
-#        for @.names -> $n {
-#            #set up this Unit as a prototype
-#            for $.dictionary.type-to-protoname -> %p {
-#                if %p.value eq $n {
-#                    $.type: %p.key;
-#                    $.dictionary.type-to-prototype{$!type} = self;
-#                }
-#            }
-#            #mop up any odd types
-#            for %odd-type-by-name -> %p {
-#                if %p.key eq $n {
-#                    $.type: %p.value;
-#                }
-#            }
-#        }
-#
-#        say "SetType: $.type" if $db;
-#    }
     method CheckChange {
         warn "You're not allowed to change named units!" if self.name;
     }
@@ -524,11 +509,17 @@ sub ListUnits is export {       # FIXME make Unit class method (revert to $!dict
 
     return sort keys $dictionary.defn-by-name;
 }
-sub ListTypes is export {       # FIXME make Unit class method (revert to $!dictionary)
+sub ListTypeNames is export {       # FIXME make Unit class method (revert to $!dictionary)
     my $dictionary := Dictionary.instance;
 
     $dictionary.type-to-protoname
 #    return sort keys $dictionary.type-to-protoname;
+}
+sub ListPrototypes is export {       # FIXME make Unit class method (revert to $!dictionary)
+    my $dictionary := Dictionary.instance;
+
+    $dictionary.type-to-prototype
+#    return sort keys $dictionary.type-to-prototype;
 }
 sub ListBases is export {       # FIXME make Unit class method (revert to $!dictionary)
     my $dictionary := Dictionary.instance;
