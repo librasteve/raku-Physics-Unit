@@ -48,7 +48,7 @@ class Unit does Physics::Unit::Maths[Unit] is export {
 
     has Real    $!factor = 1;
     has Real    $!offset = 0;
-    has Str     $!defn   = '';     # FIXME default Nil?
+    has Str     $!defn   = '';
     has Str     $!type;
 #    has Str     @!names  = [];
     has Str     @.names is rw = [];
@@ -98,8 +98,7 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     }
 
 
-    # FIXME meld these with accessors
-    # FIXME write dictionary somehow
+    # FIXME meld these with accessors - iamerejh
     ### behavioural methods ###
     method SetNames( @new-names ) {
         if @new-names.so {

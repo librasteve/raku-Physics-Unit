@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="@.names to @!names wip">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="drop check-change">
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -362,7 +361,14 @@
       <option name="project" value="LOCAL" />
       <updated>1708476910270</updated>
     </task>
-    <option name="localTasksCounter" value="39" />
+    <task id="LOCAL-00039" summary="drop check-change">
+      <created>1708478087136</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1708478087136</updated>
+    </task>
+    <option name="localTasksCounter" value="40" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -380,7 +386,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Loader ok prefixes (drop old)" />
     <MESSAGE value="Loader wip bases" />
     <MESSAGE value="Loader wip get-syns" />
     <MESSAGE value="Loader wip prototype / name" />
@@ -405,14 +410,15 @@
     <MESSAGE value="Array[Int]() %.type-to-dims" />
     <MESSAGE value="type getter ok" />
     <MESSAGE value="@.names to @!names wip" />
-    <option name="LAST_COMMIT_MESSAGE" value="@.names to @!names wip" />
+    <MESSAGE value="drop check-change" />
+    <option name="LAST_COMMIT_MESSAGE" value="drop check-change" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="perl6LineBreakpoint">
           <url>file://$PROJECT_DIR$/lib/Physics/Unit.rakumod</url>
-          <line>276</line>
+          <line>254</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
