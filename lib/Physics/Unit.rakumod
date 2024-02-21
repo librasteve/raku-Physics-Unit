@@ -50,24 +50,17 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     has Real    $!offset = 0;
     has Str     $!defn   = '';     # FIXME default Nil?
     has Str     $!type;
-    has Str     @!names  = [];
-#    has Str     @.names is rw = [];
+#    has Str     @!names  = [];
+    has Str     @.names is rw = [];
     has Int     @.dims = 0 xx NumBases;
     has MixHash $.dmix is rw = ∅.MixHash;
-    has Bool    $.is-final is rw = False;
 
     ### accessor methods ###
     # i.e. use 'self.attr: 42' not 'self.attr = 42'
-    multi method factor($f) {
-        self.check-change;
-        $!factor = $f
-    }
+    multi method factor($f) { $!factor = $f }
     multi method factor     { $!factor }
 
-    multi method offset($o) {
-        self.check-change;
-        $!offset = $o
-    }
+    multi method offset($o) { $!offset = $o }
     multi method offset     { $!offset }
 
     multi method defn($d)   { $!defn = $d.Str }
@@ -104,9 +97,6 @@ class Unit does Physics::Unit::Maths[Unit] is export {
 
     }
 
-    #iamerejh
-    multi method names(@n)  { @!names = @n }
-    multi method names      { @!names }
 
     # FIXME meld these with accessors
     # FIXME write dictionary somehow
@@ -137,30 +127,23 @@ class Unit does Physics::Unit::Maths[Unit] is export {
         say "SetNames: {@.names}" if $db;
     }
 
-    method check-change {
-        warn "Units cannot be changed once they are final!" if $!is-final;
-    }
-
     ### new & clone methods ###
 
     #new by named arguments
     multi method new( :$defn!, :@names ) {
         my $n = CreateUnit( $defn );
         $n.SetNames: @names;
-        $n.is-final = True;
         return $n
     }
 
     #new by deep cloning an existing Unit
     method clone {
-#        nextwith :names([]), :type(''), :dims(@!dims.clone), :dmix($!dmix.clone), :!is-final;
-        nextwith :names([]), :dims(@!dims.clone), :dmix($!dmix.clone), :!is-final;
+        nextwith :names([]), :dims(@!dims.clone), :dmix($!dmix.clone);
 
     }
     multi method new( Unit:D $u: @names ) {
         my $n = $u.clone;
         $n.SetNames: @names;
-#        $n.is-final = True;
         return $n
     }
 
