@@ -14,6 +14,15 @@ role Physics::Unit::Maths[::Unit] {
     }
 
     ### Combining with another Unit ###
+
+    #| since we use cloned Units to avoid grammar
+    #| we need to clear to avoid bringing in baggage
+    method clear {
+        self.defn: Nil;
+        self.type: Nil;
+        self.names: [];
+    }
+
     multi submethod times( Unit $t ) {
         self.clear;
 
@@ -45,7 +54,7 @@ role Physics::Unit::Maths[::Unit] {
 
     #| raise a one-element unit $e to power of $d digits
     #| used for assembling compound units in the Grammar
-    submethod raise( $d, $e ) {
+    method raise( $d, $e ) {
         self.clear;
 
         self.factor: self.factor ** $d;
@@ -63,7 +72,7 @@ role Physics::Unit::Maths[::Unit] {
         my $x = $l.times( $r );
 
         my $t = $x.type;
-        my $p = self.get-prototype( $t );   #iamerejh
+        my $p = self.get-prototype( $t );   # FIXME
         return( $t, $p )
     }
 
@@ -72,7 +81,7 @@ role Physics::Unit::Maths[::Unit] {
         my $x = $l.share( $r );
 
         my $t = $x.type;
-        my $p = self.get-prototype( $t );   #iamerejh
+        my $p = self.get-prototype( $t );   # FIXME
         return( $t, $p )
     }
 

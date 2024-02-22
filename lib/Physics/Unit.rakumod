@@ -51,7 +51,6 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     has Str()   $!defn   = '';
     has Str     $!type;
     has Str     @!names  = [];
-#    has Str     @.names is rw = [];
     has Int     @.dims = 0 xx NumBases;
     has MixHash $.dmix is rw = ∅.MixHash;
 
@@ -96,15 +95,8 @@ class Unit does Physics::Unit::Maths[Unit] is export {
        } ==> dims-match
     }
 
-
     multi method names(@n)  { @!names = @n }
     multi method names      { @!names }
-
-    method clear {
-        self.defn: Nil;
-        self.type: Nil;
-        self.names: [];
-    }
 
     # FIXME meld these with accessors - iamerejh
     ### behavioural methods ###
