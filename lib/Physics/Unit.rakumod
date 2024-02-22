@@ -3,7 +3,7 @@ unit module Physics::Unit:ver<1.1.26>:auth<Steve Roe (librasteve@furnival.net)>;
 use Data::Dump::Tree;
 use Physics::Unit::Maths;
 
-my $db = 0;       #debug
+our $db = 0;       #debug
 
 #some units have the same dimensions but are different types - type hints steer type inference
 our %type-hints = %(
@@ -48,10 +48,10 @@ class Unit does Physics::Unit::Maths[Unit] is export {
 
     has Real    $!factor = 1;
     has Real    $!offset = 0;
-    has Str     $!defn   = '';
+    has Str()   $!defn   = '';
     has Str     $!type;
-#    has Str     @!names  = [];
-    has Str     @.names is rw = [];
+    has Str     @!names  = [];
+#    has Str     @.names is rw = [];
     has Int     @.dims = 0 xx NumBases;
     has MixHash $.dmix is rw = ∅.MixHash;
 
@@ -63,11 +63,11 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     multi method offset($o) { $!offset = $o }
     multi method offset     { $!offset }
 
-    multi method defn($d)   { $!defn = $d.Str }
+    multi method defn($d)   { $!defn = $d }
     multi method defn       { $!defn }
 
-    multi method type($t)   { $!type = $t.Str }
-    multi method type       {
+    multi method type($t)   { $!type = $t }
+    multi method type {
 
         #1 type has been set
         #eg. on Prefix.load or explicitly to avoid ambiguous state
@@ -80,28 +80,31 @@ class Unit does Physics::Unit::Maths[Unit] is export {
             }
         }
 
-        #3 look up type from dims
-        sub dim-matches( @a ) {
+        #3 look up type via dims match
+        sub dims-match( @a ) {
             given @a {
-                when * == 0 { '' }
-                when * == 1 { .first }
-                when * >= 2 { .&type-hint }
+                when *== 0 { '' }
+                when *== 1 { .first }
+                when *>= 2 { .&type-hint }
             }
         }
 
         gather {
-            for $.dictionary.type-to-dims.kv -> $k, $v {
-                take $k if self.dims eqv $v;
+            for $.dictionary.type-to-dims.kv -> $key, $value {
+                take $key if $value eqv self.dims
             }
-        } ==> dim-matches
-
+       } ==> dims-match
     }
 
 
-#    multi method names(@n)  { @!names = @n }
-#    multi method names      { @!names }
+    multi method names(@n)  { @!names = @n }
+    multi method names      { @!names }
 
-
+    method clear {
+        self.defn: Nil;
+        self.type: Nil;
+        self.names: [];
+    }
 
     # FIXME meld these with accessors - iamerejh
     ### behavioural methods ###
@@ -110,20 +113,24 @@ class Unit does Physics::Unit::Maths[Unit] is export {
             #      if %syns-by-name{@new-names[0]} -> @syns {
             if $!dictionary.get-syns(name => @new-names[0]) -> @syns {
                 #predefined Unit, assign synonyms
-                @.names = @syns;
+                @.names: @syns;
+#                @.names = @syns;
             } else {
                 #user defined Unit, assign names provided
-                @.names = @new-names;
+                @.names: @new-names;
+#                @.names = @new-names;
             }
         } else {
             #lookup defn in the postfix synonyms
             for $.dictionary.postsyns-by-name.kv -> $k, $v {
                 if $v.grep($.defn) {
-                    @.names = @$v;
+                    @.names: @$v;
+#                    @.names = @$v;
                 }
             }
             #otherwise, just assign defn
-            @.names = [$.defn] unless @.names;
+            @.names: [$.defn] unless @.names;
+#            @.names = [$.defn] unless @.names;
         }
         @.names.map( { $.dictionary.defn-by-name{$_} = self.defn } );
         @.names.map( { $.dictionary.unit-by-name{$_} = self } );

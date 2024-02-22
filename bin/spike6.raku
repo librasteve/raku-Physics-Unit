@@ -14,8 +14,7 @@ use Physics::Unit;
 #]
 
 
-#my $u = GetUnit 'ft-lb'; $u.type: 'Torque';
-my $u = GetUnit 'Nm';
+my $u = GetUnit 'ohm';
 dd $u;
 
 #say ListTypeNames;

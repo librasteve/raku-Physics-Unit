@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="@.names =&gt; @!names wip">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="method type ==&gt;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/spike6.raku" beforeDir="false" afterPath="$PROJECT_DIR$/bin/spike6.raku" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -377,7 +378,21 @@
       <option name="project" value="LOCAL" />
       <updated>1708478265657</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL-00041" summary="review method type">
+      <created>1708565848163</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1708565848163</updated>
+    </task>
+    <task id="LOCAL-00042" summary="method type ==&gt;">
+      <created>1708565987947</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1708565987947</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -395,8 +410,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Loader wip get-syns" />
-    <MESSAGE value="Loader wip prototype / name" />
     <MESSAGE value="Load wip Unit::Base ok" />
     <MESSAGE value="Load wip Unit::Derived ok" />
     <MESSAGE value="Load wip Unit::Type ok" />
@@ -420,14 +433,16 @@
     <MESSAGE value="@.names to @!names wip" />
     <MESSAGE value="drop check-change" />
     <MESSAGE value="@.names =&gt; @!names wip" />
-    <option name="LAST_COMMIT_MESSAGE" value="@.names =&gt; @!names wip" />
+    <MESSAGE value="review method type" />
+    <MESSAGE value="method type ==&gt;" />
+    <option name="LAST_COMMIT_MESSAGE" value="method type ==&gt;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="perl6LineBreakpoint">
           <url>file://$PROJECT_DIR$/lib/Physics/Unit.rakumod</url>
-          <line>259</line>
+          <line>266</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
