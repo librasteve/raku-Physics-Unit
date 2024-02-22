@@ -89,11 +89,11 @@ class Unit does Physics::Unit::Maths[Unit] is export {
             }
         }
 
-        dim-matches gather {
+        gather {
             for $.dictionary.type-to-dims.kv -> $k, $v {
                 take $k if self.dims eqv $v;
             }
-        }
+        } ==> dim-matches
 
     }
 
