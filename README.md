@@ -19,7 +19,7 @@
 ## Thoughts
 - add synth units
   - need unique name/type pattern
-- add something like
+- [x] add something like
   - Unit Factory
   - Unit Directory
   - Session class
@@ -28,7 +28,8 @@
 - add currency dim
 - add information dim
 - package units
-- class Prefix, Base ... is Unit
+- [x] class Prefix, Base ... is Unit
+- [ ] reinstate check-change & is-final / finalize (both .new multis / clone)  ??
 
 ## TODOS
 - [ ] cc info to main (check preload = 1)

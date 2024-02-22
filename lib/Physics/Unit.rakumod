@@ -81,21 +81,26 @@ class Unit does Physics::Unit::Maths[Unit] is export {
         }
 
         #3 look up type from dims
-        sub dim-types( @a ) {
+        sub dim-matches( @a ) {
             given @a {
                 when * == 0 { '' }
                 when * == 1 { .first }
-                default { .&type-hint }
+                when * >= 2 { .&type-hint }
             }
         }
 
-        dim-types gather {
+        dim-matches gather {
             for $.dictionary.type-to-dims.kv -> $k, $v {
                 take $k if self.dims eqv $v;
             }
         }
 
     }
+
+
+#    multi method names(@n)  { @!names = @n }
+#    multi method names      { @!names }
+
 
 
     # FIXME meld these with accessors - iamerejh
