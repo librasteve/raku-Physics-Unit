@@ -73,30 +73,31 @@ class Unit does Physics::Unit::Maths[Unit] is export {
         return when $!type;
 
         #2 check if symbol (if set) is a prototype
-        with @!names.first {
+        with $.symbol {
             for $.dictionary.type-to-protoname.kv -> $k, $v {
                 return $k when $v;
             }
         }
 
-        #3 look up type via dims match
-        sub dims-match( @a ) {
-            given @a {
-                when *== 0 { '' }
-                when *== 1 { .first }
-                when *>= 2 { .&type-hint }
-            }
+        #3 look up types with matching dims
+        #employ type-hints to select just 1
+        sub types-with-matching-dims($_) {
+            when * == 0 { '' }
+            when * == 1 { .first }
+            when * >= 2 { .&type-hint }
         }
 
         gather {
             for $.dictionary.type-to-dims.kv -> $key, $value {
                 take $key if $value eqv self.dims
             }
-       } ==> dims-match
-    }
+        } ==> types-with-matching-dims;
 
-    multi method names(@n)  { @!names = @n }
-    multi method names      { @!names }
+    }
+    
+    multi method names(@n)  { 
+        @!names = @n
+    }
 
     # FIXME meld these with accessors - iamerejh
     ### behavioural methods ###
@@ -106,29 +107,29 @@ class Unit does Physics::Unit::Maths[Unit] is export {
             if $!dictionary.get-syns(name => @new-names[0]) -> @syns {
                 #predefined Unit, assign synonyms
                 @.names: @syns;
-#                @.names = @syns;
             } else {
                 #user defined Unit, assign names provided
                 @.names: @new-names;
-#                @.names = @new-names;
             }
         } else {
             #lookup defn in the postfix synonyms
             for $.dictionary.postsyns-by-name.kv -> $k, $v {
                 if $v.grep($.defn) {
                     @.names: @$v;
-#                    @.names = @$v;
                 }
             }
             #otherwise, just assign defn
             @.names: [$.defn] unless @.names;
-#            @.names = [$.defn] unless @.names;
         }
         @.names.map( { $.dictionary.defn-by-name{$_} = self.defn } );
         @.names.map( { $.dictionary.unit-by-name{$_} = self } );
 
         say "SetNames: {@.names}" if $db;
     }
+    
+    multi method names      { @!names }
+    
+    method symbol           { @!names.first }
 
     ### new & clone methods ###
 
@@ -197,9 +198,9 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     method raku {
         my $t-str = self.type;
         return qq:to/END/;
-      Unit.new( factor => $.factor, offset => $.offset, defn => '$.defn', type => $t-str,
-      dims => [{@.dims.join(',')}], dmix => {$.dmix.raku}, names => [{@.names.map( ->$n {"'$n'"}).join(',')}] );
-    END
+          Unit.new( factor => $.factor, offset => $.offset, defn => '$.defn', type => $t-str,
+          dims => [{@.dims.join(',')}], dmix => {$.dmix.raku}, names => [{@.names.map( ->$n {"'$n'"}).join(',')}] );
+        END
   }
 
     method load( %config ) {

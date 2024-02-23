@@ -87,8 +87,9 @@ role Physics::Unit::Maths[::Unit] {
 
     method root-extract( Int $n where 1 <= * <= 4 ) {
         #only when all dims divisible by root
-        my $l = self.clone.clear;
-        die "Taking roots only works where *.factor == 1" unless $l.factor == 1;
+        my $l = self.clone;
+           $l.clear;
+        die 'Taking roots only works where factor == 1' unless $l.factor == 1;
 
         $l.dims = $l.dims.map({($_/$n).Int});
 

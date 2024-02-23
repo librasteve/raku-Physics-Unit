@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="names getter/setter">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="clear fn -&gt; role Maths">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" afterDir="false" />
     </list>
@@ -397,7 +398,14 @@
       <option name="project" value="LOCAL" />
       <updated>1708585903835</updated>
     </task>
-    <option name="localTasksCounter" value="44" />
+    <task id="LOCAL-00044" summary="clear fn -&gt; role Maths">
+      <created>1708586488877</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1708586488878</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -415,7 +423,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Load wip Unit::Derived ok" />
     <MESSAGE value="Load wip Unit::Type ok" />
     <MESSAGE value="Load wip Unit::Dims ok" />
     <MESSAGE value="Load wip Unit::Affix ok" />
@@ -440,14 +447,15 @@
     <MESSAGE value="review method type" />
     <MESSAGE value="method type ==&gt;" />
     <MESSAGE value="names getter/setter" />
-    <option name="LAST_COMMIT_MESSAGE" value="names getter/setter" />
+    <MESSAGE value="clear fn -&gt; role Maths" />
+    <option name="LAST_COMMIT_MESSAGE" value="clear fn -&gt; role Maths" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="perl6LineBreakpoint">
           <url>file://$PROJECT_DIR$/lib/Physics/Unit.rakumod</url>
-          <line>258</line>
+          <line>261</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>
