@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="clear fn -&gt; role Maths">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="drop given in twmd">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/spike6.raku" beforeDir="false" afterPath="$PROJECT_DIR$/bin/spike6.raku" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" afterDir="false" />
     </list>
@@ -405,7 +406,14 @@
       <option name="project" value="LOCAL" />
       <updated>1708586488878</updated>
     </task>
-    <option name="localTasksCounter" value="45" />
+    <task id="LOCAL-00045" summary="drop given in twmd">
+      <created>1708646777617</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1708646777617</updated>
+    </task>
+    <option name="localTasksCounter" value="46" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -423,7 +431,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Load wip Unit::Type ok" />
     <MESSAGE value="Load wip Unit::Dims ok" />
     <MESSAGE value="Load wip Unit::Affix ok" />
     <MESSAGE value="Load wip Unit ok" />
@@ -448,14 +455,15 @@
     <MESSAGE value="method type ==&gt;" />
     <MESSAGE value="names getter/setter" />
     <MESSAGE value="clear fn -&gt; role Maths" />
-    <option name="LAST_COMMIT_MESSAGE" value="clear fn -&gt; role Maths" />
+    <MESSAGE value="drop given in twmd" />
+    <option name="LAST_COMMIT_MESSAGE" value="drop given in twmd" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="perl6LineBreakpoint">
           <url>file://$PROJECT_DIR$/lib/Physics/Unit.rakumod</url>
-          <line>261</line>
+          <line>264</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

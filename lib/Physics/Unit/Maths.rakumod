@@ -14,15 +14,6 @@ role Physics::Unit::Maths[::Unit] {
     }
 
     ### Combining with another Unit ###
-
-    #| since we use cloned Units to avoid grammar
-    #| we need to clear to avoid bringing in baggage
-    method clear {
-        self.defn: Nil;
-        self.type: Nil;
-        self.names: [];
-    }
-
     multi submethod times( Unit $t ) {
         self.clear;
 

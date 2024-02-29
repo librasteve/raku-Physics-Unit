@@ -15,7 +15,7 @@ use Physics::Unit;
 
 
 my $u = GetUnit 'ohm';
-dd $u;
+say $u.raku;
 
 #say ListTypeNames;
 #say ListPrototypes;

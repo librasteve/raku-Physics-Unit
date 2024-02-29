@@ -38,10 +38,13 @@ my %pwr-superscript = (
 # todo
 # externailze all but Unit
 # appenders
+# more accessors -> submethods?
 # FIXME s
 
 class Unit { ... }
 class Dictionary { ... }
+
+
 
 class Unit does Physics::Unit::Maths[Unit] is export {
     has $.dictionary = Dictionary.instance;
@@ -72,71 +75,69 @@ class Unit does Physics::Unit::Maths[Unit] is export {
         #eg. on Prefix.load or explicitly to avoid ambiguous state
         return when $!type;
 
-        #2 check if symbol (if set) is a prototype
-        with $.symbol {
+        #2 check if name (if set) is a prototype
+        with $.name {
             for $.dictionary.type-to-protoname.kv -> $k, $v {
                 return $k when $v;
             }
         }
 
         #3 look up types with matching dims
-        #employ type-hints to select just 1
-        sub types-with-matching-dims($_) {
+        {
             when * == 0 { '' }
             when * == 1 { .first }
             when * >= 2 { .&type-hint }
-        }
-
-        gather {
-            for $.dictionary.type-to-dims.kv -> $key, $value {
-                take $key if $value eqv self.dims
+        }(
+            gather {
+                for $.dictionary.type-to-dims.kv -> $key, $value {
+                    take $key if $value eqv self.dims
+                }
             }
-        } ==> types-with-matching-dims;
+        )
 
     }
-    
-    multi method names(@n)  { 
-        @!names = @n
-    }
 
-    # FIXME meld these with accessors - iamerejh
-    ### behavioural methods ###
-    method SetNames( @new-names ) {
+    #iamerejh -> symbol?
+    method name             { @!names.first || '' }
+
+
+
+
+    ### new & clone methods ###
+
+    method load-names( @new-names ) {
+
+        #iamerejh refactor get-syns
         if @new-names.so {
-            #      if %syns-by-name{@new-names[0]} -> @syns {
-            if $!dictionary.get-syns(name => @new-names[0]) -> @syns {
+            if $.dictionary.get-syns(name => @new-names[0]) -> @syns {
                 #predefined Unit, assign synonyms
-                @.names: @syns;
+                @!names = @syns;
+
             } else {
                 #user defined Unit, assign names provided
-                @.names: @new-names;
+                @!names = @new-names;
             }
         } else {
             #lookup defn in the postfix synonyms
             for $.dictionary.postsyns-by-name.kv -> $k, $v {
-                if $v.grep($.defn) {
-                    @.names: @$v;
+                if $v.grep($!defn) {
+                    @!names = @$v;
                 }
             }
             #otherwise, just assign defn
-            @.names: [$.defn] unless @.names;
+            @!names = [$!defn] unless @!names;
         }
-        @.names.map( { $.dictionary.defn-by-name{$_} = self.defn } );
-        @.names.map( { $.dictionary.unit-by-name{$_} = self } );
 
-        say "SetNames: {@.names}" if $db;
+        @!names.map( { $.dictionary.defn-by-name{$_} = $!defn } );
+        @!names.map( { $.dictionary.unit-by-name{$_} =   self } );
+
+        say "load-names: {@!names}" if $db;
     }
-    
-    multi method names      { @!names }
-    
-    method symbol           { @!names.first }
 
-    ### new & clone methods ###
-
-    #new by named arguments
+    #new by partial named arguments
     multi method new( :$defn!, :@names ) {
         my $n = CreateUnit( $defn );
-        $n.SetNames: @names;
+        $n.load-names: @names;
         return $n
     }
 
@@ -147,14 +148,24 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     }
     multi method new( Unit:D $u: @names ) {
         my $n = $u.clone;
-        $n.SetNames: @names;
+        $n.load-names: @names;
         return $n
     }
+
+    #| role Maths uses cloned Units to avoid grammar
+    #| we need to clear all but dims and dmix
+    submethod clear {
+        $!defn = Nil;
+        $!type = Nil;
+        @!names = [];
+    }
+
+    ### behavioural methods ###
 
     #| Manually attach NewType when no preset type, eg. m-1
     #| FIXME - put in Type class (reverse args)
     method NewType( Str $type-name ) {
-        for @.names -> $name {
+        for @!names -> $name {
             $.dictionary.type-to-protoname{$type-name} = $name;
         }
         $.dictionary.type-to-prototype{$type-name} = self;
@@ -164,9 +175,6 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     ### output methods ###
     method Str  { self.name }
     method gist { self.Str }
-
-    multi method name()         { @!names[0] || '' }
-    multi method name( Str $n ) { self.SetNames([$n]) }
 
     method canonical {
         #reset to SI base names
@@ -196,10 +204,9 @@ class Unit does Physics::Unit::Maths[Unit] is export {
         return @dim-str.join('⋅')
     }
     method raku {
-        my $t-str = self.type;
         return qq:to/END/;
-          Unit.new( factor => $.factor, offset => $.offset, defn => '$.defn', type => $t-str,
-          dims => [{@.dims.join(',')}], dmix => {$.dmix.raku}, names => [{@.names.map( ->$n {"'$n'"}).join(',')}] );
+          Unit.new( factor => $!factor, offset => $!offset, defn => '$!defn', type => {$.type},
+          dims => [{@!dims.join(',')}], dmix => {$!dmix.raku}, names => [{@!names.map( ->$n {"'$n'"}).join(',')}] );
         END
   }
 
@@ -277,7 +284,7 @@ class Unit::Base {
             @synonyms.map({ $.dictionary.syns-by-name{$_} = |@synonyms });
 
             my $u = Unit.new;
-            $u.SetNames: @synonyms;
+            $u.load-names: @synonyms;
             $u.defn: $u.name;
 
             #dimension vector has zeros in all but one place
@@ -320,6 +327,7 @@ class Unit::Dims {
 }
 
 class Unit::Derived is Unit {
+
     method load( %config ) {
         my @a = |%config<Derived>;
 
@@ -337,17 +345,25 @@ class Unit::Derived is Unit {
 }
 
 class Unit::Prefix is Unit {
+
+    #| new for Unit::Prefix
+    #| skips Grammar, no dims, no dmix
+    multi method new( :$factor!, :$defn!, :@names!, :$type! where * ~~ 'prefix' ) {
+        callsame
+    }
+
     method load( %config ) {
         my @a = |%config<Prefix>;
 
         for @a -> %h {
-            my ( $code, $name ) = %h<names>;
+            my ($code, $name) = %h<names>;
 
-            my $u = Unit.new;
-            $u.factor:     %h<defn>;            # FIXME - go 'is built'  ?
-            $u.defn:       %h<defn>;
-            $u.names.push: $name;
-            $u.type:       'prefix';
+            my $u = Unit.new(
+                factor => %h<defn>,
+                defn   => %h<defn>,
+                names  => [$name],
+                type   => 'prefix',
+            );
 
             $.dictionary.prefix-by-name{$name} = $u;
             $.dictionary.prefix-by-code{$code} = $u;
@@ -624,7 +640,7 @@ sub naive-plural( $n ) {
 
 ######## Grammars ########
 
-sub CreateUnit( $defn is copy ) {       # FIXME make Unit class method
+sub CreateUnit( $defn is copy ) {       # FIXME make Unit::Definition.parse class method
 	#6.d faster regexes with Strings {<$str>} & slower with Arrays {<@arr>}
     my $dictionary := Dictionary.instance;
 
