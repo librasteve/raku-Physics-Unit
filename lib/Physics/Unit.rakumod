@@ -38,8 +38,7 @@ my %pwr-superscript = (
 # todo
 # externailze all but Unit
 # appenders
-# more accessors -> submethods?
-# better is-final (reset in clear() )
+# more accessors (private attrs)
 # FIXME s
 
 class Unit { ... }
@@ -48,7 +47,7 @@ class Dictionary { ... }
 class Unit does Physics::Unit::Maths[Unit] is export {
     has $.dictionary = Dictionary.instance;
 
-    has Bool    $.final is rw = False;
+    has Bool    $!final  = False;
     has Real    $!factor = 1;
     has Real    $!offset = 0;
     has Str()   $!defn   = '';
@@ -57,12 +56,14 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     has Int     @.dims = 0 xx NumBases;
     has MixHash $.dmix is rw = ∅.MixHash;
 
+    ### accessor methods ###
+
     method check-final {
+        #type and names are exempt
         die "You're not allowed to change a finalized Unit!" if $!final;
     }
     method finalize         { $!final = True }
 
-    ### accessor methods ###
     # i.e. use 'self.attr: 42' not 'self.attr = 42'
     multi method factor($f) { self.check-final; $!factor = $f }
     multi method factor     { $!factor }
@@ -73,7 +74,7 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     multi method defn($d)   { self.check-final; $!defn = $d }
     multi method defn       { $!defn }
 
-    multi method type($t)   { self.check-final; $!type = $t }
+    multi method type($t)   { $!type = $t }
     multi method type {
 
         #1 type has been set
@@ -102,29 +103,25 @@ class Unit does Physics::Unit::Maths[Unit] is export {
 
     }
 
-    method name             { @!names.first }
+    multi method names(@n)  {
 
-    ### new & clone methods ###
-
-    method load-names( @new-names ) {
-
-        if @new-names {         #iamerejh refactor get-syns
-            if $.dictionary.get-syns(name => @new-names[0]) -> @syns {
-                #predefined Unit, assign synonyms
+        if @n {
+            if $.dictionary.get-syns(name => @n.first) -> @syns {
+                #1 predefined Unit, assign synonyms
                 @!names = @syns;
 
             } else {
-                #user defined Unit, assign names provided
-                @!names = @new-names;
+                #2 user defined Unit, assign names provided
+                @!names = @n;
             }
         } else {
-            #lookup defn in the postfix synonyms
+            #3 lookup defn in the postfix synonyms (eg. 'mm')
             for $.dictionary.postsyns-by-name.kv -> $k, $v {
                 if $v.grep($!defn) {
-                    @!names = @$v;
+                    @!names = |$v;
                 }
             }
-            #otherwise, just assign defn
+            #4 otherwise, just assign defn
             @!names = [$!defn] unless @!names;
         }
 
@@ -133,33 +130,35 @@ class Unit does Physics::Unit::Maths[Unit] is export {
 
         say "load-names: {@!names}" if $db;
     }
+    multi method names      { @!names }
+
+    method name             { @!names.first }
+
+    ### new & clone methods ###
 
     #new by partial named arguments
     multi method new( :$defn!, :@names ) {
         my $n = CreateUnit( $defn );
-        $n.load-names: @names;
+        $n.names: @names;
         $n.finalize;
         return $n
     }
 
-    #new by deep cloning an existing Unit
+    #deep cloned Units (used by e.g. role Maths)
     method clone {
-        nextwith :names([]), :dims(@!dims.clone), :dmix($!dmix.clone), :final(False);
-
+        nextwith :names([]), :dims(@!dims.clone), :dmix($!dmix.clone);
+    }
+    method clear {
+        $!final = False;
+        $!defn  = Nil;
+        $!type  = Nil;
+        @!names = [];
     }
     multi method new( Unit:D $u: @names ) {
         my $n = $u.clone;
-        $n.load-names: @names;
+        $n.names: @names;
         $n.finalize;
         return $n
-    }
-
-    #| role Maths uses cloned Units to avoid grammar
-    #| we need to clear all but dims and dmix
-    submethod clear {
-        $!defn = Nil;
-        $!type = Nil;
-        @!names = [];
     }
 
     ### behavioural methods ###
@@ -210,7 +209,7 @@ class Unit does Physics::Unit::Maths[Unit] is export {
           Unit.new( factor => $!factor, offset => $!offset, defn => '$!defn', type => {$.type},
           dims => [{@!dims.join(',')}], dmix => {$!dmix.raku}, names => [{@!names.map( ->$n {"'$n'"}).join(',')}] );
         END
-  }
+    }
 
     method load( %config ) {
 
@@ -286,7 +285,7 @@ class Unit::Base {
             @synonyms.map({ $.dictionary.syns-by-name{$_} = |@synonyms });
 
             my $u = Unit.new;
-            $u.load-names: @synonyms;
+            $u.names: @synonyms;
             $u.defn: $u.name;
 
             #dimension vector has zeros in all but one place

@@ -14,9 +14,9 @@ use Physics::Unit;
 #]
 
 
-my $u = GetUnit 'ohm';
+my $u = GetUnit 'mm';
 say $u.raku;
-$u.factor: 23;
+
 
 
 

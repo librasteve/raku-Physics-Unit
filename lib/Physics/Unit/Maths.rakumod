@@ -97,7 +97,6 @@ role Physics::Unit::Maths[::Unit] {
 
     #| used to provide shortest name
     #| note the equal factor constraint
-    #| FIXME should be private (when subs are folded in)
     method same-dims( Unit $u ) {
         return 0 unless $u.dmix  eqv self.dmix;
         return 0 unless $u.factor == self.factor;
