@@ -39,6 +39,7 @@ my %pwr-superscript = (
 # externailze all but Unit
 # appenders
 # more accessors -> submethods?
+# better is-final (reset in clear() )
 # FIXME s
 
 class Unit { ... }
@@ -97,14 +98,14 @@ class Unit does Physics::Unit::Maths[Unit] is export {
 
     }
 
-    method name             { @!names.first // '' }
+    method name             { @!names.first }
 
     ### new & clone methods ###
 
     method load-names( @new-names ) {
 
         #iamerejh refactor get-syns
-        if @new-names.so {
+        if @new-names {
             if $.dictionary.get-syns(name => @new-names[0]) -> @syns {
                 #predefined Unit, assign synonyms
                 @!names = @syns;
@@ -566,35 +567,35 @@ sub GetPrototype( Str $type ) is export {     # FIXME make Unit class method (re
 	}
 }
 sub GetUnit( $u ) is export {     # FIXME make Unit class method (revert to $!dictionary)
-  my $dictionary := Dictionary.instance;
+    my $dictionary := Dictionary.instance;
 
-  #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
-  say "GU1 from $u" if $db;
-  if $u ~~ Unit {
-    return $u
-  }
-
-  #2 if name or prefix already instantiated
-  say "GU2 from $u" if $db;
-
-  return $dictionary.unit-by-name{$u} if $dictionary.unit-by-name{$u}.defined;
-  return $dictionary.get-prefix(:name($u)) if $dictionary.get-prefix(:name($u)).defined;
-
-  #3 if name in our defns, instantiate it
-  say "GU3 from $u" if $db;
-
-  for $dictionary.defn-by-name -> %p {
-    if %p.key.grep($u) {
-      my $nuo = Unit.new( defn => %p.value, names => [%p.key] );
-      return $nuo;
+    #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
+    say "GU1 from $u" if $db;
+    if $u ~~ Unit {
+        return $u
     }
-  }
 
-  #4 if no match, instantiate new Unit object from definition
-  say "GU4 from $u" if $db;
+    #2 if name or prefix already instantiated
+    say "GU2 from $u" if $db;
 
-  my $nuo = Unit.new( defn => $u );
-  return subst-shortest( $nuo ) // $nuo;
+    return $dictionary.unit-by-name{$u} if $dictionary.unit-by-name{$u}.defined;
+    return $dictionary.get-prefix(:name($u)) if $dictionary.get-prefix(:name($u)).defined;
+
+    #3 if name in our defns, instantiate it
+    say "GU3 from $u" if $db;
+
+    for $dictionary.defn-by-name -> %p {
+        if %p.key.grep($u) {
+            my $nuo = Unit.new( defn => %p.value, names => [%p.key] );
+            return $nuo;
+        }
+    }
+
+    #4 if no match, instantiate new Unit object from definition
+    say "GU4 from $u" if $db;
+
+    my $nuo = Unit.new( defn => $u );
+    return subst-shortest( $nuo ) // $nuo;
 }
 
 ######## Subroutines (Internal) ########
@@ -778,10 +779,11 @@ sub CreateUnit( $defn is copy ) {       # FIXME make Unit::Definition.parse clas
     my $match = UnitGrammar.parse( $defn, :actions(UnitActions) );
 
     if $match.so {
-        say "Made: $match\t= ", $match.made if $db;
-
         my $made-unit = $match.made;
         $made-unit.defn: $defn;
+
+        say "Made: $match => {$made-unit.raku}" if $db;   #names not yet loaded
+
         return $made-unit;
     } else {
         die "Couldn't parse defn Str $defn";

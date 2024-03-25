@@ -16,6 +16,7 @@ use Physics::Unit;
 
 my $u = GetUnit 'ohm';
 say $u.raku;
+$u.factor: 23;
 
 #say ListTypeNames;
 #say ListPrototypes;
@@ -37,6 +38,7 @@ say '==============';
 
 # Define your own Unit named "ff"
 my $ff = Unit.new( defn => 'furlong / fortnight', names => ['ff'] );
+say '==============';
 dd $ff;
 say "$ff";				# 'ff' ... string context gives unit name
 say $ff.type;			# 'Speed' inferred from defn
