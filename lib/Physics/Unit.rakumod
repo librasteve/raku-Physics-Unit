@@ -45,11 +45,10 @@ my %pwr-superscript = (
 class Unit { ... }
 class Dictionary { ... }
 
-
-
 class Unit does Physics::Unit::Maths[Unit] is export {
     has $.dictionary = Dictionary.instance;
 
+    has Bool    $.final is rw = False;
     has Real    $!factor = 1;
     has Real    $!offset = 0;
     has Str()   $!defn   = '';
@@ -58,18 +57,23 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     has Int     @.dims = 0 xx NumBases;
     has MixHash $.dmix is rw = ∅.MixHash;
 
+    method check-final {
+        die "You're not allowed to change a finalized Unit!" if $!final;
+    }
+    method finalize         { $!final = True }
+
     ### accessor methods ###
     # i.e. use 'self.attr: 42' not 'self.attr = 42'
-    multi method factor($f) { $!factor = $f }
+    multi method factor($f) { self.check-final; $!factor = $f }
     multi method factor     { $!factor }
 
-    multi method offset($o) { $!offset = $o }
+    multi method offset($o) { self.check-final; $!offset = $o }
     multi method offset     { $!offset }
 
-    multi method defn($d)   { $!defn = $d }
+    multi method defn($d)   { self.check-final; $!defn = $d }
     multi method defn       { $!defn }
 
-    multi method type($t)   { $!type = $t }
+    multi method type($t)   { self.check-final; $!type = $t }
     multi method type {
 
         #1 type has been set
@@ -104,8 +108,7 @@ class Unit does Physics::Unit::Maths[Unit] is export {
 
     method load-names( @new-names ) {
 
-        #iamerejh refactor get-syns
-        if @new-names {
+        if @new-names {         #iamerejh refactor get-syns
             if $.dictionary.get-syns(name => @new-names[0]) -> @syns {
                 #predefined Unit, assign synonyms
                 @!names = @syns;
@@ -135,17 +138,19 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     multi method new( :$defn!, :@names ) {
         my $n = CreateUnit( $defn );
         $n.load-names: @names;
+        $n.finalize;
         return $n
     }
 
     #new by deep cloning an existing Unit
     method clone {
-        nextwith :names([]), :dims(@!dims.clone), :dmix($!dmix.clone);
+        nextwith :names([]), :dims(@!dims.clone), :dmix($!dmix.clone), :final(False);
 
     }
     multi method new( Unit:D $u: @names ) {
         my $n = $u.clone;
         $n.load-names: @names;
+        $n.finalize;
         return $n
     }
 
