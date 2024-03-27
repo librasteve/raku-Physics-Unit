@@ -32,7 +32,7 @@ class Unit does Maths[Unit] does Parser[Unit] {
 
     constant \NumBases = 8;
 
-    has Bool    $.final  = False;
+    has Bool    $!final  = False;
     has Real    $!factor = 1;
     has Real    $!offset = 0;
     has Str()   $!defn   = '';
@@ -45,7 +45,7 @@ class Unit does Maths[Unit] does Parser[Unit] {
 
     method check-final {
         #type and names are exempt and may be manually set at any time
-        die "You're not allowed to change a finalized Unit!" if $.final;
+        die "You're not allowed to change a finalized Unit!" if $!final;
     }
     method finalize         { $!final = True }
 
@@ -281,7 +281,7 @@ class Unit does Maths[Unit] does Parser[Unit] {
         return subst-shortest(Unit.new( defn => $u ));
     }
 
-
+    #iamerejh
     method get-prototype( $t ) {
         GetPrototype( $t );
     }

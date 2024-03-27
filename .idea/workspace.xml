@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="GetUnit =&gt; Unit.find">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="encapsulate subst-shortest">
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -96,13 +95,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00005" summary="wip yaml types &amp; dims">
-      <created>1707521691540</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1707521691540</updated>
     </task>
     <task id="LOCAL-00006" summary="ok yaml en_SI">
       <created>1707553672314</created>
@@ -440,7 +432,14 @@
       <option name="project" value="LOCAL" />
       <updated>1711550281160</updated>
     </task>
-    <option name="localTasksCounter" value="54" />
+    <task id="LOCAL-00054" summary="encapsulate subst-shortest">
+      <created>1711551458018</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1711551458018</updated>
+    </task>
+    <option name="localTasksCounter" value="55" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -458,7 +457,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Add Comma config" />
     <MESSAGE value="Reorder load" />
     <MESSAGE value="Rename Affix =&gt; Postfix" />
     <MESSAGE value="Maths -&gt; role ok" />
@@ -483,7 +481,8 @@
     <MESSAGE value="role Parser ok" />
     <MESSAGE value="rm non preload" />
     <MESSAGE value="GetUnit =&gt; Unit.find" />
-    <option name="LAST_COMMIT_MESSAGE" value="GetUnit =&gt; Unit.find" />
+    <MESSAGE value="encapsulate subst-shortest" />
+    <option name="LAST_COMMIT_MESSAGE" value="encapsulate subst-shortest" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
