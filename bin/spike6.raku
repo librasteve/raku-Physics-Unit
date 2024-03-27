@@ -23,7 +23,7 @@ say $u.raku;
 #say ListTypeNames;
 #say ListPrototypes;
 
-die;
+exit;
 
 #dd GetAffixByName;
 #dd GetPrototype('Torque');

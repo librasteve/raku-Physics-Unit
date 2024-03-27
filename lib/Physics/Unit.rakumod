@@ -2,6 +2,7 @@ unit module Physics::Unit:ver<1.1.26>:auth<Steve Roe (librasteve@furnival.net)>;
 
 use Data::Dump::Tree;
 use Physics::Unit::Maths;
+use Physics::Unit::Parser;
 
 our $db = 0;       #debug
 
@@ -41,16 +42,26 @@ my %pwr-superscript = (
 # more accessors (private attrs)
 # FIXME s
 
-class Unit { ... }
-class Dictionary { ... }
+class Unit {...}
+class Dictionary {...}
 
-class Unit does Physics::Unit::Maths[Unit] is export {
+#class Defn {
+#    has Str()    $.string is rw = '';
+#
+#
+#}
+
+#subset Names of Array where *.all ~~ Str;
+
+class Unit does Maths[Unit] does Parser[Unit] {
     has $.dictionary = Dictionary.instance;
 
-    has Bool    $!final  = False;
+    has Bool    $.final  = False;
     has Real    $!factor = 1;
     has Real    $!offset = 0;
+#    has Defn    $!defn  .= new;
     has Str()   $!defn   = '';
+
     has Str     $!type;
     has Str     @!names  = [];
     has Int     @.dims = 0 xx NumBases;
@@ -59,8 +70,8 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     ### accessor methods ###
 
     method check-final {
-        #type and names are exempt
-        die "You're not allowed to change a finalized Unit!" if $!final;
+        #type and names are exempt and may be manually set at any time
+        die "You're not allowed to change a finalized Unit!" if $.final;
     }
     method finalize         { $!final = True }
 
@@ -73,6 +84,9 @@ class Unit does Physics::Unit::Maths[Unit] is export {
 
     multi method defn($d)   { self.check-final; $!defn = $d }
     multi method defn       { $!defn }
+
+#    multi method defn($d)   { self.check-final; $!defn.string = $d }
+#    multi method defn       { $!defn.string }
 
     multi method type($t)   { $!type = $t }
     multi method type {
@@ -117,15 +131,15 @@ class Unit does Physics::Unit::Maths[Unit] is export {
         } else {
             #3 lookup defn in the postfix synonyms (eg. 'mm')
             for $.dictionary.postsyns-by-name.kv -> $k, $v {
-                if $v.grep($!defn) {
+                if $v.grep($.defn) {
                     @!names = |$v;
                 }
             }
             #4 otherwise, just assign defn
-            @!names = [$!defn] unless @!names;
+            @!names = [$.defn] unless @!names;
         }
 
-        @!names.map( { $.dictionary.defn-by-name{$_} = $!defn } );
+        @!names.map( { $.dictionary.defn-by-name{$_} = $.defn } );
         @!names.map( { $.dictionary.unit-by-name{$_} =   self } );
 
         say "load-names: {@!names}" if $db;
@@ -136,9 +150,10 @@ class Unit does Physics::Unit::Maths[Unit] is export {
 
     ### new & clone methods ###
 
-    #new by partial named arguments
+    #new by parsing definition
     multi method new( :$defn!, :@names ) {
-        my $n = CreateUnit( $defn );
+#        my $n = CreateUnit( $defn );
+        my $n = self.parse( $defn, $locale, Dictionary.instance );
         $n.names: @names;
         $n.finalize;
         return $n
@@ -150,7 +165,7 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     }
     method clear {
         $!final = False;
-        $!defn  = Nil;
+        $.defn:   Nil;
         $!type  = Nil;
         @!names = [];
     }
@@ -206,7 +221,7 @@ class Unit does Physics::Unit::Maths[Unit] is export {
     }
     method raku {
         return qq:to/END/;
-          Unit.new( factor => $!factor, offset => $!offset, defn => '$!defn', type => {$.type},
+          Unit.new( factor => $!factor, offset => $!offset, defn => '$.defn', type => {$.type},
           dims => [{@!dims.join(',')}], dmix => {$!dmix.raku}, names => [{@!names.map( ->$n {"'$n'"}).join(',')}] );
         END
     }
@@ -262,6 +277,10 @@ class Unit does Physics::Unit::Maths[Unit] is export {
 
     method get-unit( $d ) {
         GetUnit( $d );
+    }
+
+    method get-unit-func {
+        &GetUnit;
     }
 }
 
@@ -636,161 +655,6 @@ sub naive-plural( $n ) {
         || $n ~~ /<[\d\/^*]>/             #...contains a digit or a symbol
     {
         return $n ~ 's';
-    }
-}
-
-######## Grammars ########
-
-sub CreateUnit( $defn is copy ) {       # FIXME make Unit::Definition.parse class method
-	#6.d faster regexes with Strings {<$str>} & slower with Arrays {<@arr>}
-    my $dictionary := Dictionary.instance;
-
-    $defn .= trim;
-    $defn .= subst('%LOCALE%', $locale);
-
-	#| preprocess postfix units to extended defn - eg. cm to centimetre
-	$defn = $dictionary.postfix-by-name{$defn} // $defn;
-
-    #| rm compound names from element unit-name match candidates (to force regen of dmix)
-    my $unit-names       = $dictionary.defn-by-name.keys.grep({! /<[\s*^./]>/}).join('|');
-
-    my $prefix-names     = $dictionary.all-prefixes;
-
-    my $pwr-prewords     = %pwr-preword.keys.join('|');
-    my $pwr-postwords    = %pwr-postword.keys.join('|');
-    my $pwr-superscripts = %pwr-superscript.keys.join('|');
-
-    #escape quote non alphanum| charactersi...
-    $unit-names       ~~ s:g/ ( <-[a..z A..Z 0..9 \|]> ) / '$0' /;
-    $pwr-superscripts ~~ s:g/ ( <-[a..z A..Z 0..9 \|]> ) / '$0' /;
-
-#    use Grammar::Tracer;
-    grammar UnitGrammar {
-        token TOP         { ^  \s* <numerator=.compound>
-        [\s* <divider> \s* <denominator=.compound>]?
-        [\s* '+' \s* <offset>  ]? \s* $	             }  #offset '+' hardwired
-        token divider     { '/' || 'per' }
-        token compound    { <element>+ % <sep> }
-        token sep         { [ '*' || '.' || ' *' || ' .' || ' ' || '⋅' ] }
-        token element     { <factor> || <pnp-before> || <pnp-after> }
-
-        token factor      { <number> }
-        token offset      { <number> }
-        token number      { \S+ <?{ defined +"$/" }> } #get chars, assert coerce to Real via +
-
-        token pnp-before  { <pwr-before>  \s+? <prefix-name> } #pnp==prefix-name-power
-        token pnp-after   { <prefix-name> \s*? <pwr-after>?  }
-
-        token prefix-name { <prefix>? \s*? <name> }
-        token prefix      { <$prefix-names> }
-        token name        { <$unit-names>   }
-
-        token pwr-before  { <$pwr-prewords> }
-        token pwr-after   { <pwr-postwd> || <pwr-supers> || <pwr-normal> }
-        token pwr-postwd  { <$pwr-postwords>    }
-        token pwr-supers  { <$pwr-superscripts> }
-
-        token pwr-normal  { <pwr-symbol>? \s*? <pwr-digits> }
-        token pwr-symbol  { '**' || '^' }
-        token pwr-digits  { <[-+]>? <[1..4]> }
-    }
-
-    class UnitActions   {
-        ##say "in xxx...", $/.made;  #<== handy debug line, paste just after make
-
-        #| assemble result with math operations from numerator and denominator (&offset)
-        method TOP($/)			{
-            my $nu = $<numerator>.made;
-            my $de = $<denominator>.made;
-            my $os = $<offset>.made;
-            $nu.share($de) if $de;
-            $nu.offset: +$os if $os;
-            make $nu;
-        }
-
-        #| accumulates element Units using times
-        method compound($/)		{
-            my $acc = Unit.new;
-            for $<element>>>.made -> $x {
-                $acc.times($x);
-            }
-            make $acc;
-        }
-
-        #| makes a list of element units (either factor or prefix-name-power)
-        method element($/)		{
-            my ( $unit, $defn, $pwr );
-
-            if $unit = $<factor>.made {
-                make $unit;
-            } else {
-                $unit = $<pnp-before><prefix-name>.made<unit> ||
-                    $<pnp-after><prefix-name>.made<unit>;
-                $defn = $<pnp-before><prefix-name>.made<defn> ||
-                    $<pnp-after><prefix-name>.made<defn>;
-                $pwr  = $<pnp-before><pwr-before>.made ||
-                    $<pnp-after>.made || 1;
-                make $unit.raise($pwr, $defn);
-            }
-        }
-
-        #| handle factor and offset matches
-        method factor($/)		{
-            make Unit.new.times($/.Real);
-        }
-        method offset($/) {
-            make $<number>;
-        }
-
-        #| make both unit and defn from prefix-name matches
-        method prefix-name($/) {
-            my $unit = $<name>.made<unit>;
-            my $defn = $<name>.made<defn>;
-            my $pfix = $<prefix>.made<unit>;
-            $unit.times($pfix) if $pfix;
-            make %( defn => $defn, unit => $unit );
-        }
-        method prefix($/)	{
-            make %( unit => GetUnit($/.Str).clone );
-        }
-        method name($/) {
-            my $defn=$/.Str;
-            my $unit=GetUnit($defn).clone;
-            $unit.dmix=∅.MixHash;
-            make %( defn => $defn, unit => $unit );
-        }
-
-        #| extract (signed) power digits from various grammar options
-        method pwr-before($/)	{
-            make %pwr-preword{$/.Str};
-        }
-        method pnp-after($/)	{
-            make $<pwr-after><pwr-postwd>.made ||
-                $<pwr-after><pwr-supers>.made ||
-                $<pwr-after><pwr-normal>.made;
-        }
-        method pwr-postwd($/)	{
-            make %pwr-postword{$/.Str}.Int;
-        }
-        method pwr-supers($/)	{
-            make %pwr-superscript{$/.Str}.Int;
-        }
-        method pwr-normal($/)	{
-            make $<pwr-digits>.Int;
-        }
-    }
-
-    my $match = UnitGrammar.parse( $defn, :actions(UnitActions) );
-
-    if $match.so {
-        my $made-unit = $match.made;
-        $made-unit.defn: $defn;
-
-        say "Made: $match => {$made-unit.raku}" if $db;   #names not yet loaded
-
-        return $made-unit;
-    } else {
-        die "Couldn't parse defn Str $defn";
     }
 }
 

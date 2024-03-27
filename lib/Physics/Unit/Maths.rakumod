@@ -1,6 +1,6 @@
-#| Mathematical Methods for class Unit
+#| Mathematical Methods for Units
 
-role Physics::Unit::Maths[::Unit] {
+role Maths[::Unit] {
 
     ### Scaling by Real factor ###
     multi submethod times( Real $t ) {

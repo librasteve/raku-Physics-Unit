@@ -1,4 +1,3 @@
- use Data::Dump::Tree;
 use YAMLish;
 
 grammar Schema::Core::NoBools is Schema::Core {
