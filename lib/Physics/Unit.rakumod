@@ -1,11 +1,11 @@
-unit module Physics::Unit:ver<1.1.26>:auth<Steve Roe (librasteve@furnival.net)>; #viz. https://en.wikipedia.org/wiki/International_System_of_Units
+unit module Physics::Unit:ver<1.1.26>:auth<Steve Roe (librasteve@furnival.net)>;
+#viz. https://en.wikipedia.org/wiki/International_System_of_Units
 
-use Data::Dump::Tree;
+use Physics::Unit::Config;
 use Physics::Unit::Maths;
 use Physics::Unit::Parser;
 
-our $db = 0;       #debug
-
+# FIXME TYPE HINTS TO TYPE CLASS METHOD
 #some units have the same dimensions but are different types - type hints steer type inference
 our %type-hints = %(
     Area           => <Area FuelConsumption>,
@@ -15,53 +15,27 @@ our %type-hints = %(
     SpecificEnergy => <SpecificEnergy Dose>,
 );
 
-##### Constants and Data Maps ######
-
-my $locale = 'imp';        # locale for 'us' or 'imp' gallons, pints, mpg etc.
-$locale = ($_ ~~ /en_US/) ?? 'us' !! 'imp'   with %*ENV<LANG>;
-$locale = ($_ ~~ /en_US/) ?? 'us' !! $locale with %*ENV<RAKULANG>; 
-
-constant \preload = 0;		#Preload All Units ie. for debug (precomp load 1.6s otherwise ~60s)
-constant \NumBases = 8;
-
-#Power synonyms
-my %pwr-preword   = ( square  => 2, sq => 2, cubic => 3, cu => 3 );
-my %pwr-postword  = ( squared => 2, cubed => 3, );
-
-#Power superscripts eg. x¹ x² x³ x⁴ x⁻¹ x⁻² x⁻³ x⁻⁴
-my %pwr-superscript = (
-     '¹' =>  1,  '²' =>  2,  '³' =>  3,  '⁴' =>  4,
-    '⁻¹' => -1, '⁻²' => -2, '⁻³' => -3, '⁻⁴' => -4,
-);
-
 #-------------------------- NEW SHIT
 
 # todo
 # externailze all but Unit
 # appenders
-# more accessors (private attrs)
+# more accessors (private attrs for dims and dmix
 # FIXME s
 
 class Unit {...}
 class Dictionary {...}
 
-#class Defn {
-#    has Str()    $.string is rw = '';
-#
-#
-#}
-
-#subset Names of Array where *.all ~~ Str;
-
 class Unit does Maths[Unit] does Parser[Unit] {
+    has $!cg = Config.new;
     has $.dictionary = Dictionary.instance;
+
+    constant \NumBases = 8;
 
     has Bool    $.final  = False;
     has Real    $!factor = 1;
     has Real    $!offset = 0;
-#    has Defn    $!defn  .= new;
     has Str()   $!defn   = '';
-
     has Str     $!type;
     has Str     @!names  = [];
     has Int     @.dims = 0 xx NumBases;
@@ -84,9 +58,6 @@ class Unit does Maths[Unit] does Parser[Unit] {
 
     multi method defn($d)   { self.check-final; $!defn = $d }
     multi method defn       { $!defn }
-
-#    multi method defn($d)   { self.check-final; $!defn.string = $d }
-#    multi method defn       { $!defn.string }
 
     multi method type($t)   { $!type = $t }
     multi method type {
@@ -142,7 +113,7 @@ class Unit does Maths[Unit] does Parser[Unit] {
         @!names.map( { $.dictionary.defn-by-name{$_} = $.defn } );
         @!names.map( { $.dictionary.unit-by-name{$_} =   self } );
 
-        say "load-names: {@!names}" if $db;
+        say "load-names: {@!names}" if $!cg.db;
     }
     multi method names      { @!names }
 
@@ -153,7 +124,7 @@ class Unit does Maths[Unit] does Parser[Unit] {
     #new by parsing definition
     multi method new( :$defn!, :@names ) {
 #        my $n = CreateUnit( $defn );
-        my $n = self.parse( $defn, $locale, Dictionary.instance );
+        my $n = self.parse( $defn, Dictionary.instance );
         $n.names: @names;
         $n.finalize;
         return $n
@@ -207,7 +178,7 @@ class Unit does Maths[Unit] does Parser[Unit] {
     }
     method pretty {
         #following SI recommendation
-        my %pwr-sup-rev = %pwr-superscript.kv.reverse;
+        my %pwr-sup-rev = $!cg.pwr-superscript.kv.reverse;
         my ( $ds, @dim-str );
         for 0 ..^ NumBases -> $i {
             given @.dims[$i] {
@@ -239,35 +210,24 @@ class Unit does Maths[Unit] does Parser[Unit] {
         #	   |
         #	   > canonical name
 
-        if not preload {
-            #load data map hashes only - instantiate Unit objects on demand
+        #| iterate over each unit line
+        for @a -> %h {
+            my ($defn, $names) = %h<defn>, %h<names>;
 
-            #| iterate over each unit line
-            for @a -> %h {
-                my ($defn, $names) = %h<defn>, %h<names>;
+            my @synonyms = |$names;
 
-                my @synonyms = |$names;
-
-                #| for each name (ie. synonym)
-                for |$names -> $singular {
-                    if naive-plural($singular) -> $plural {
-                        @synonyms.push: $plural;
-                    }
-                }
-                for @synonyms -> $name {
-                    $.dictionary.defn-by-name{$name} = $defn;
-                    $.dictionary.syns-by-name{$name} = @synonyms;
+            #| for each name (ie. synonym)
+            for |$names -> $singular {
+                if naive-plural($singular) -> $plural {
+                    @synonyms.push: $plural;
                 }
             }
-        } else {
-            #instantiate all Units right away (slow)   #FIXME - wrong anyway
-
-            for @a -> %h {
-                my ($defn, $names) = %h<defn>, %h<names>;
-
-                Unit.new(defn => $defn, names => [|$names]);
+            for @synonyms -> $name {
+                $.dictionary.defn-by-name{$name} = $defn;
+                $.dictionary.syns-by-name{$name} = @synonyms;
             }
         }
+
     }
 
     #iamerejh
@@ -285,6 +245,7 @@ class Unit does Maths[Unit] does Parser[Unit] {
 }
 
 class Unit::Base {
+    has $!cg = Config.new;
     has $.dictionary = Dictionary.instance;
 
     method load( @a ) {
@@ -321,7 +282,7 @@ class Unit::Base {
             $.dictionary.postsyns-by-name{$u.name} = @synonyms;       #all synonyms as value
 
             $.dictionary.postfix-by-name;
-            say "Initialized Base $names[0]" if $db;
+            say "Initialized Base $names[0]" if $!cg.db;
         }
     }
 }
@@ -365,6 +326,7 @@ class Unit::Derived is Unit {
 }
 
 class Unit::Prefix is Unit {
+    has $!cg = Config.new;
 
     #| new for Unit::Prefix
     #| skips Grammar, no dims, no dmix
@@ -389,7 +351,7 @@ class Unit::Prefix is Unit {
             $.dictionary.prefix-by-code{$code} = $u;
             $.dictionary.prefix-to-factor{$name} = %h<defn>;
 
-            say "Initialized Prefix $name" if $db;
+            say "Initialized Prefix $name" if $!cg.db;
         }
     }
 }
@@ -446,6 +408,8 @@ class Unit::Postfix {
 }
 
 class Dictionary {
+    has $!cg = Config.new;
+
     ### Singleton Behaviour ###
     my Dictionary $instance;
 
@@ -498,7 +462,7 @@ class Dictionary {
         # load dictionary for non-core units
         Unit.new.load:          $load.config<units>;
 
-        if $db {
+        if $!cg.db {
             say "+++++++++++++++++++";
             say "INITIALIZATION DONE";
             say "+++++++++++++++++++";
@@ -590,6 +554,7 @@ sub GetPrototype( Str $type ) is export {     # FIXME make Unit class method (re
 	}
 }
 sub GetUnit( $u ) is export {     # FIXME make Unit class method (revert to $!dictionary)
+    my $db = 0;   # FIXME unify
     my $dictionary := Dictionary.instance;
 
     #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
