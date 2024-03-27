@@ -36,14 +36,15 @@ class Unit does Maths[Unit] does Parser[Unit] {
     has Real    $!factor = 1;
     has Real    $!offset = 0;
     has Str()   $!defn   = '';
-    has Str     $!type;
-    has Str     @!names  = [];
+#    has Int     @!dims = 0 xx NumBases;
     has Int     @.dims = 0 xx NumBases;
     has MixHash $.dmix is rw = ∅.MixHash;
+    has Str     $!type;
+    has Str     @!names  = [];
 
     ### accessor methods ###
 
-    method check-final {
+    method check-final      {
         #type and names are exempt and may be manually set at any time
         die "You're not allowed to change a finalized Unit!" if $!final;
     }
@@ -56,11 +57,14 @@ class Unit does Maths[Unit] does Parser[Unit] {
     multi method offset($o) { self.check-final; $!offset = $o }
     multi method offset     { $!offset }
 
-    multi method defn($d)   { self.check-final; $!defn = $d }
+#    multi method dims(@d)   { say self.check-final; @!dims = @d }
+#    multi method dims       { @!dims }
+
+    multi method defn($d)  { self.check-final; $!defn = $d }
     multi method defn       { $!defn }
 
     multi method type($t)   { $!type = $t }
-    multi method type {
+    multi method type       {
 
         #1 type has been set
         #eg. on Prefix.load or explicitly to avoid ambiguous state
@@ -136,7 +140,7 @@ class Unit does Maths[Unit] does Parser[Unit] {
     }
     method clear {
         $!final = False;
-        $.defn:   Nil;
+        $!defn  = Nil;
         $!type  = Nil;
         @!names = [];
     }
@@ -592,7 +596,7 @@ sub GetPrototype( Str $type ) is export {     # FIXME make Unit class method (re
 		return $pt;
 	} else {
 		for $dictionary.type-to-protoname -> %p {
-			return GetUnit(%p.value) if %p.key eq $type;
+			return Unit.find(%p.value) if %p.key eq $type;
 		}
 	}
 }

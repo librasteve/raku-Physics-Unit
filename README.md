@@ -5,14 +5,14 @@
 # Version 2
 
 ## Issues / Opportunities
-- GetUnit revert to Unit.new
+- Unit.find revert to Unit.new
 - Measure Types to be parameterized? and international? - yep (breaks Nav)
 - Measure[]
 - consider 20 but <km> [again]
 - Physics::Unit::Unit => Physics::Unit
 - slangify
 - synthetic units Type = u.WHICH  (valid identifier)  ??
-  - my $u = GetUnit <ohm>; say $u.WHICH;   #Physics::Unit::Unit|4267563835920   #PU4267563835920
+  - my $u = Unit.find <ohm>; say $u.WHICH;   #Physics::Unit::Unit|4267563835920   #PU4267563835920
 - https://raku.land/zef:lizmat/ObjectCache ??
 - rework us vs imp
 
@@ -210,9 +210,9 @@ my $fh = $ff.new( <fh fi> );
 my $gonzo = Unit.new( defn => "13 square millimeters per ff", names => ['gonzo'] );
 
 # Parsing of input  
-my $u1 = GetUnit( 'J' );
-my $u2 = GetUnit( 'kg m^2 / s^2' );
-my $u3 = GetUnit( 'kg m^2/s^2' );  
+my $u1 = Unit.find( 'J' );
+my $u2 = Unit.find( 'kg m^2 / s^2' );
+my $u3 = Unit.find( 'kg m^2/s^2' );  
 say ~$u3;                                             # 'J'
 say "compare $u1, $u2... " ~ $u2.same-dims($u1);      # 1 (ie. same)
 

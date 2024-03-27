@@ -4,8 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="encapsulate subst-shortest">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="encapsulate .final">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/spike6.raku" beforeDir="false" afterPath="$PROJECT_DIR$/bin/spike6.raku" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/synopsis-unit.raku" beforeDir="false" afterPath="$PROJECT_DIR$/bin/synopsis-unit.raku" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/t/02-dim.rakutest" beforeDir="false" afterPath="$PROJECT_DIR$/t/02-dim.rakutest" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,13 +100,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00006" summary="ok yaml en_SI">
-      <created>1707553672314</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1707553672314</updated>
     </task>
     <task id="LOCAL-00007" summary="wip Loader">
       <created>1707575802007</created>
@@ -439,7 +437,14 @@
       <option name="project" value="LOCAL" />
       <updated>1711551458018</updated>
     </task>
-    <option name="localTasksCounter" value="55" />
+    <task id="LOCAL-00055" summary="encapsulate .final">
+      <created>1711551676189</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1711551676189</updated>
+    </task>
+    <option name="localTasksCounter" value="56" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -457,7 +462,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Reorder load" />
     <MESSAGE value="Rename Affix =&gt; Postfix" />
     <MESSAGE value="Maths -&gt; role ok" />
     <MESSAGE value="Clarify set type" />
@@ -482,7 +486,8 @@
     <MESSAGE value="rm non preload" />
     <MESSAGE value="GetUnit =&gt; Unit.find" />
     <MESSAGE value="encapsulate subst-shortest" />
-    <option name="LAST_COMMIT_MESSAGE" value="encapsulate subst-shortest" />
+    <MESSAGE value="encapsulate .final" />
+    <option name="LAST_COMMIT_MESSAGE" value="encapsulate .final" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

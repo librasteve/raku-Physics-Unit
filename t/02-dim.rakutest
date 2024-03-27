@@ -63,7 +63,7 @@ Illuminance
 >;
 
 for ^@d-u-n -> $i {
-	is GetUnit(@d-u-n[$i]).type, @unit-types[$i], "{@d-u-n[$i]} => {@unit-types[$i]}";
+	is Unit.find(@d-u-n[$i]).type, @unit-types[$i], "{@d-u-n[$i]} => {@unit-types[$i]}";
 }
 
 #done-testing
