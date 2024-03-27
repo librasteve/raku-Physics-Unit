@@ -14,16 +14,16 @@ use Physics::Unit;
 #]
 
 
-my $u = Unit.find: 'mm';
+my $u = Unit.find: 'henry';
 say $u.raku;
 
-
-
-
-#say ListTypeNames;
-#say ListPrototypes;
-
 exit;
+
+
+
+say ListTypeNames;
+say ListPrototypes;
+
 
 #dd GetAffixByName;
 #dd GetPrototype('Torque');

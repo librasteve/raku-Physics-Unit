@@ -20,7 +20,6 @@ our %type-hints = %(
 # todo
 # externailze all but Unit
 # appenders
-# more accessors (private attrs for dims and dmix
 # FIXME s
 
 class Unit {...}
@@ -36,7 +35,6 @@ class Unit does Maths[Unit] does Parser[Unit] {
     has Real    $!factor = 1;
     has Real    $!offset = 0;
     has Str()   $!defn   = '';
-#    has Int     @!dims = 0 xx NumBases;
     has Int     @.dims = 0 xx NumBases;
     has MixHash $.dmix is rw = ∅.MixHash;
     has Str     $!type;
@@ -56,9 +54,6 @@ class Unit does Maths[Unit] does Parser[Unit] {
 
     multi method offset($o) { self.check-final; $!offset = $o }
     multi method offset     { $!offset }
-
-#    multi method dims(@d)   { say self.check-final; @!dims = @d }
-#    multi method dims       { @!dims }
 
     multi method defn($d)  { self.check-final; $!defn = $d }
     multi method defn       { $!defn }
@@ -198,8 +193,8 @@ class Unit does Maths[Unit] does Parser[Unit] {
     }
 
     ### output methods ###
-    method Str  { self.name }
-    method gist { self.Str }
+    method Str       { self.name }
+    method gist      { self.Str }
     method canonical {
         #reset to SI base names
         my ( $ds, @dim-str );
@@ -213,7 +208,7 @@ class Unit does Maths[Unit] does Parser[Unit] {
         }
         return @dim-str.join('.')
     }
-    method pretty {
+    method pretty    {
         #following SI recommendation
         my %pwr-sup-rev = $cg.pwr-superscript.kv.reverse;
         my ( $ds, @dim-str );
@@ -227,7 +222,7 @@ class Unit does Maths[Unit] does Parser[Unit] {
         }
         return @dim-str.join('⋅')
     }
-    method raku {
+    method raku      {
         return qq:to/END/;
           Unit.new( factor => $!factor, offset => $!offset, defn => '$.defn', type => {$.type},
           dims => [{@!dims.join(',')}], dmix => {$!dmix.raku}, names => [{@!names.map( ->$n {"'$n'"}).join(',')}] );
@@ -334,7 +329,7 @@ class Unit::Base {
     }
 }
 
-class Unit::Type {
+class Unit::Types {
     has $.dictionary = Dictionary.instance;
 
     method load( @a ) {
@@ -488,7 +483,7 @@ class Dictionary {
     has %.postfix-by-name;      #name => extended postfix defn (eg. cm => 'centimetre') to decongest Grammar namespace
     has %.postsyns-by-name;     #name => list of synonyms for every postfix [n, nano] X~ [m, metre, meter, metres, meters]
 
-    submethod load {
+    method load {
         # FIXME - load general config & inject to loader
 
         require Physics::Unit::Definitions::en_SI;
@@ -496,7 +491,7 @@ class Dictionary {
 
         # core type info
         Unit::Base.new.load:    $load.config<base>;
-        Unit::Type.new.load:    $load.config<types>;
+        Unit::Types.new.load:    $load.config<types>;
         Unit::Dims.new.load:    $load.config<dims>;
         
         # unit children

@@ -62,6 +62,9 @@ Illuminance
 #CatalyticActivity
 >;
 
+#dd Unit.find(@d-u-n[12]).dims;
+#exit;
+
 for ^@d-u-n -> $i {
 	is Unit.find(@d-u-n[$i]).type, @unit-types[$i], "{@d-u-n[$i]} => {@unit-types[$i]}";
 }
