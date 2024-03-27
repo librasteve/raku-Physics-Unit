@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="rm non preload">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/spike6.raku" beforeDir="false" afterPath="$PROJECT_DIR$/bin/spike6.raku" afterDir="false" />
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="GetUnit =&gt; Unit.find">
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,13 +96,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00003" summary="wip yaml debool">
-      <created>1707518347945</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1707518347945</updated>
     </task>
     <task id="LOCAL-00004" summary="wip yaml types &amp; dims">
       <created>1707521227383</created>
@@ -441,7 +433,14 @@
       <option name="project" value="LOCAL" />
       <updated>1711541288691</updated>
     </task>
-    <option name="localTasksCounter" value="52" />
+    <task id="LOCAL-00052" summary="GetUnit =&gt; Unit.find">
+      <created>1711549793405</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1711549793406</updated>
+    </task>
+    <option name="localTasksCounter" value="53" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -459,7 +458,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Add Build.pm" />
     <MESSAGE value="Add Comma config" />
     <MESSAGE value="Reorder load" />
     <MESSAGE value="Rename Affix =&gt; Postfix" />
@@ -484,7 +482,8 @@
     <MESSAGE value="final type and names" />
     <MESSAGE value="role Parser ok" />
     <MESSAGE value="rm non preload" />
-    <option name="LAST_COMMIT_MESSAGE" value="rm non preload" />
+    <MESSAGE value="GetUnit =&gt; Unit.find" />
+    <option name="LAST_COMMIT_MESSAGE" value="GetUnit =&gt; Unit.find" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

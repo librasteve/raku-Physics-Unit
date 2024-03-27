@@ -37,7 +37,7 @@ role Maths[::Unit] {
     multi submethod share( Unit $d ) {
         self.clear;
 
-        my $u = self.get-unit($d).clone;
+        my $u = Unit.find($d).clone;
         self.times: $u.invert;
 
         self

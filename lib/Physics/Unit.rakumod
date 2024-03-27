@@ -233,7 +233,7 @@ class Unit does Maths[Unit] does Parser[Unit] {
     ### class methods ###
 
     multi method find( Unit:U: $u ) {
-        my $dictionary = Dictionary.instance;    # no instance / no attrs
+        my $dictionary = Dictionary.instance;    # no instance means no attrs
 
         #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
         say "GU1 from $u" if $cg.db;
@@ -262,14 +262,6 @@ class Unit does Maths[Unit] does Parser[Unit] {
 
         my $nuo = Unit.new( defn => $u );
         return subst-shortest( $nuo ) // $nuo;
-    }
-
-    method get-unit( $d ) {
-        GetUnit( $d );
-    }
-
-    method get-unit-func {
-        &GetUnit;
     }
 
 
@@ -587,38 +579,10 @@ sub GetPrototype( Str $type ) is export {     # FIXME make Unit class method (re
 		}
 	}
 }
-sub GetUnit( $u ) is export {     # FIXME make Unit class method (revert to $!dictionary)
-    Unit.find: $u;
-#    my $db = 0;   # FIXME unify
-#    my $dictionary := Dictionary.instance;
-#
-#    #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
-#    say "GU1 from $u" if $db;
-#    if $u ~~ Unit {
-#        return $u
-#    }
-#
-#    #2 if name or prefix already instantiated
-#    say "GU2 from $u" if $db;
-#
-#    return $dictionary.unit-by-name{$u} if $dictionary.unit-by-name{$u}.defined;
-#    return $dictionary.get-prefix(:name($u)) if $dictionary.get-prefix(:name($u)).defined;
-#
-#    #3 if name in our defns, instantiate it
-#    say "GU3 from $u" if $db;
-#
-#    for $dictionary.defn-by-name -> %p {
-#        if %p.key.grep($u) {
-#            my $nuo = Unit.new( defn => %p.value, names => [%p.key] );
-#            return $nuo;
-#        }
-#    }
-#
-#    #4 if no match, instantiate new Unit object from definition
-#    say "GU4 from $u" if $db;
-#
-#    my $nuo = Unit.new( defn => $u );
-#    return subst-shortest( $nuo ) // $nuo;
+
+#| DEPRECATED - rm with Measure ver 2
+sub GetUnit( $u ) is export {
+    Unit.find: $u
 }
 
 ######## Subroutines (Internal) ########
