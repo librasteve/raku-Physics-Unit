@@ -14,7 +14,7 @@ use Physics::Unit;
 #]
 
 
-my $u = GetUnit 'mm';
+my $u = Unit.find: 'mm';
 say $u.raku;
 
 

@@ -27,7 +27,7 @@ class Unit {...}
 class Dictionary {...}
 
 class Unit does Maths[Unit] does Parser[Unit] {
-    has $!cg = Config.new;
+    my $cg = Config.new;
     has $.dictionary = Dictionary.instance;
 
     constant \NumBases = 8;
@@ -113,7 +113,7 @@ class Unit does Maths[Unit] does Parser[Unit] {
         @!names.map( { $.dictionary.defn-by-name{$_} = $.defn } );
         @!names.map( { $.dictionary.unit-by-name{$_} =   self } );
 
-        say "load-names: {@!names}" if $!cg.db;
+        say "load-names: {@!names}" if $cg.db;
     }
     multi method names      { @!names }
 
@@ -147,56 +147,7 @@ class Unit does Maths[Unit] does Parser[Unit] {
         return $n
     }
 
-    ### behavioural methods ###
-
-    #| Manually attach NewType when no preset type, eg. m-1
-    #| FIXME - put in Type class (reverse args)
-    method NewType( Str $type-name ) {
-        for @!names -> $name {
-            $.dictionary.type-to-protoname{$type-name} = $name;
-        }
-        $.dictionary.type-to-prototype{$type-name} = self;
-        $.dictionary.type-to-dims{$type-name} = self.dims;
-    }
-
-    ### output methods ###
-    method Str  { self.name }
-    method gist { self.Str }
-
-    method canonical {
-        #reset to SI base names
-        my ( $ds, @dim-str );
-        for 0 ..^ NumBases -> $i {
-            given @.dims[$i] {
-                when 0  { $ds = '' }
-                when 1  { $ds = "{$.dictionary.basenames[$i]}" }
-                default { $ds = "{$.dictionary.basenames[$i]}$_" }
-            }
-            @dim-str.push: $ds if $ds;
-        }
-        return @dim-str.join('.')
-    }
-    method pretty {
-        #following SI recommendation
-        my %pwr-sup-rev = $!cg.pwr-superscript.kv.reverse;
-        my ( $ds, @dim-str );
-        for 0 ..^ NumBases -> $i {
-            given @.dims[$i] {
-                when 0  { $ds = '' }
-                when 1  { $ds = "{$.dictionary.basenames[$i]}" }
-                default { $ds = "{$.dictionary.basenames[$i]}%pwr-sup-rev{$_}" }
-            }
-            @dim-str.push: $ds if $ds;
-        }
-        return @dim-str.join('⋅')
-    }
-    method raku {
-        return qq:to/END/;
-          Unit.new( factor => $!factor, offset => $!offset, defn => '$.defn', type => {$.type},
-          dims => [{@!dims.join(',')}], dmix => {$!dmix.raku}, names => [{@!names.map( ->$n {"'$n'"}).join(',')}] );
-        END
-    }
-
+    #loader
     method load( %config ) {
 
         #| just ignore the outer keys FIXME autoload Measure classes
@@ -230,9 +181,87 @@ class Unit does Maths[Unit] does Parser[Unit] {
 
     }
 
-    #iamerejh
-    method get-prototype( $t ) {
-        GetPrototype( $t );
+    ### behavioural methods ###
+
+    #| Manually attach NewType when no preset type, eg. m-1
+    #| FIXME - put in Type class (reverse args)
+    method NewType( Str $type-name ) {
+        for @!names -> $name {
+            $.dictionary.type-to-protoname{$type-name} = $name;
+        }
+        $.dictionary.type-to-prototype{$type-name} = self;
+        $.dictionary.type-to-dims{$type-name} = self.dims;
+    }
+
+    ### output methods ###
+    method Str  { self.name }
+    method gist { self.Str }
+    method canonical {
+        #reset to SI base names
+        my ( $ds, @dim-str );
+        for 0 ..^ NumBases -> $i {
+            given @.dims[$i] {
+                when 0  { $ds = '' }
+                when 1  { $ds = "{$.dictionary.basenames[$i]}" }
+                default { $ds = "{$.dictionary.basenames[$i]}$_" }
+            }
+            @dim-str.push: $ds if $ds;
+        }
+        return @dim-str.join('.')
+    }
+    method pretty {
+        #following SI recommendation
+        my %pwr-sup-rev = $cg.pwr-superscript.kv.reverse;
+        my ( $ds, @dim-str );
+        for 0 ..^ NumBases -> $i {
+            given @.dims[$i] {
+                when 0  { $ds = '' }
+                when 1  { $ds = "{$.dictionary.basenames[$i]}" }
+                default { $ds = "{$.dictionary.basenames[$i]}%pwr-sup-rev{$_}" }
+            }
+            @dim-str.push: $ds if $ds;
+        }
+        return @dim-str.join('⋅')
+    }
+    method raku {
+        return qq:to/END/;
+          Unit.new( factor => $!factor, offset => $!offset, defn => '$.defn', type => {$.type},
+          dims => [{@!dims.join(',')}], dmix => {$!dmix.raku}, names => [{@!names.map( ->$n {"'$n'"}).join(',')}] );
+        END
+    }
+
+    ### class methods ###
+
+    multi method find( Unit:U: $u ) {
+        my $dictionary = Dictionary.instance;    # no instance / no attrs
+
+        #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
+        say "GU1 from $u" if $cg.db;
+        if $u ~~ Unit {
+            return $u
+        }
+
+        #2 if name or prefix already instantiated
+        say "GU2 from $u" if $cg.db;
+
+        return $dictionary.unit-by-name{$u} if $dictionary.unit-by-name{$u}.defined;
+        return $dictionary.get-prefix(:name($u)) if $dictionary.get-prefix(:name($u)).defined;
+
+        #3 if name in our defns, instantiate it
+        say "GU3 from $u" if $cg.db;
+
+        for $dictionary.defn-by-name -> %p {
+            if %p.key.grep($u) {
+                my $nuo = Unit.new( defn => %p.value, names => [%p.key] );
+                return $nuo;
+            }
+        }
+
+        #4 if no match, instantiate new Unit object from definition
+        say "GU4 from $u" if $cg.db;
+
+        my $nuo = Unit.new( defn => $u );
+        return subst-shortest( $nuo ) // $nuo;
     }
 
     method get-unit( $d ) {
@@ -242,10 +271,15 @@ class Unit does Maths[Unit] does Parser[Unit] {
     method get-unit-func {
         &GetUnit;
     }
+
+
+    method get-prototype( $t ) {
+        GetPrototype( $t );
+    }
 }
 
 class Unit::Base {
-    has $!cg = Config.new;
+    my $cg = Config.new;
     has $.dictionary = Dictionary.instance;
 
     method load( @a ) {
@@ -282,7 +316,7 @@ class Unit::Base {
             $.dictionary.postsyns-by-name{$u.name} = @synonyms;       #all synonyms as value
 
             $.dictionary.postfix-by-name;
-            say "Initialized Base $names[0]" if $!cg.db;
+            say "Initialized Base $names[0]" if $cg.db;
         }
     }
 }
@@ -326,7 +360,7 @@ class Unit::Derived is Unit {
 }
 
 class Unit::Prefix is Unit {
-    has $!cg = Config.new;
+    my $cg = Config.new;
 
     #| new for Unit::Prefix
     #| skips Grammar, no dims, no dmix
@@ -351,7 +385,7 @@ class Unit::Prefix is Unit {
             $.dictionary.prefix-by-code{$code} = $u;
             $.dictionary.prefix-to-factor{$name} = %h<defn>;
 
-            say "Initialized Prefix $name" if $!cg.db;
+            say "Initialized Prefix $name" if $cg.db;
         }
     }
 }
@@ -408,7 +442,7 @@ class Unit::Postfix {
 }
 
 class Dictionary {
-    has $!cg = Config.new;
+    my $cg = Config.new;
 
     ### Singleton Behaviour ###
     my Dictionary $instance;
@@ -462,7 +496,7 @@ class Dictionary {
         # load dictionary for non-core units
         Unit.new.load:          $load.config<units>;
 
-        if $!cg.db {
+        if $cg.db {
             say "+++++++++++++++++++";
             say "INITIALIZATION DONE";
             say "+++++++++++++++++++";
@@ -554,36 +588,37 @@ sub GetPrototype( Str $type ) is export {     # FIXME make Unit class method (re
 	}
 }
 sub GetUnit( $u ) is export {     # FIXME make Unit class method (revert to $!dictionary)
-    my $db = 0;   # FIXME unify
-    my $dictionary := Dictionary.instance;
-
-    #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
-    say "GU1 from $u" if $db;
-    if $u ~~ Unit {
-        return $u
-    }
-
-    #2 if name or prefix already instantiated
-    say "GU2 from $u" if $db;
-
-    return $dictionary.unit-by-name{$u} if $dictionary.unit-by-name{$u}.defined;
-    return $dictionary.get-prefix(:name($u)) if $dictionary.get-prefix(:name($u)).defined;
-
-    #3 if name in our defns, instantiate it
-    say "GU3 from $u" if $db;
-
-    for $dictionary.defn-by-name -> %p {
-        if %p.key.grep($u) {
-            my $nuo = Unit.new( defn => %p.value, names => [%p.key] );
-            return $nuo;
-        }
-    }
-
-    #4 if no match, instantiate new Unit object from definition
-    say "GU4 from $u" if $db;
-
-    my $nuo = Unit.new( defn => $u );
-    return subst-shortest( $nuo ) // $nuo;
+    Unit.find: $u;
+#    my $db = 0;   # FIXME unify
+#    my $dictionary := Dictionary.instance;
+#
+#    #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
+#    say "GU1 from $u" if $db;
+#    if $u ~~ Unit {
+#        return $u
+#    }
+#
+#    #2 if name or prefix already instantiated
+#    say "GU2 from $u" if $db;
+#
+#    return $dictionary.unit-by-name{$u} if $dictionary.unit-by-name{$u}.defined;
+#    return $dictionary.get-prefix(:name($u)) if $dictionary.get-prefix(:name($u)).defined;
+#
+#    #3 if name in our defns, instantiate it
+#    say "GU3 from $u" if $db;
+#
+#    for $dictionary.defn-by-name -> %p {
+#        if %p.key.grep($u) {
+#            my $nuo = Unit.new( defn => %p.value, names => [%p.key] );
+#            return $nuo;
+#        }
+#    }
+#
+#    #4 if no match, instantiate new Unit object from definition
+#    say "GU4 from $u" if $db;
+#
+#    my $nuo = Unit.new( defn => $u );
+#    return subst-shortest( $nuo ) // $nuo;
 }
 
 ######## Subroutines (Internal) ########
