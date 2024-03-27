@@ -232,36 +232,53 @@ class Unit does Maths[Unit] does Parser[Unit] {
 
     ### class methods ###
 
+    sub subst-shortest( Unit $u ) {
+        my $dictionary = Dictionary.instance;
+
+        # substitutes shortest name if >1 unit name has same dimensions
+        # ... so that eg. 'J' beats 'kg m^2 / s^2'
+        # ... requires eg. 'J' to be instantiated first
+
+        my @same-dims;
+        for $dictionary.unit-by-name.kv -> $k,$v {
+            @same-dims.push($k) if $v.same-dims($u)
+        }
+
+        if @same-dims {
+            my @sort-by-size = @same-dims.sort({$^a.chars cmp $^b.chars});
+            return $dictionary.unit-by-name{@sort-by-size[0]};  #shortest
+        } else {
+            return $u;
+        }
+    }
+
     multi method find( Unit:U: $u ) {
         my $dictionary = Dictionary.instance;    # no instance means no attrs
 
         #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
-        say "GU1 from $u" if $cg.db;
-        if $u ~~ Unit {
-            return $u
-        }
+        say "UF1 from $u" if $cg.db;
+
+        return $u if $u ~~ Unit;
 
         #2 if name or prefix already instantiated
-        say "GU2 from $u" if $cg.db;
+        say "UF2 from $u" if $cg.db;
 
-        return $dictionary.unit-by-name{$u} if $dictionary.unit-by-name{$u}.defined;
-        return $dictionary.get-prefix(:name($u)) if $dictionary.get-prefix(:name($u)).defined;
+        return $_ with $dictionary.unit-by-name{$u};
+        return $_ with $dictionary.get-prefix(:name($u));
 
         #3 if name in our defns, instantiate it
-        say "GU3 from $u" if $cg.db;
+        say "UF3 from $u" if $cg.db;
 
         for $dictionary.defn-by-name -> %p {
             if %p.key.grep($u) {
-                my $nuo = Unit.new( defn => %p.value, names => [%p.key] );
-                return $nuo;
+                return Unit.new( defn => %p.value, names => [%p.key] );
             }
         }
 
-        #4 if no match, instantiate new Unit object from definition
-        say "GU4 from $u" if $cg.db;
+        #4 if no match, instantiate new Unit as (shortest) object from definition
+        say "UF4 from $u" if $cg.db;
 
-        my $nuo = Unit.new( defn => $u );
-        return subst-shortest( $nuo ) // $nuo;
+        return subst-shortest(Unit.new( defn => $u ));
     }
 
 
@@ -585,24 +602,7 @@ sub GetUnit( $u ) is export {
     Unit.find: $u
 }
 
-######## Subroutines (Internal) ########
-
-sub subst-shortest( Unit $u ) {
-    my $dictionary = Dictionary.instance;
-
-    # substitutes shortest name if >1 unit name has same dimensions
-    # ... so that eg. 'J' beats 'kg m^2 / s^2'
-    # ... requires eg. 'J' to be instantiated first
-
-    my @same-dims;
-    for $dictionary.unit-by-name.kv -> $k,$v {
-        @same-dims.push($k) if $v.same-dims($u)
-    }
-    if @same-dims {
-        my @sort-by-size = @same-dims.sort({$^a.chars cmp $^b.chars});
-        return $dictionary.unit-by-name{@sort-by-size[0]}  #shortest
-    }
-}
+######## Subroutines (Internal) #######
 
 sub type-hint( @t ) {
 	#type hints help when multiple types are found
