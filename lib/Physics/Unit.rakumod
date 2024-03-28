@@ -292,7 +292,7 @@ class Unit {
     multi method basetype(Unit:U: Type $t ) {
         my $dx = Directory.instance;    # no instance means no attrs
 
-        $dx.types.basetype( $t, $dx );
+        $dx.types.basetype( $t );
     }
     multi method basetype(Unit:D:) {
         $.dx.types.basetype( $.type, $.dx );
@@ -493,15 +493,23 @@ class Directory {
         has %.to-basetype{Type} of Unit;
         has %.to-dims{Type} of Array[Int]();
 
-        method basetype(Type $type, $dx) {
-            if my $pt = $dx.types.to-basetype{$type} {
+        method basetype( Type $t ) {
+            if my $pt = %.to-basetype{$t} {
                 return $pt;
             } else {
-                for $dx.types.to-basename -> %p {
-                    return Unit.find(%p.value) if %p.key eq $type;
+                for %.to-basename -> %p {
+                    return Unit.find(%p.value) if %p.key eq $t;
                 }
             }
         }
+
+        method names( --> Array[Name]() ) {
+            %.to-basename.keys.sort
+        }
+    }
+
+    my class DX::Postfix {
+
     }
 
     ### Attributes ###
@@ -559,14 +567,6 @@ class Directory {
 
 
 #types
-
-
-sub ListTypeNames is export {       # FIXME make Unit class method (revert to $!dx)
-    my $dx := Directory.instance;
-
-    $dx.types.to-basename
-#    return sort keys $dx.types.to-basename;
-}
 
 sub ListPrototypes is export {       # FIXME make Unit class method (revert to $!dx)
     my $dx := Directory.instance;

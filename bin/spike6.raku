@@ -22,10 +22,9 @@ my $dx := Directory.instance;
 #say $dx.prefix.by-name;
 #say $dx.prefix.by-symbol;
 #say $dx.prefix.to-factor;
+#say $dx.types.to-basetype;
+#say $dx.types.names;
 
-say $dx.types.to-basetype;
-
-#say ListTypeNames;
 #say ListPrototypes;
 
 exit;
@@ -69,7 +68,7 @@ my $u3 = Unit.find( 'kg m^2/s^2' );
 say ~$u3;
 say "compare $u1, $u2... " ~ $u2.same-dims($u1);
 
-put ListTypeNames;
+put $dx.types.names;
 #put ListUnits;
 
 #`[[
