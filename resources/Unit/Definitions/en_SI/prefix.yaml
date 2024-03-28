@@ -5,7 +5,7 @@
 
 # Format key:
 #Prefix:
-#- {names: [symbol, synonym-one  ...], defn: 'definition string'}
+#- {names: [symbol, name], defn: 'definition string'}
 
 Prefix:
 - {names: [da, deka],     defn: 10}

@@ -4,10 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="base =&gt; bases">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="microcosm spike">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/spike6.raku" beforeDir="false" afterPath="$PROJECT_DIR$/bin/spike6.raku" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Config.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Config.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Parser.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Parser.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/Unit/Definitions/en_SI/prefix.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/resources/Unit/Definitions/en_SI/prefix.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -97,13 +101,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00012" summary="Loader ok prefixes (drop old)">
-      <created>1707850065031</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1707850065031</updated>
     </task>
     <task id="LOCAL-00013" summary="Loader wip bases">
       <created>1707851038971</created>
@@ -441,7 +438,14 @@
       <option name="project" value="LOCAL" />
       <updated>1711625402848</updated>
     </task>
-    <option name="localTasksCounter" value="61" />
+    <task id="LOCAL-00061" summary="microcosm spike">
+      <created>1711627608729</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1711627608730</updated>
+    </task>
+    <option name="localTasksCounter" value="62" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -459,7 +463,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="revert odd type exceptions" />
     <MESSAGE value="drop odd type exceptions" />
     <MESSAGE value="Array[Int]() %.type-to-dims" />
     <MESSAGE value="type getter ok" />
@@ -484,14 +487,15 @@
     <MESSAGE value="move stuff to roles" />
     <MESSAGE value="add Defn, Name, Type types" />
     <MESSAGE value="base =&gt; bases" />
-    <option name="LAST_COMMIT_MESSAGE" value="base =&gt; bases" />
+    <MESSAGE value="microcosm spike" />
+    <option name="LAST_COMMIT_MESSAGE" value="microcosm spike" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="perl6LineBreakpoint">
           <url>file://$PROJECT_DIR$/bin/spike6.raku</url>
-          <line>25</line>
+          <line>28</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>

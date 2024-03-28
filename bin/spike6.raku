@@ -17,8 +17,11 @@ use Physics::Unit;
 my $u = Unit.find: 'henry';
 say $u.raku;
 
-my $dictionary := Dictionary.instance;
-say $dictionary.bases.names;
+my $dx := Dictionary.instance;
+#say $dx.bases.names;
+#say $dx.prefix.by-name;
+#say $dx.prefix.by-symbol;
+#say $dx.prefix.to-factor;
 
 exit;
 

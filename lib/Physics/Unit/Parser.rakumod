@@ -5,7 +5,7 @@ use Physics::Unit::Config;
 role Parser[::Unit] {
     my $cg = Config.new;
 
-    method parse($defn is copy, $dictionary) {
+    method parse($defn is copy, $dx) {
 
         # Generally defn parsing proceeds by finding elements which are themselves
         # Unit objects and then recursively getting them (which can invoice recursive
@@ -16,12 +16,12 @@ role Parser[::Unit] {
         $defn .= subst('%LOCALE%', $cg.locale);
 
         #| preprocess postfix units to extended defn - eg. cm to centimetre
-        $defn = $dictionary.postfix-by-name{$defn} // $defn;
+        $defn = $dx.postfix-by-name{$defn} // $defn;
 
         #| rm compound names from element unit-name match candidates (to force regen of dmix)
-        my $unit-names = $dictionary.defn-by-name.keys.grep({ !/<[\s*^./]>/ }).join('|');
+        my $unit-names = $dx.defn-by-name.keys.grep({ !/<[\s*^./]>/ }).join('|');
 
-        my $prefix-names = $dictionary.all-prefixes;
+        my $prefix-names = $dx.all-prefixes;
 
         my $pwr-prewords = $cg.pwr-preword.keys.join('|');
         my $pwr-postwords = $cg.pwr-postword.keys.join('|');

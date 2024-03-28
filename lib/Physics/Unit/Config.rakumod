@@ -24,6 +24,7 @@ class Config {
     subset Defn of Str is export;
     subset Type of Str is export;
     subset Name of Str is export;
+    subset Symbol of Str is export;
 
 }
 

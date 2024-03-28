@@ -30,7 +30,7 @@ class Unit {
     also does Parser[Unit];
 
     my $cg = Config.new;
-    has $.dictionary = Dictionary.instance;
+    has $.dx = Dictionary.instance;
 
     constant \NumBases = 8;
 
@@ -70,7 +70,7 @@ class Unit {
 
         #2 check if name (if set) is a prototype
         with $.name {
-            for $.dictionary.type-to-protoname.kv -> $k, $v {
+            for $.dx.type-to-protoname.kv -> $k, $v {
                 return $k when $v;
             }
         }
@@ -82,7 +82,7 @@ class Unit {
             when * >= 2 { .&type-hint }
         }(
             gather {
-                for $.dictionary.type-to-dims.kv -> $key, $value {
+                for $.dx.type-to-dims.kv -> $key, $value {
                     take $key if $value eqv self.dims
                 }
             }
@@ -93,7 +93,7 @@ class Unit {
     multi method names(@n)  {
 
         if @n {
-            if $.dictionary.get-syns(name => @n.first) -> @syns {
+            if $.dx.get-syns(name => @n.first) -> @syns {
                 #1 predefined Unit, assign synonyms
                 @!names = @syns;
 
@@ -103,7 +103,7 @@ class Unit {
             }
         } else {
             #3 lookup defn in the postfix synonyms (eg. 'mm')
-            for $.dictionary.postsyns-by-name.kv -> $k, $v {
+            for $.dx.postsyns-by-name.kv -> $k, $v {
                 if $v.grep($.defn) {
                     @!names = |$v;
                 }
@@ -112,8 +112,8 @@ class Unit {
             @!names = [$.defn] unless @!names;
         }
 
-        @!names.map( { $.dictionary.defn-by-name{$_} = $.defn } );
-        @!names.map( { $.dictionary.unit-by-name{$_} =   self } );
+        @!names.map( { $.dx.defn-by-name{$_} = $.defn } );
+        @!names.map( { $.dx.unit-by-name{$_} =   self } );
 
         say "load-names: {@!names}" if $cg.db;
     }
@@ -180,8 +180,8 @@ class Unit {
                 }
             }
             for @synonyms -> $name {
-                $.dictionary.defn-by-name{$name} = $defn;
-                $.dictionary.syns-by-name{$name} = @synonyms;
+                $.dx.defn-by-name{$name} = $defn;
+                $.dx.syns-by-name{$name} = @synonyms;
             }
         }
 
@@ -193,10 +193,10 @@ class Unit {
     #| FIXME - put in Type class (reverse args)
     method NewType( Str $type-name ) {
         for @!names -> $name {
-            $.dictionary.type-to-protoname{$type-name} = $name;
+            $.dx.type-to-protoname{$type-name} = $name;
         }
-        $.dictionary.type-to-prototype{$type-name} = self;
-        $.dictionary.type-to-dims{$type-name} = self.dims;
+        $.dx.type-to-prototype{$type-name} = self;
+        $.dx.type-to-dims{$type-name} = self.dims;
     }
 
     ### output methods ###
@@ -214,8 +214,8 @@ class Unit {
         for 0 ..^ NumBases -> $i {
             given @.dims[$i] {
                 when 0  { $ds = '' }
-                when 1  { $ds = "{$.dictionary.bases.names[$i]}" }
-                default { $ds = "{$.dictionary.bases.names[$i]}$_" }
+                when 1  { $ds = "{$.dx.bases.names[$i]}" }
+                default { $ds = "{$.dx.bases.names[$i]}$_" }
             }
             @dim-str.push: $ds if $ds;
         }
@@ -228,8 +228,8 @@ class Unit {
         for 0 ..^ NumBases -> $i {
             given @.dims[$i] {
                 when 0  { $ds = '' }
-                when 1  { $ds = "{$.dictionary.bases.names[$i]}" }
-                default { $ds = "{$.dictionary.bases.names[$i]}%pwr-sup-rev{$_}" }
+                when 1  { $ds = "{$.dx.bases.names[$i]}" }
+                default { $ds = "{$.dx.bases.names[$i]}%pwr-sup-rev{$_}" }
             }
             @dim-str.push: $ds if $ds;
         }
@@ -239,27 +239,27 @@ class Unit {
     ### class methods ###
 
     sub subst-shortest( Unit $u ) {
-        my $dictionary = Dictionary.instance;
+        my $dx = Dictionary.instance;
 
         # substitutes shortest name if >1 unit name has same dimensions
         # ... so that eg. 'J' beats 'kg m^2 / s^2'
         # ... requires eg. 'J' to be instantiated first
 
         my @same-dims;
-        for $dictionary.unit-by-name.kv -> $k,$v {
+        for $dx.unit-by-name.kv -> $k,$v {
             @same-dims.push($k) if $v.same-dims($u)
         }
 
         if @same-dims {
             my @sort-by-size = @same-dims.sort({$^a.chars cmp $^b.chars});
-            return $dictionary.unit-by-name{@sort-by-size[0]};  #shortest
+            return $dx.unit-by-name{@sort-by-size[0]};  #shortest
         } else {
             return $u;
         }
     }
 
     multi method find( Unit:U: $u ) {
-        my $dictionary = Dictionary.instance;    # no instance means no attrs
+        my $dx = Dictionary.instance;    # no instance means no attrs
 
         #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
         say "UF1 from $u" if $cg.db;
@@ -269,13 +269,13 @@ class Unit {
         #2 if name or prefix already instantiated
         say "UF2 from $u" if $cg.db;
 
-        return $_ with $dictionary.unit-by-name{$u};
-        return $_ with $dictionary.get-prefix(:name($u));
+        return $_ with $dx.unit-by-name{$u};
+        return $_ with $dx.get-prefix(:name($u));
 
         #3 if name in our defns, instantiate it
         say "UF3 from $u" if $cg.db;
 
-        for $dictionary.defn-by-name -> %p {
+        for $dx.defn-by-name -> %p {
             if %p.key.grep($u) {
                 return Unit.new( defn => %p.value, names => [%p.key] );
             }
@@ -299,7 +299,7 @@ class Unit {
 
 class Unit::Bases {
     my $cg = Config.new;
-    has $.dictionary = Dictionary.instance;
+    has $.dx = Dictionary.instance;
 
     method load( @a ) {
 
@@ -315,7 +315,7 @@ class Unit::Bases {
                     @synonyms.push: $plural;
                 }
             }
-            @synonyms.map({ $.dictionary.syns-by-name{$_} = |@synonyms });
+            @synonyms.map({ $.dx.syns-by-name{$_} = |@synonyms });
 
             my $u = Unit.new;
             $u.names: @synonyms;
@@ -326,36 +326,36 @@ class Unit::Bases {
             $u.dmix{$u.name} = 1;
             $u.type: $type;
 
-            $.dictionary.type-to-protoname{$type} = $u.name;
-            $.dictionary.type-to-prototype{$type} = $u;
+            $.dx.type-to-protoname{$type} = $u.name;
+            $.dx.type-to-prototype{$type} = $u;
 
-            $.dictionary.bases.names.push: $u.name;
+            $.dx.bases.names.push: $u.name;
             
-            $.dictionary.postfix-by-name{$u.name} = @synonyms[1];    #extended name as value
-            $.dictionary.postsyns-by-name{$u.name} = @synonyms;       #all synonyms as value
+            $.dx.postfix-by-name{$u.name} = @synonyms[1];    #extended name as value
+            $.dx.postsyns-by-name{$u.name} = @synonyms;       #all synonyms as value
 
-            $.dictionary.postfix-by-name;
+            $.dx.postfix-by-name;
             say "Initialized Base $names[0]" if $cg.db;
         }
     }
 }
 
 class Unit::Types {
-    has $.dictionary = Dictionary.instance;
+    has $.dx = Dictionary.instance;
 
     method load( @a ) {
         for @a -> %h {
-            $.dictionary.type-to-protoname{%h.keys} = %h.values;
+            $.dx.type-to-protoname{%h.keys} = %h.values;
         }
     }
 }
 
 class Unit::Dims {
-    has $.dictionary = Dictionary.instance;
+    has $.dx = Dictionary.instance;
 
     method load( @a ) {
         for @a -> %h {
-            $.dictionary.type-to-dims{%h.keys} = %h.values;
+            $.dx.type-to-dims{%h.keys} = %h.values;
         }
     }
 }
@@ -369,8 +369,8 @@ class Unit::Derived is Unit {
 
             my @synonyms = |$names;
 
-            $.dictionary.postfix-by-name{@synonyms[0]} = @synonyms[1];
-            $.dictionary.postsyns-by-name{@synonyms[0]} = @synonyms;
+            $.dx.postfix-by-name{@synonyms[0]} = @synonyms[1];
+            $.dx.postsyns-by-name{@synonyms[0]} = @synonyms;
         }
 
         callsame
@@ -399,9 +399,9 @@ class Unit::Prefix is Unit {
                 type   => 'prefix',
             );
 
-            $.dictionary.prefix-by-name{$name} = $u;
-            $.dictionary.prefix-by-code{$code} = $u;
-            $.dictionary.prefix-to-factor{$name} = %h<defn>;
+            $.dx.prefix.by-name{$name} = $u;
+            $.dx.prefix.by-symbol{$code} = $u;
+            $.dx.prefix.to-factor{$name} = %h<defn>;
 
             say "Initialized Prefix $name" if $cg.db;
         }
@@ -409,7 +409,7 @@ class Unit::Prefix is Unit {
 }
 
 class Unit::Postfix {
-    has $.dictionary = Dictionary.instance;
+    has $.dx = Dictionary.instance;
 
     #Load SI Prefix code / Unit combos to data map hashes for postfix operators
     method load {
@@ -417,43 +417,43 @@ class Unit::Postfix {
         # redo THIS!!! ^^^
 
         # replace kg with g
-        $.dictionary.postfix-by-name<kg>:delete;
-        $.dictionary.postsyns-by-name<kg>:delete;
-        $.dictionary.postfix-by-name<g> = 'gram';
-        $.dictionary.postsyns-by-name<g> = <g gram grams gramme grammes>;
+        $.dx.postfix-by-name<kg>:delete;
+        $.dx.postsyns-by-name<kg>:delete;
+        $.dx.postfix-by-name<g> = 'gram';
+        $.dx.postsyns-by-name<g> = <g gram grams gramme grammes>;
 
         # delete non-declining singletons from %postfix-by-name so that they do not generate unwanted postfixes
         # leave them in %postfix-syns-by-name as we will want the syns for the singletons in do-postfix
-        #$.dictionary.postfix-by-name<°>:delete;   (Angle does not make it to %postfix-by-name)
-        $.dictionary.postfix-by-name<°C>:delete;
-        $.dictionary.postfix-by-name<radian>:delete;
-        $.dictionary.postfix-by-name<steradian>:delete;
+        #$.dx.postfix-by-name<°>:delete;   (Angle does not make it to %postfix-by-name)
+        $.dx.postfix-by-name<°C>:delete;
+        $.dx.postfix-by-name<radian>:delete;
+        $.dx.postfix-by-name<steradian>:delete;
 
         # Angle does not make it to %postfix-syns-by-name ?!
-        $.dictionary.postsyns-by-name<°> = <° degree degrees deg degs º>;
+        $.dx.postsyns-by-name<°> = <° degree degrees deg degs º>;
 
         # pour in 'l' ie. ml, cl, etc quite common
-        $.dictionary.postfix-by-name<l> = 'litre';
-        $.dictionary.postsyns-by-name<l> = <l L litre litres liter liters>;
+        $.dx.postfix-by-name<l> = 'litre';
+        $.dx.postsyns-by-name<l> = <l L litre litres liter liters>;
 
         # now %postfix-by-name has the right simple-names
         # so now can copy these across and us them to spin up all the combos
-        my %simple-names = $.dictionary.postfix-by-name;
+        my %simple-names = $.dx.postfix-by-name;
 
         for %simple-names.keys -> $n {
-            for $.dictionary.prefix-by-code.kv -> $c, $p {
+            for $.dx.prefix.by-symbol.kv -> $c, $p {
 
                 # combine short keys and values, then extend both codes & names to decongest namespace
                 my $combo = $c ~ $n;                                                #eg. 'ml' (used by custom Postfix op)
-                $.dictionary.postfix-by-name{$combo} = $.dictionary.prefix-by-code{$c} ~ %simple-names{$n};   #eg. 'millilitres' (used by Grammar)
+                $.dx.postfix-by-name{$combo} = $.dx.prefix.by-symbol{$c} ~ %simple-names{$n};   #eg. 'millilitres' (used by Grammar)
 
                 # set up synonym list for population of Unit object name
-                my $syns = $.dictionary.postsyns-by-name{$n};
+                my $syns = $.dx.postsyns-by-name{$n};
                 $syns = [ $p X~ @$syns ];   # using @$ to prevent ~ from stringifying the whole array
                 $syns.shift;                # drop eg. 'millil'
                 $syns.unshift: $combo;      # insert eg. 'ml'
 
-                $.dictionary.postsyns-by-name{$combo} = $syns;
+                $.dx.postsyns-by-name{$combo} = $syns;
             }
         }
     }
@@ -476,26 +476,25 @@ class Dictionary {
     ### Classes ###
     # a microcosm #
 
-    my class Bases {
-        has Name @.names;
+    my class Dx::Bases {
+        has @.names of Name;
     }
 
-    my class Prefix {
-        has Name @.names;
+    my class Dx::Prefix {
+        has %.by-name{Name}     of Unit;
+        has %.by-symbol{Symbol} of Name();   #ie. Prefix may have only one name
+        has %.to-factor{Name}   of Real;
+    }
+
+    my class Dx::Types {
+
     }
 
     ### Attributes ###
-    has Bases  $.bases  .= new;
-    has Prefix $.prefix .= new;
+    has Dx::Bases  $.bases  .= new;
+    has Dx::Prefix $.prefix .= new;
 
-    
-    has %.prefix-by-name;       #name => Prefix object
-    has %.prefix-by-code;       #code => Prefix name
-    has %.prefix-to-factor;     #name => Prefix factor
 
-    has %.defn-by-name;         #name => defn Str of known names incl. postfix (values may be dupes)
-    has %.syns-by-name;         #name => list of synonyms (excl. user defined, incl. plurals)
-    has %.unit-by-name;         #name => Unit object cache (when instantiated)
 
     has %.type-to-protoname;    #type => prototype name
     has %.type-to-prototype;    #type => prototype Unit object (when instantiated)
@@ -504,41 +503,17 @@ class Dictionary {
     has %.postfix-by-name;      #name => extended postfix defn (eg. cm => 'centimetre') to decongest Grammar namespace
     has %.postsyns-by-name;     #name => list of synonyms for every postfix [n, nano] X~ [m, metre, meter, metres, meters]
 
-    method load {
-        # FIXME - load general config & inject to loader
+    has %.defn-by-name;         #name => defn Str of known names incl. postfix (values may be dupes)
+    has %.syns-by-name;         #name => list of synonyms (excl. user defined, incl. plurals)
+    has %.unit-by-name;         #name => Unit object cache (when instantiated)
 
-        require Physics::Unit::Definitions::en_SI;
-        my $load = Physics::Unit::Definitions::en_SI.new;
-
-        # core type info
-        Unit::Bases.new.load:    $load.config<bases>;
-        Unit::Types.new.load:   $load.config<types>;
-        Unit::Dims.new.load:    $load.config<dims>;
-        
-        # unit children
-        Unit::Derived.new.load: $load.config<derived>;
-        Unit::Prefix.new.load:  $load.config<prefix>;
-        
-        # prep for postfix exports
-        Unit::Postfix.new.load;
-
-        # load dictionary for non-core units
-        Unit.new.load:          $load.config<units>;
-
-        if $cg.db {
-            say "+++++++++++++++++++";
-            say "INITIALIZATION DONE";
-            say "+++++++++++++++++++";
-            say "";
-        }
-    }
 
     method get-prefix(:$name) {       # type as Name?
-        %!prefix-by-name{$name}
+        $.prefix.by-name{$name}
     }
 
     method all-prefixes {
-        %!prefix-by-name.keys.join('|')
+        $.prefix.by-name.keys.join('|')
     }
 
     method get-syns(:$name) {       # type as Name?
@@ -552,67 +527,96 @@ class Dictionary {
     #    method defn(Name $n --> Defn) {      #getter
     #        %!defn-by-name{$n}
     #    }
+
+    method load {
+        # FIXME - load general config & inject to loader
+
+        require Physics::Unit::Definitions::en_SI;
+        my $load = Physics::Unit::Definitions::en_SI.new;
+
+        # core type info
+        Unit::Bases.new.load:    $load.config<bases>;
+        Unit::Types.new.load:   $load.config<types>;
+        Unit::Dims.new.load:    $load.config<dims>;
+
+        # unit children
+        Unit::Derived.new.load: $load.config<derived>;
+        Unit::Prefix.new.load:  $load.config<prefix>;
+
+        # prep for postfix exports
+        Unit::Postfix.new.load;
+
+        # load dx for non-core units
+        Unit.new.load:          $load.config<units>;
+
+        if $cg.db {
+            say "+++++++++++++++++++";
+            say "INITIALIZATION DONE";
+            say "+++++++++++++++++++";
+            say "";
+        }
+    }
 }
 
 
 ######## Subroutines (Exported) ########
-sub ListSyns is export {       # FIXME make Unit class method (revert to $!dictionary)
-    my $dictionary := Dictionary.instance;
+sub ListSyns is export {       # FIXME make Unit class method (revert to $!dx)
+    my $dx := Dictionary.instance;
 
-    $dictionary.syns-by-name;
-    #	return sort keys $dictionary.defn-by-name;
+    $dx.syns-by-name;
+    #	return sort keys $dx.defn-by-name;
 }
-sub ListDefns is export {       # FIXME make Unit class method (revert to $!dictionary)
-    my $dictionary := Dictionary.instance;
+sub ListDefns is export {       # FIXME make Unit class method (revert to $!dx)
+    my $dx := Dictionary.instance;
 
-    $dictionary.defn-by-name;
-#	return sort keys $dictionary.defn-by-name;
+    $dx.defn-by-name;
+#	return sort keys $dx.defn-by-name;
 }
-sub ListUnits is export {       # FIXME make Unit class method (revert to $!dictionary)
-    my $dictionary := Dictionary.instance;
+sub ListUnits is export {       # FIXME make Unit class method (revert to $!dx)
+    my $dx := Dictionary.instance;
 
-    return sort keys $dictionary.defn-by-name;
+    return sort keys $dx.defn-by-name;
 }
-sub ListTypeNames is export {       # FIXME make Unit class method (revert to $!dictionary)
-    my $dictionary := Dictionary.instance;
+sub ListTypeNames is export {       # FIXME make Unit class method (revert to $!dx)
+    my $dx := Dictionary.instance;
 
-    $dictionary.type-to-protoname
-#    return sort keys $dictionary.type-to-protoname;
+    $dx.type-to-protoname
+#    return sort keys $dx.type-to-protoname;
 }
-sub ListPrototypes is export {       # FIXME make Unit class method (revert to $!dictionary)
-    my $dictionary := Dictionary.instance;
+sub ListPrototypes is export {       # FIXME make Unit class method (revert to $!dx)
+    my $dx := Dictionary.instance;
 
-    $dictionary.type-to-prototype
-#    return sort keys $dictionary.type-to-prototype;
+    $dx.type-to-prototype
+#    return sort keys $dx.type-to-prototype;
 }
-sub ListBases is export {       # FIXME make Unit class method (revert to $!dictionary)
-    my $dictionary := Dictionary.instance;
+sub ListBases is export {       # FIXME make Unit class method (revert to $!dx)
+    my $dx := Dictionary.instance;
 
-    return $dictionary.bases.names;
+    return $dx.bases.names;
 }
 sub GetPrefixToFactor is export {
-    my $dictionary := Dictionary.instance;
+    my $dx := Dictionary.instance;
 
-    return $dictionary.prefix-to-factor;
+    return $dx.prefix.to-factor;
 }
 sub GetPostfixByName is export {
-    my $dictionary := Dictionary.instance;
+    my $dx := Dictionary.instance;
 
-    return $dictionary.postfix-by-name;
+    return $dx.postfix-by-name;
 }
 sub GetPostfixSynsByName is export {
-    my $dictionary := Dictionary.instance;
+    my $dx := Dictionary.instance;
 
-    return $dictionary.postsyns-by-name;
+    return $dx.postsyns-by-name;
 }
 
-sub GetBase(Type $type ) is export {     # FIXME make Unit class method (revert to $!dictionary)
-    my $dictionary := Dictionary.instance;
+sub GetBase(Type $type ) is export {     # FIXME make Unit class method (revert to $!dx)
+    my $dx := Dictionary.instance;
 
-    if my $pt = $dictionary.type-to-prototype{$type} {
+    if my $pt = $dx.type-to-prototype{$type} {
 		return $pt;
 	} else {
-		for $dictionary.type-to-protoname -> %p {
+		for $dx.type-to-protoname -> %p {
 			return Unit.find(%p.value) if %p.key eq $type;
 		}
 	}
