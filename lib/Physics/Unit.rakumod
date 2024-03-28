@@ -22,10 +22,13 @@ our %type-hints = %(
 # appenders
 # FIXME s
 
-class Unit {...}
+#class Unit {...}
 class Dictionary {...}
 
-class Unit does Maths[Unit] does Parser[Unit] {
+class Unit {
+    also does Maths[Unit];
+    also does Parser[Unit];
+
     my $cg = Config.new;
     has $.dictionary = Dictionary.instance;
 
@@ -35,10 +38,10 @@ class Unit does Maths[Unit] does Parser[Unit] {
     has Real    $!factor = 1;
     has Real    $!offset = 0;
     has Str()   $!defn   = '';
-    has Int     @.dims = 0 xx NumBases;
-    has MixHash $.dmix is rw = ∅.MixHash;
     has Str     $!type;
     has Str     @!names  = [];
+    has Int     @.dims = 0 xx NumBases;
+    has MixHash $.dmix is rw = ∅.MixHash;
 
     ### accessor methods ###
 
@@ -55,7 +58,7 @@ class Unit does Maths[Unit] does Parser[Unit] {
     multi method offset($o) { self.check-final; $!offset = $o }
     multi method offset     { $!offset }
 
-    multi method defn($d)  { self.check-final; $!defn = $d }
+    multi method defn($d)   { self.check-final; $!defn = $d }
     multi method defn       { $!defn }
 
     multi method type($t)   { $!type = $t }
@@ -120,8 +123,8 @@ class Unit does Maths[Unit] does Parser[Unit] {
 
     ### new & clone methods ###
 
-    #new by parsing definition
-    multi method new( :$defn!, :@names ) {
+    #| new by parsing defn
+    multi method new( :$defn!,  :@names ) {
 #        my $n = CreateUnit( $defn );
         my $n = self.parse( $defn, Dictionary.instance );
         $n.names: @names;
@@ -129,16 +132,7 @@ class Unit does Maths[Unit] does Parser[Unit] {
         return $n
     }
 
-    #deep cloned Units (used by e.g. role Maths)
-    method clone {
-        nextwith :names([]), :dims(@!dims.clone), :dmix($!dmix.clone);
-    }
-    method clear {
-        $!final = False;
-        $!defn  = Nil;
-        $!type  = Nil;
-        @!names = [];
-    }
+    #| new by cloning
     multi method new( Unit:D $u: @names ) {
         my $n = $u.clone;
         $n.names: @names;
@@ -146,7 +140,20 @@ class Unit does Maths[Unit] does Parser[Unit] {
         return $n
     }
 
-    #loader
+    #| deep clone
+    method clone {
+        nextwith :names([]), :dims(@!dims.clone), :dmix($!dmix.clone);
+    }
+
+    #| clear all but dims and dmix (used by role Maths)
+    method clear {
+        $!final = False;
+        $!defn  = Nil;
+        $!type  = Nil;
+        @!names = [];
+    }
+
+    #| loader
     method load( %config ) {
 
         #| just ignore the outer keys FIXME autoload Measure classes
@@ -195,6 +202,12 @@ class Unit does Maths[Unit] does Parser[Unit] {
     ### output methods ###
     method Str       { self.name }
     method gist      { self.Str }
+    method raku      {
+        return qq:to/END/;
+          Unit.new( factor => $!factor, offset => $!offset, defn => '$.defn', type => {$.type},
+          dims => [{@!dims.join(',')}], dmix => {$!dmix.raku}, names => [{@!names.map( ->$n {"'$n'"}).join(',')}] );
+        END
+    }
     method canonical {
         #reset to SI base names
         my ( $ds, @dim-str );
@@ -221,12 +234,6 @@ class Unit does Maths[Unit] does Parser[Unit] {
             @dim-str.push: $ds if $ds;
         }
         return @dim-str.join('⋅')
-    }
-    method raku      {
-        return qq:to/END/;
-          Unit.new( factor => $!factor, offset => $!offset, defn => '$.defn', type => {$.type},
-          dims => [{@!dims.join(',')}], dmix => {$!dmix.raku}, names => [{@!names.map( ->$n {"'$n'"}).join(',')}] );
-        END
     }
 
     ### class methods ###
@@ -283,6 +290,10 @@ class Unit does Maths[Unit] does Parser[Unit] {
     #iamerejh
     method get-prototype( $t ) {
         GetPrototype( $t );
+    }
+
+    method rebase {
+        GetPrototype( self.type );
     }
 }
 
@@ -452,11 +463,9 @@ class Unit::Postfix {
 class Dictionary {
     my $cg = Config.new;
 
-    ### Singleton Behaviour ###
+    ### Singleton ###
     my Dictionary $instance;
-
     method new {!!!}
-
     method instance {
         unless $instance {
             $instance = Dictionary.bless;
