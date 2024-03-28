@@ -23,7 +23,7 @@ my $dx := Directory.instance;
 #say $dx.prefix.by-symbol;
 #say $dx.prefix.to-factor;
 
-say $dx.type-to-basetype;
+say $dx.types.to-basetype;
 
 #say ListTypeNames;
 #say ListPrototypes;

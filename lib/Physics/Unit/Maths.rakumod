@@ -63,7 +63,7 @@ role Maths[::Unit] {
         my $x = $l.times( $r );
 
         my $t = $x.type;
-        my $p = self.get-basetype( $t );   # FIXME
+        my $p = Unit.basetype( $t );
         return( $t, $p )
     }
 
@@ -72,7 +72,7 @@ role Maths[::Unit] {
         my $x = $l.share( $r );
 
         my $t = $x.type;
-        my $p = self.get-basetype( $t );   # FIXME
+        my $p = Unit.basetype( $t );
         return( $t, $p )
     }
 
@@ -89,7 +89,7 @@ role Maths[::Unit] {
         }
 
         my $t = $l.type;
-        my $p = self.get-basetype( $t );
+        my $p = Unit.basetype( $t );
         return( $t, $p )
     }
 

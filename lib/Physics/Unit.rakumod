@@ -70,7 +70,7 @@ class Unit {
 
         #2 check if name (if set) is a base type
         with $.name {
-            for $.dx.type-to-basename.kv -> $k, $v {
+            for $.dx.types.to-basename.kv -> $k, $v {
                 return $k when $v;
             }
         }
@@ -82,7 +82,7 @@ class Unit {
             when * >= 2 { .&type-hint }
         }(
             gather {
-                for $.dx.type-to-dims.kv -> $key, $value {
+                for $.dx.types.to-dims.kv -> $key, $value {
                     take $key if $value eqv self.dims
                 }
             }
@@ -193,10 +193,10 @@ class Unit {
     #| FIXME - put in Type class (reverse args)
     method NewType( Str $type-name ) {
         for @!names -> $name {
-            $.dx.type-to-basename{$type-name} = $name;
+            $.dx.types.to-basename{$type-name} = $name;
         }
-        $.dx.type-to-basetype{$type-name} = self;
-        $.dx.type-to-dims{$type-name} = self.dims;
+        $.dx.types.to-basetype{$type-name} = self;
+        $.dx.types.to-dims{$type-name} = self.dims;
     }
 
     ### output methods ###
@@ -238,7 +238,7 @@ class Unit {
 
     ### class methods ###
 
-    sub subst-shortest( Unit $u ) {
+    sub subst-shortest( $u ) {
         my $dx = Directory.instance;
 
         # substitutes shortest name if >1 unit name has same dimensions
@@ -257,20 +257,22 @@ class Unit {
             return $u;
         }
     }
-
-    multi method find( Unit:U: $u ) {
+    multi method find( Unit:U: Unit:D $u ) {
         my $dx = Directory.instance;    # no instance means no attrs
 
         #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
         say "UF1 from $u" if $cg.db;
 
-        return $u if $u ~~ Unit;
+        return $u;
+    }
+    multi method find( Unit:U: Str()  $u ) {
+        my $dx = Directory.instance;    # no instance means no attrs
 
         #2 if name or prefix already instantiated
         say "UF2 from $u" if $cg.db;
 
-        return $_ with $dx.unit-by-name{~$u};
-        return $_ with $dx.prefix.by-name{~$u};
+        return $_ with $dx.unit-by-name{$u};
+        return $_ with $dx.prefix.by-name{$u};
 
         #3 if name in our defns, instantiate it
         say "UF3 from $u" if $cg.db;
@@ -287,13 +289,13 @@ class Unit {
         return subst-shortest(Unit.new( defn => $u ));
     }
 
-    #iamerejh
-    method get-basetype( Type $t ) {
-        GetBase( $t );
-    }
+    multi method basetype(Unit:U: Type $t ) {
+        my $dx = Directory.instance;    # no instance means no attrs
 
-    method rebase {
-        GetBase( $.type );
+        $dx.types.basetype( $t, $dx );
+    }
+    multi method basetype(Unit:D:) {
+        $.dx.types.basetype( $.type, $.dx );
     }
 }
 
@@ -326,8 +328,8 @@ class Unit::Bases {
             $u.dmix{$u.name} = 1;
             $u.type: $type;
 
-            $.dx.type-to-basename{$type} = $u.name;
-            $.dx.type-to-basetype{$type} = $u;
+            $.dx.types.to-basename{$type} = $u.name;
+            $.dx.types.to-basetype{$type} = $u;
 
             $.dx.bases.names.push: $u.name;
             
@@ -345,7 +347,7 @@ class Unit::Types {
 
     method load( @a ) {
         for @a -> %h {
-            $.dx.type-to-basename{%h.keys} = %h.values;
+            $.dx.types.to-basename{%h.keys} = %h.values;
         }
     }
 }
@@ -355,7 +357,7 @@ class Unit::Dims {
 
     method load( @a ) {
         for @a -> %h {
-            $.dx.type-to-dims{%h.keys} = %h.values;
+            $.dx.types.to-dims{%h.keys} = %h.values;
         }
     }
 }
@@ -487,18 +489,27 @@ class Directory {
     }
 
     my class Dx::Types {
+        has %.to-basename{Type} of Name();
+        has %.to-basetype{Type} of Unit;
+        has %.to-dims{Type} of Array[Int]();
 
+        method basetype(Type $type, $dx) {
+            if my $pt = $dx.types.to-basetype{$type} {
+                return $pt;
+            } else {
+                for $dx.types.to-basename -> %p {
+                    return Unit.find(%p.value) if %p.key eq $type;
+                }
+            }
+        }
     }
 
     ### Attributes ###
     has Dx::Bases  $.bases  .= new;
     has Dx::Prefix $.prefix .= new;
+    has Dx::Types  $.types  .= new;
 
 
-    #types
-    has %.type-to-basename;    #type => basetype name
-    has %.type-to-basetype;    #type => basetype Unit object (when instantiated)
-    has Array[Int]() %.type-to-dims;		    #type => dims vector
 
     #postfix
     has %.postfix-by-name;      #name => extended postfix defn (eg. cm => 'centimetre') to decongest Grammar namespace
@@ -511,8 +522,7 @@ class Directory {
     method get-syns(:$name) {       # type as Name?
         %!syns-by-name{$name}
     }
-
-
+    
 
     method load {
         # FIXME - load general config & inject to loader
@@ -546,6 +556,46 @@ class Directory {
 
 
 ######## Subroutines (Exported) ########
+
+
+#types
+
+
+sub ListTypeNames is export {       # FIXME make Unit class method (revert to $!dx)
+    my $dx := Directory.instance;
+
+    $dx.types.to-basename
+#    return sort keys $dx.types.to-basename;
+}
+
+sub ListPrototypes is export {       # FIXME make Unit class method (revert to $!dx)
+    my $dx := Directory.instance;
+
+    $dx.types.to-basetype    #ie type-to-base-symbol #iamerejh
+#    return sort keys $dx.types.to-basetype;
+}
+
+
+
+#prefix
+sub GetPrefixToFactor is export {
+    my $dx := Directory.instance;
+
+    return $dx.prefix.to-factor;
+}
+
+#postfix
+sub GetPostfixByName is export {
+    my $dx := Directory.instance;
+
+    return $dx.postfix-by-name;
+}
+sub GetPostfixSynsByName is export {
+    my $dx := Directory.instance;
+
+    return $dx.postsyns-by-name;
+}
+
 #units
 sub ListSyns is export {       # FIXME make Unit class method (revert to $!dx)
     my $dx := Directory.instance;
@@ -557,59 +607,12 @@ sub ListDefns is export {       # FIXME make Unit class method (revert to $!dx)
     my $dx := Directory.instance;
 
     $dx.defn-by-name;
-#	return sort keys $dx.defn-by-name;
+    #	return sort keys $dx.defn-by-name;
 }
 sub ListUnits is export {       # FIXME make Unit class method (revert to $!dx)
     my $dx := Directory.instance;
 
     return sort keys $dx.defn-by-name;
-}
-
-#types
-sub GetBase(Type $type ) is export {     # FIXME make Unit class method (revert to $!dx)
-    my $dx := Directory.instance;
-
-    if my $pt = $dx.type-to-basetype{$type} {
-        return $pt;
-    } else {
-        for $dx.type-to-basename -> %p {
-            return Unit.find(%p.value) if %p.key eq $type;
-        }
-    }
-}
-
-sub ListTypeNames is export {       # FIXME make Unit class method (revert to $!dx)
-    my $dx := Directory.instance;
-
-    $dx.type-to-basename
-#    return sort keys $dx.type-to-basename;
-}
-
-sub ListPrototypes is export {       # FIXME make Unit class method (revert to $!dx)
-    my $dx := Directory.instance;
-
-    $dx.type-to-basetype    #ie type-to-base-symbol #iamerejh
-#    return sort keys $dx.type-to-basetype;
-}
-
-
-
-#prefix
-sub GetPrefixToFactor is export {
-    my $dx := Directory.instance;
-
-    return $dx.prefix.to-factor;
-}
-#postfix
-sub GetPostfixByName is export {
-    my $dx := Directory.instance;
-
-    return $dx.postfix-by-name;
-}
-sub GetPostfixSynsByName is export {
-    my $dx := Directory.instance;
-
-    return $dx.postsyns-by-name;
 }
 
 #| DEPRECATED - rm with Measure ver 2

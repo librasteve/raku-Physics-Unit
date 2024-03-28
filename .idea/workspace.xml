@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="drop ListBases">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Dictionary =&gt; Directory">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/spike6.raku" beforeDir="false" afterPath="$PROJECT_DIR$/bin/spike6.raku" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,13 +98,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00017" summary="Load wip Unit::Derived ok">
-      <created>1708086070315</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1708086070315</updated>
     </task>
     <task id="LOCAL-00018" summary="Load wip Unit::Type ok">
       <created>1708231238761</created>
@@ -440,7 +435,14 @@
       <option name="project" value="LOCAL" />
       <updated>1711632117580</updated>
     </task>
-    <option name="localTasksCounter" value="66" />
+    <task id="LOCAL-00066" summary="Dictionary =&gt; Directory">
+      <created>1711647869116</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1711647869116</updated>
+    </task>
+    <option name="localTasksCounter" value="67" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -458,7 +460,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="@.names to @!names wip" />
     <MESSAGE value="drop check-change" />
     <MESSAGE value="@.names =&gt; @!names wip" />
     <MESSAGE value="review method type" />
@@ -483,7 +484,8 @@
     <MESSAGE value="Dx::Bases, Dx::Prefix ok" />
     <MESSAGE value="drop method prefix-by-name" />
     <MESSAGE value="drop ListBases" />
-    <option name="LAST_COMMIT_MESSAGE" value="drop ListBases" />
+    <MESSAGE value="Dictionary =&gt; Directory" />
+    <option name="LAST_COMMIT_MESSAGE" value="Dictionary =&gt; Directory" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
