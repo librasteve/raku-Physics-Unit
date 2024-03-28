@@ -295,7 +295,7 @@ class Unit {
         $dx.types.basetype( $t );
     }
     multi method basetype(Unit:D:) {
-        $.dx.types.basetype( $.type, $.dx );
+        $.dx.types.basetype( $.type );
     }
 }
 
@@ -491,9 +491,9 @@ class Directory {
     my class Dx::Types {
         has %.to-basename{Type} of Name();
         has %.to-basetype{Type} of Unit;
-        has %.to-dims{Type}     of Array[Int]();
+        has %.to-dims{Type} of Array[Int]();
 
-        method basetype( Type $t --> Unit ) {
+        method basetype( Type $t ) {
             if my $pt = %.to-basetype{$t} {
                 return $pt;
             } else {
@@ -568,8 +568,6 @@ class Directory {
 
 
 ######## Subroutines (Exported) ########
-
-
 
 #prefix
 sub GetPrefixToFactor is export {

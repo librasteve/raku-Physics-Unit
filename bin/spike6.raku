@@ -23,13 +23,12 @@ my $dx := Directory.instance;
 #say $dx.prefix.by-symbol;
 #say $dx.prefix.to-factor;
 say $dx.types.to-basename;
-say $dx.types.to-basetype;
+say $dx.types.to-basetype;  #iamerejh move to Dx::Bases
 
 
 say $dx.types.names;
 say $dx.types.bases;
 
-#say ListPrototypes;
 
 exit;
 

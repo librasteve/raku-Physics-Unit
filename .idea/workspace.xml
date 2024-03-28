@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="rm ListTypeNames">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="rm ListProtoTypes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/spike6.raku" beforeDir="false" afterPath="$PROJECT_DIR$/bin/spike6.raku" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
@@ -97,13 +97,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00019" summary="Load wip Unit::Dims ok">
-      <created>1708231332612</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1708231332612</updated>
     </task>
     <task id="LOCAL-00020" summary="Load wip Unit::Affix ok">
       <created>1708233135608</created>
@@ -441,7 +434,14 @@
       <option name="project" value="LOCAL" />
       <updated>1711651670562</updated>
     </task>
-    <option name="localTasksCounter" value="68" />
+    <task id="LOCAL-00068" summary="rm ListProtoTypes">
+      <created>1711652432973</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1711652432973</updated>
+    </task>
+    <option name="localTasksCounter" value="69" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -459,7 +459,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="@.names =&gt; @!names wip" />
     <MESSAGE value="review method type" />
     <MESSAGE value="method type ==&gt;" />
     <MESSAGE value="names getter/setter" />
@@ -484,14 +483,15 @@
     <MESSAGE value="drop ListBases" />
     <MESSAGE value="Dictionary =&gt; Directory" />
     <MESSAGE value="rm ListTypeNames" />
-    <option name="LAST_COMMIT_MESSAGE" value="rm ListTypeNames" />
+    <MESSAGE value="rm ListProtoTypes" />
+    <option name="LAST_COMMIT_MESSAGE" value="rm ListProtoTypes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="perl6LineBreakpoint">
           <url>file://$PROJECT_DIR$/bin/spike6.raku</url>
-          <line>24</line>
+          <line>25</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
