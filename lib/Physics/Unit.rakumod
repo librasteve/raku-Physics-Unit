@@ -491,9 +491,9 @@ class Directory {
     my class Dx::Types {
         has %.to-basename{Type} of Name();
         has %.to-basetype{Type} of Unit;
-        has %.to-dims{Type} of Array[Int]();
+        has %.to-dims{Type}     of Array[Int]();
 
-        method basetype( Type $t ) {
+        method basetype( Type $t --> Unit ) {
             if my $pt = %.to-basetype{$t} {
                 return $pt;
             } else {
@@ -505,6 +505,10 @@ class Directory {
 
         method names( --> Array[Name]() ) {
             %.to-basename.keys.sort
+        }
+
+        method bases( --> Array[Name]() ) {
+            %.to-basetype.keys.sort
         }
     }
 
@@ -564,16 +568,6 @@ class Directory {
 
 
 ######## Subroutines (Exported) ########
-
-
-#types
-
-sub ListPrototypes is export {       # FIXME make Unit class method (revert to $!dx)
-    my $dx := Directory.instance;
-
-    $dx.types.to-basetype    #ie type-to-base-symbol #iamerejh
-#    return sort keys $dx.types.to-basetype;
-}
 
 
 
