@@ -4,9 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Dx::Bases, Dx::Prefix ok">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="drop ListBases">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/spike6.raku" beforeDir="false" afterPath="$PROJECT_DIR$/bin/spike6.raku" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Parser.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Parser.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/Unit/Definitions/en_SI/types.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/resources/Unit/Definitions/en_SI/types.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,20 +99,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00014" summary="Loader wip get-syns">
-      <created>1707921180032</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1707921180032</updated>
-    </task>
-    <task id="LOCAL-00015" summary="Loader wip prototype / name">
-      <created>1707922066564</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1707922066564</updated>
     </task>
     <task id="LOCAL-00016" summary="Load wip Unit::Base ok">
       <created>1708019133123</created>
@@ -440,7 +429,21 @@
       <option name="project" value="LOCAL" />
       <updated>1711630662081</updated>
     </task>
-    <option name="localTasksCounter" value="63" />
+    <task id="LOCAL-00063" summary="drop method prefix-by-name">
+      <created>1711631127180</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1711631127180</updated>
+    </task>
+    <task id="LOCAL-00064" summary="drop ListBases">
+      <created>1711631651776</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1711631651776</updated>
+    </task>
+    <option name="localTasksCounter" value="65" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -458,8 +461,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Array[Int]() %.type-to-dims" />
-    <MESSAGE value="type getter ok" />
     <MESSAGE value="@.names to @!names wip" />
     <MESSAGE value="drop check-change" />
     <MESSAGE value="@.names =&gt; @!names wip" />
@@ -483,14 +484,16 @@
     <MESSAGE value="base =&gt; bases" />
     <MESSAGE value="microcosm spike" />
     <MESSAGE value="Dx::Bases, Dx::Prefix ok" />
-    <option name="LAST_COMMIT_MESSAGE" value="Dx::Bases, Dx::Prefix ok" />
+    <MESSAGE value="drop method prefix-by-name" />
+    <MESSAGE value="drop ListBases" />
+    <option name="LAST_COMMIT_MESSAGE" value="drop ListBases" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="perl6LineBreakpoint">
           <url>file://$PROJECT_DIR$/bin/spike6.raku</url>
-          <line>28</line>
+          <line>24</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>

@@ -3,7 +3,7 @@
 #SI Types
 
 # Format key:
-#- Type:                  'prototype unit'
+#- Type:                  'type unit'
 - Dimensionless:          'unity'
 - Angle:                  'radian'
 - AngularSpeed:           'radians per second'

@@ -68,9 +68,9 @@ class Unit {
         #eg. on Prefix.load or explicitly to avoid ambiguous state
         return when $!type;
 
-        #2 check if name (if set) is a prototype
+        #2 check if name (if set) is a base type
         with $.name {
-            for $.dx.type-to-protoname.kv -> $k, $v {
+            for $.dx.type-to-basename.kv -> $k, $v {
                 return $k when $v;
             }
         }
@@ -193,9 +193,9 @@ class Unit {
     #| FIXME - put in Type class (reverse args)
     method NewType( Str $type-name ) {
         for @!names -> $name {
-            $.dx.type-to-protoname{$type-name} = $name;
+            $.dx.type-to-basename{$type-name} = $name;
         }
-        $.dx.type-to-prototype{$type-name} = self;
+        $.dx.type-to-basetype{$type-name} = self;
         $.dx.type-to-dims{$type-name} = self.dims;
     }
 
@@ -288,7 +288,7 @@ class Unit {
     }
 
     #iamerejh
-    method get-prototype( Type $t ) {
+    method get-basetype( Type $t ) {
         GetBase( $t );
     }
 
@@ -326,8 +326,8 @@ class Unit::Bases {
             $u.dmix{$u.name} = 1;
             $u.type: $type;
 
-            $.dx.type-to-protoname{$type} = $u.name;
-            $.dx.type-to-prototype{$type} = $u;
+            $.dx.type-to-basename{$type} = $u.name;
+            $.dx.type-to-basetype{$type} = $u;
 
             $.dx.bases.names.push: $u.name;
             
@@ -345,7 +345,7 @@ class Unit::Types {
 
     method load( @a ) {
         for @a -> %h {
-            $.dx.type-to-protoname{%h.keys} = %h.values;
+            $.dx.type-to-basename{%h.keys} = %h.values;
         }
     }
 }
@@ -496,8 +496,8 @@ class Dictionary {
 
 
     #types
-    has %.type-to-protoname;    #type => prototype name
-    has %.type-to-prototype;    #type => prototype Unit object (when instantiated)
+    has %.type-to-basename;    #type => basetype name
+    has %.type-to-basetype;    #type => basetype Unit object (when instantiated)
     has Array[Int]() %.type-to-dims;		    #type => dims vector
 
     #postfix
@@ -569,10 +569,10 @@ sub ListUnits is export {       # FIXME make Unit class method (revert to $!dx)
 sub GetBase(Type $type ) is export {     # FIXME make Unit class method (revert to $!dx)
     my $dx := Dictionary.instance;
 
-    if my $pt = $dx.type-to-prototype{$type} {
+    if my $pt = $dx.type-to-basetype{$type} {
         return $pt;
     } else {
-        for $dx.type-to-protoname -> %p {
+        for $dx.type-to-basename -> %p {
             return Unit.find(%p.value) if %p.key eq $type;
         }
     }
@@ -581,14 +581,15 @@ sub GetBase(Type $type ) is export {     # FIXME make Unit class method (revert 
 sub ListTypeNames is export {       # FIXME make Unit class method (revert to $!dx)
     my $dx := Dictionary.instance;
 
-    $dx.type-to-protoname
-#    return sort keys $dx.type-to-protoname;
+    $dx.type-to-basename
+#    return sort keys $dx.type-to-basename;
 }
+
 sub ListPrototypes is export {       # FIXME make Unit class method (revert to $!dx)
     my $dx := Dictionary.instance;
 
-    $dx.type-to-prototype
-#    return sort keys $dx.type-to-prototype;
+    $dx.type-to-basetype    #ie type-to-base-symbol
+#    return sort keys $dx.type-to-basetype;
 }
 
 

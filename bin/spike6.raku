@@ -23,13 +23,12 @@ my $dx := Dictionary.instance;
 #say $dx.prefix.by-symbol;
 #say $dx.prefix.to-factor;
 
+say $dx.type-to-basetype;
+
+#say ListTypeNames;
+#say ListPrototypes;
+
 exit;
-
-
-
-say ListTypeNames;
-say ListPrototypes;
-
 
 #dd GetAffixByName;
 #dd GetPrototype('Torque');
