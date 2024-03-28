@@ -269,8 +269,8 @@ class Unit {
         #2 if name or prefix already instantiated
         say "UF2 from $u" if $cg.db;
 
-        return $_ with $dx.unit-by-name{$u};
-        return $_ with $dx.get-prefix(:name($u));
+        return $_ with $dx.unit-by-name{~$u};
+        return $_ with $dx.prefix.by-name{~$u};
 
         #3 if name in our defns, instantiate it
         say "UF3 from $u" if $cg.db;
@@ -506,15 +506,6 @@ class Dictionary {
     has %.defn-by-name;         #name => defn Str of known names incl. postfix (values may be dupes)
     has %.syns-by-name;         #name => list of synonyms (excl. user defined, incl. plurals)
     has %.unit-by-name;         #name => Unit object cache (when instantiated)
-
-
-    method get-prefix(:$name) {       # type as Name?
-        $.prefix.by-name{$name}
-    }
-
-    method all-prefixes {
-        $.prefix.by-name.keys.join('|')
-    }
 
     method get-syns(:$name) {       # type as Name?
         %!syns-by-name{$name}
