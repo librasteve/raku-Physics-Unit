@@ -16,7 +16,7 @@ class Physics::Unit::Definitions::en_SI {      # FIXME adjust to is Loader?
 
     my $raph = '.raph-config';
 
-    has @!parts = <base types dims derived prefix units>;
+    has @!parts = <bases types dims derived prefix units>;
 
     has %.config;
 
@@ -24,7 +24,7 @@ class Physics::Unit::Definitions::en_SI {      # FIXME adjust to is Loader?
         my $path = $?CLASS.^name.split("::").[*-3..*-1].join('/');
 
         for @!parts -> $part {
-            #e.g. /Unit/Definitions/en_SI/base.yaml
+            #e.g. /Unit/Definitions/en_SI/bases.yaml
             %!config{$part} = "$*HOME/$raph/$path/$part.yaml".IO.slurp.&load-yaml: :schema(Schema::Core::NoBools);
         }
     }

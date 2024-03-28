@@ -289,15 +289,15 @@ class Unit {
 
     #iamerejh
     method get-prototype( $t ) {
-        GetPrototype( $t );
+        GetBase( $t );
     }
 
     method rebase {
-        GetPrototype( self.type );
+        GetBase( $.type );
     }
 }
 
-class Unit::Base {
+class Unit::Bases {
     my $cg = Config.new;
     has $.dictionary = Dictionary.instance;
 
@@ -499,7 +499,7 @@ class Dictionary {
         my $load = Physics::Unit::Definitions::en_SI.new;
 
         # core type info
-        Unit::Base.new.load:    $load.config<base>;
+        Unit::Bases.new.load:    $load.config<bases>;
         Unit::Types.new.load:   $load.config<types>;
         Unit::Dims.new.load:    $load.config<dims>;
         
@@ -594,7 +594,7 @@ sub GetPostfixSynsByName is export {
     return $dictionary.postsyns-by-name;
 }
 
-sub GetPrototype( Type $type ) is export {     # FIXME make Unit class method (revert to $!dictionary)
+sub GetBase(Type $type ) is export {     # FIXME make Unit class method (revert to $!dictionary)
     my $dictionary := Dictionary.instance;
 
     if my $pt = $dictionary.type-to-prototype{$type} {
