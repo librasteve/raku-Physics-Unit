@@ -23,7 +23,7 @@ our %type-hints = %(
 # FIXME s
 
 #class Unit {...}
-class Dictionary {...}
+class Dictionary is export {...}
 
 class Unit {
     also does Maths[Unit];
@@ -214,8 +214,8 @@ class Unit {
         for 0 ..^ NumBases -> $i {
             given @.dims[$i] {
                 when 0  { $ds = '' }
-                when 1  { $ds = "{$.dictionary.basenames[$i]}" }
-                default { $ds = "{$.dictionary.basenames[$i]}$_" }
+                when 1  { $ds = "{$.dictionary.bases.names[$i]}" }
+                default { $ds = "{$.dictionary.bases.names[$i]}$_" }
             }
             @dim-str.push: $ds if $ds;
         }
@@ -228,8 +228,8 @@ class Unit {
         for 0 ..^ NumBases -> $i {
             given @.dims[$i] {
                 when 0  { $ds = '' }
-                when 1  { $ds = "{$.dictionary.basenames[$i]}" }
-                default { $ds = "{$.dictionary.basenames[$i]}%pwr-sup-rev{$_}" }
+                when 1  { $ds = "{$.dictionary.bases.names[$i]}" }
+                default { $ds = "{$.dictionary.bases.names[$i]}%pwr-sup-rev{$_}" }
             }
             @dim-str.push: $ds if $ds;
         }
@@ -329,7 +329,7 @@ class Unit::Bases {
             $.dictionary.type-to-protoname{$type} = $u.name;
             $.dictionary.type-to-prototype{$type} = $u;
 
-            $.dictionary.basenames.push: $u.name;
+            $.dictionary.bases.names.push: $u.name;
             
             $.dictionary.postfix-by-name{$u.name} = @synonyms[1];    #extended name as value
             $.dictionary.postsyns-by-name{$u.name} = @synonyms;       #all synonyms as value
@@ -361,7 +361,6 @@ class Unit::Dims {
 }
 
 class Unit::Derived is Unit {
-
     method load( %config ) {
         my @a = |%config<Derived>;
 
@@ -474,8 +473,21 @@ class Dictionary {
         $instance;
     }
 
+    ### Classes ###
+    # a microcosm #
+
+    my class Bases {
+        has Name @.names;
+    }
+
+    my class Prefix {
+        has Name @.names;
+    }
+
     ### Attributes ###
-    has Name @.basenames;
+    has Bases  $.bases  .= new;
+    has Prefix $.prefix .= new;
+
     
     has %.prefix-by-name;       #name => Prefix object
     has %.prefix-by-code;       #code => Prefix name
@@ -576,7 +588,7 @@ sub ListPrototypes is export {       # FIXME make Unit class method (revert to $
 sub ListBases is export {       # FIXME make Unit class method (revert to $!dictionary)
     my $dictionary := Dictionary.instance;
 
-    return $dictionary.basenames;
+    return $dictionary.bases.names;
 }
 sub GetPrefixToFactor is export {
     my $dictionary := Dictionary.instance;

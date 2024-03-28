@@ -16,7 +16,9 @@ use Physics::Unit;
 
 my $u = Unit.find: 'henry';
 say $u.raku;
-$u.rebase;
+
+my $dictionary := Dictionary.instance;
+say $dictionary.bases.names;
 
 exit;
 
