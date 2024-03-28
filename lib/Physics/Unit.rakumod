@@ -37,9 +37,9 @@ class Unit {
     has Bool    $!final  = False;
     has Real    $!factor = 1;
     has Real    $!offset = 0;
-    has Str()   $!defn   = '';
-    has Str     $!type;
-    has Str     @!names  = [];
+    has Defn()  $!defn   = '';
+    has Type    $!type;
+    has Name    @!names  = [];
     has Int     @.dims = 0 xx NumBases;
     has MixHash $.dmix is rw = ∅.MixHash;
 
@@ -475,7 +475,7 @@ class Dictionary {
     }
 
     ### Attributes ###
-    has @.basenames;
+    has Name @.basenames;
     
     has %.prefix-by-name;       #name => Prefix object
     has %.prefix-by-code;       #code => Prefix name
@@ -500,7 +500,7 @@ class Dictionary {
 
         # core type info
         Unit::Base.new.load:    $load.config<base>;
-        Unit::Types.new.load:    $load.config<types>;
+        Unit::Types.new.load:   $load.config<types>;
         Unit::Dims.new.load:    $load.config<dims>;
         
         # unit children
@@ -593,7 +593,8 @@ sub GetPostfixSynsByName is export {
 
     return $dictionary.postsyns-by-name;
 }
-sub GetPrototype( Str $type ) is export {     # FIXME make Unit class method (revert to $!dictionary)
+
+sub GetPrototype( Type $type ) is export {     # FIXME make Unit class method (revert to $!dictionary)
     my $dictionary := Dictionary.instance;
 
     if my $pt = $dictionary.type-to-prototype{$type} {
