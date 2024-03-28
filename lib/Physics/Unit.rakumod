@@ -23,14 +23,14 @@ our %type-hints = %(
 # FIXME s
 
 #class Unit {...}
-class Dictionary is export {...}
+class Directory is export {...}
 
 class Unit {
     also does Maths[Unit];
     also does Parser[Unit];
 
     my $cg = Config.new;
-    has $.dx = Dictionary.instance;
+    has $.dx = Directory.instance;
 
     constant \NumBases = 8;
 
@@ -126,7 +126,7 @@ class Unit {
     #| new by parsing defn
     multi method new( :$defn!,  :@names ) {
 #        my $n = CreateUnit( $defn );
-        my $n = self.parse( $defn, Dictionary.instance );
+        my $n = self.parse( $defn, Directory.instance );
         $n.names: @names;
         $n.finalize;
         return $n
@@ -239,7 +239,7 @@ class Unit {
     ### class methods ###
 
     sub subst-shortest( Unit $u ) {
-        my $dx = Dictionary.instance;
+        my $dx = Directory.instance;
 
         # substitutes shortest name if >1 unit name has same dimensions
         # ... so that eg. 'J' beats 'kg m^2 / s^2'
@@ -259,7 +259,7 @@ class Unit {
     }
 
     multi method find( Unit:U: $u ) {
-        my $dx = Dictionary.instance;    # no instance means no attrs
+        my $dx = Directory.instance;    # no instance means no attrs
 
         #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
         say "UF1 from $u" if $cg.db;
@@ -299,7 +299,7 @@ class Unit {
 
 class Unit::Bases {
     my $cg = Config.new;
-    has $.dx = Dictionary.instance;
+    has $.dx = Directory.instance;
 
     method load( @a ) {
 
@@ -341,7 +341,7 @@ class Unit::Bases {
 }
 
 class Unit::Types {
-    has $.dx = Dictionary.instance;
+    has $.dx = Directory.instance;
 
     method load( @a ) {
         for @a -> %h {
@@ -351,7 +351,7 @@ class Unit::Types {
 }
 
 class Unit::Dims {
-    has $.dx = Dictionary.instance;
+    has $.dx = Directory.instance;
 
     method load( @a ) {
         for @a -> %h {
@@ -409,7 +409,7 @@ class Unit::Prefix is Unit {
 }
 
 class Unit::Postfix {
-    has $.dx = Dictionary.instance;
+    has $.dx = Directory.instance;
 
     #Load SI Prefix code / Unit combos to data map hashes for postfix operators
     method load {
@@ -459,15 +459,15 @@ class Unit::Postfix {
     }
 }
 
-class Dictionary {
+class Directory {
     my $cg = Config.new;
 
     ### Singleton ###
-    my Dictionary $instance;
+    my Directory $instance;
     method new {!!!}
     method instance {
         unless $instance {
-            $instance = Dictionary.bless;
+            $instance = Directory.bless;
             $instance.load;
         }
         $instance;
@@ -548,26 +548,26 @@ class Dictionary {
 ######## Subroutines (Exported) ########
 #units
 sub ListSyns is export {       # FIXME make Unit class method (revert to $!dx)
-    my $dx := Dictionary.instance;
+    my $dx := Directory.instance;
 
     $dx.syns-by-name;
     #	return sort keys $dx.defn-by-name;
 }
 sub ListDefns is export {       # FIXME make Unit class method (revert to $!dx)
-    my $dx := Dictionary.instance;
+    my $dx := Directory.instance;
 
     $dx.defn-by-name;
 #	return sort keys $dx.defn-by-name;
 }
 sub ListUnits is export {       # FIXME make Unit class method (revert to $!dx)
-    my $dx := Dictionary.instance;
+    my $dx := Directory.instance;
 
     return sort keys $dx.defn-by-name;
 }
 
 #types
 sub GetBase(Type $type ) is export {     # FIXME make Unit class method (revert to $!dx)
-    my $dx := Dictionary.instance;
+    my $dx := Directory.instance;
 
     if my $pt = $dx.type-to-basetype{$type} {
         return $pt;
@@ -579,16 +579,16 @@ sub GetBase(Type $type ) is export {     # FIXME make Unit class method (revert 
 }
 
 sub ListTypeNames is export {       # FIXME make Unit class method (revert to $!dx)
-    my $dx := Dictionary.instance;
+    my $dx := Directory.instance;
 
     $dx.type-to-basename
 #    return sort keys $dx.type-to-basename;
 }
 
 sub ListPrototypes is export {       # FIXME make Unit class method (revert to $!dx)
-    my $dx := Dictionary.instance;
+    my $dx := Directory.instance;
 
-    $dx.type-to-basetype    #ie type-to-base-symbol
+    $dx.type-to-basetype    #ie type-to-base-symbol #iamerejh
 #    return sort keys $dx.type-to-basetype;
 }
 
@@ -596,18 +596,18 @@ sub ListPrototypes is export {       # FIXME make Unit class method (revert to $
 
 #prefix
 sub GetPrefixToFactor is export {
-    my $dx := Dictionary.instance;
+    my $dx := Directory.instance;
 
     return $dx.prefix.to-factor;
 }
 #postfix
 sub GetPostfixByName is export {
-    my $dx := Dictionary.instance;
+    my $dx := Directory.instance;
 
     return $dx.postfix-by-name;
 }
 sub GetPostfixSynsByName is export {
-    my $dx := Dictionary.instance;
+    my $dx := Directory.instance;
 
     return $dx.postsyns-by-name;
 }

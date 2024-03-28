@@ -17,7 +17,7 @@ use Physics::Unit;
 my $u = Unit.find: 'henry';
 say $u.raku;
 
-my $dx := Dictionary.instance;
+my $dx := Directory.instance;
 #say $dx.bases.names;
 #say $dx.prefix.by-name;
 #say $dx.prefix.by-symbol;
