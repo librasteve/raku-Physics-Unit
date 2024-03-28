@@ -288,7 +288,7 @@ class Unit {
     }
 
     #iamerejh
-    method get-prototype( $t ) {
+    method get-prototype( Type $t ) {
         GetBase( $t );
     }
 
@@ -495,29 +495,24 @@ class Dictionary {
     has Dx::Prefix $.prefix .= new;
 
 
-
+    #types
     has %.type-to-protoname;    #type => prototype name
     has %.type-to-prototype;    #type => prototype Unit object (when instantiated)
     has Array[Int]() %.type-to-dims;		    #type => dims vector
 
+    #postfix
     has %.postfix-by-name;      #name => extended postfix defn (eg. cm => 'centimetre') to decongest Grammar namespace
     has %.postsyns-by-name;     #name => list of synonyms for every postfix [n, nano] X~ [m, metre, meter, metres, meters]
 
+    #units
     has %.defn-by-name;         #name => defn Str of known names incl. postfix (values may be dupes)
     has %.syns-by-name;         #name => list of synonyms (excl. user defined, incl. plurals)
     has %.unit-by-name;         #name => Unit object cache (when instantiated)
-
     method get-syns(:$name) {       # type as Name?
         %!syns-by-name{$name}
     }
 
-    # FIXME need methods for
-    # type-to-prototype
-    # type-to-protoname
 
-    #    method defn(Name $n --> Defn) {      #getter
-    #        %!defn-by-name{$n}
-    #    }
 
     method load {
         # FIXME - load general config & inject to loader
@@ -551,6 +546,7 @@ class Dictionary {
 
 
 ######## Subroutines (Exported) ########
+#units
 sub ListSyns is export {       # FIXME make Unit class method (revert to $!dx)
     my $dx := Dictionary.instance;
 
@@ -568,6 +564,20 @@ sub ListUnits is export {       # FIXME make Unit class method (revert to $!dx)
 
     return sort keys $dx.defn-by-name;
 }
+
+#types
+sub GetBase(Type $type ) is export {     # FIXME make Unit class method (revert to $!dx)
+    my $dx := Dictionary.instance;
+
+    if my $pt = $dx.type-to-prototype{$type} {
+        return $pt;
+    } else {
+        for $dx.type-to-protoname -> %p {
+            return Unit.find(%p.value) if %p.key eq $type;
+        }
+    }
+}
+
 sub ListTypeNames is export {       # FIXME make Unit class method (revert to $!dx)
     my $dx := Dictionary.instance;
 
@@ -580,16 +590,16 @@ sub ListPrototypes is export {       # FIXME make Unit class method (revert to $
     $dx.type-to-prototype
 #    return sort keys $dx.type-to-prototype;
 }
-sub ListBases is export {       # FIXME make Unit class method (revert to $!dx)
-    my $dx := Dictionary.instance;
 
-    return $dx.bases.names;
-}
+
+
+#prefix
 sub GetPrefixToFactor is export {
     my $dx := Dictionary.instance;
 
     return $dx.prefix.to-factor;
 }
+#postfix
 sub GetPostfixByName is export {
     my $dx := Dictionary.instance;
 
@@ -599,18 +609,6 @@ sub GetPostfixSynsByName is export {
     my $dx := Dictionary.instance;
 
     return $dx.postsyns-by-name;
-}
-
-sub GetBase(Type $type ) is export {     # FIXME make Unit class method (revert to $!dx)
-    my $dx := Dictionary.instance;
-
-    if my $pt = $dx.type-to-prototype{$type} {
-		return $pt;
-	} else {
-		for $dx.type-to-protoname -> %p {
-			return Unit.find(%p.value) if %p.key eq $type;
-		}
-	}
 }
 
 #| DEPRECATED - rm with Measure ver 2
