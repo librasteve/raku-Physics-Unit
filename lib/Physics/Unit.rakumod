@@ -328,7 +328,7 @@ class Unit::Bases {
             $u.type: $type;
 
             $.dx.types.to-name{$type} = $u.name;
-            $.dx.types.to-basetype{$type} = $u;
+            $.dx.bases.by-type{$type} = $u;
 
             $.dx.bases.names.push: $u.name;
             
@@ -479,8 +479,7 @@ class Directory {
 
     my class Dx::Bases {
         has @.names             of Name;
-#        has %.by-type{Type}     of Unit;
-
+        has %.by-type{Type}     of Unit;
     }
 
     my class Dx::Prefix {
@@ -491,7 +490,7 @@ class Directory {
 
     my class Dx::Types {
         has %.to-name{Type}     of Name();
-        has %.to-basetype{Type} of Unit;
+#        has %.to-basetype{Type} of Unit;
         has %.to-dims{Type} of Array[Int]();
 
         method to-unit(Type $t --> Unit ) {
