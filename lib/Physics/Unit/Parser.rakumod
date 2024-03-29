@@ -16,7 +16,7 @@ role Parser[::Unit] {
         $defn .= subst('%LOCALE%', $cg.locale);
 
         #| preprocess postfix units to extended defn - eg. cm to centimetre
-        $defn = $dx.postfix-by-name{$defn} // $defn;
+        $defn = $dx.postfix.by-name{$defn} // $defn;
 
         #| rm compound names from element unit-name match candidates (to force regen of dmix)
         my $unit-names = $dx.defn-by-name.keys.grep({ !/<[\s*^./]>/ }).join('|');
