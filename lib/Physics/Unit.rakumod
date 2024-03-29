@@ -70,7 +70,7 @@ class Unit {
 
         #2 check if name (if set) is a base type
         with $.name {
-            for $.dx.types.to-basename.kv -> $k, $v {
+            for $.dx.types.to-name.kv -> $k, $v {
                 return $k when $v;
             }
         }
@@ -187,19 +187,8 @@ class Unit {
 
     }
 
-    ### behavioural methods ###
-
-    #| Manually attach NewType when no preset type, eg. m-1
-    #| FIXME - put in Type class (reverse args)
-    method NewType( Str $type-name ) {
-        for @!names -> $name {
-            $.dx.types.to-basename{$type-name} = $name;
-        }
-        $.dx.types.to-basetype{$type-name} = self;
-        $.dx.types.to-dims{$type-name} = self.dims;
-    }
-
     ### output methods ###
+
     method Str       { self.name }
     method gist      { self.Str }
     method raku      {
@@ -236,7 +225,7 @@ class Unit {
         return @dim-str.join('⋅')
     }
 
-    ### class methods ###
+    ### behavioural & class methods ###
 
     sub subst-shortest( $u ) {
         my $dx = Directory.instance;
@@ -289,13 +278,23 @@ class Unit {
         return subst-shortest(Unit.new( defn => $u ));
     }
 
-    multi method basetype(Unit:U: Type $t ) {
+    multi method type-to-unit(Unit:U: Type $t ) {
         my $dx = Directory.instance;    # no instance means no attrs
 
-        $dx.types.basetype( $t );
+        $dx.types.to-unit( $t );
     }
-    multi method basetype(Unit:D:) {
-        $.dx.types.basetype( $.type );
+    multi method type-to-unit(Unit:D:) {
+        $.dx.types.to-unit( $.type );
+    }
+
+
+    #| Manually attach NewType when no preset type, eg. m-1
+    #| FIXME - put in Type class (reverse args)
+    method NewType( Str $type-name ) {
+        for @!names -> $name {
+            $.dx.types.to-name{$type-name} = $name;
+        }
+        $.dx.types.to-dims{$type-name} = self.dims;
     }
 }
 
@@ -328,7 +327,7 @@ class Unit::Bases {
             $u.dmix{$u.name} = 1;
             $u.type: $type;
 
-            $.dx.types.to-basename{$type} = $u.name;
+            $.dx.types.to-name{$type} = $u.name;
             $.dx.types.to-basetype{$type} = $u;
 
             $.dx.bases.names.push: $u.name;
@@ -347,7 +346,7 @@ class Unit::Types {
 
     method load( @a ) {
         for @a -> %h {
-            $.dx.types.to-basename{%h.keys} = %h.values;
+            $.dx.types.to-name{%h.keys} = %h.values;
         }
     }
 }
@@ -479,40 +478,32 @@ class Directory {
     # a microcosm #
 
     my class Dx::Bases {
-        has @.names of Name;
+        has @.names             of Name;
+#        has %.by-type{Type}     of Unit;
+
     }
 
     my class Dx::Prefix {
         has %.by-name{Name}     of Unit;
-        has %.by-symbol{Symbol} of Name();   #ie. Prefix may have only one name
+        has %.by-symbol{Symbol} of Name();   #Prefix has one symbol plus one name
         has %.to-factor{Name}   of Real;
     }
 
     my class Dx::Types {
-        has %.to-basename{Type} of Name();
+        has %.to-name{Type}     of Name();
         has %.to-basetype{Type} of Unit;
         has %.to-dims{Type} of Array[Int]();
 
-        method basetype( Type $t ) {
-            if my $pt = %.to-basetype{$t} {
-                return $pt;
-            } else {
-                for %.to-basename -> %p {
-                    return Unit.find(%p.value) if %p.key eq $t;
-                }
-            }
+        method to-unit(Type $t --> Unit ) {
+            Unit.find( %.to-name{$t} )
         }
 
         method names( --> Array[Name]() ) {
-            %.to-basename.keys.sort
-        }
-
-        method bases( --> Array[Name]() ) {
-            %.to-basetype.keys.sort
+            %.to-name.keys.sort
         }
     }
 
-    my class DX::Postfix {
+    my class DX::Postfix { #iamerejh
 
     }
 

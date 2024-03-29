@@ -63,8 +63,8 @@ role Maths[::Unit] {
         my $x = $l.times( $r );
 
         my $t = $x.type;
-        my $p = Unit.basetype( $t );
-        return( $t, $p )
+        my $u = Unit.type-to-unit( $t );
+        return( $t, $u )
     }
 
     method divide( Unit $r ) {
@@ -72,8 +72,8 @@ role Maths[::Unit] {
         my $x = $l.share( $r );
 
         my $t = $x.type;
-        my $p = Unit.basetype( $t );
-        return( $t, $p )
+        my $u = Unit.type-to-unit( $t );
+        return( $t, $u )
     }
 
     method root-extract( Int $n where 1 <= * <= 4 ) {
@@ -89,8 +89,8 @@ role Maths[::Unit] {
         }
 
         my $t = $l.type;
-        my $p = Unit.basetype( $t );
-        return( $t, $p )
+        my $u = Unit.type-to-unit( $t );
+        return( $t, $u )
     }
 
     #### convert & compare methods ####
