@@ -480,6 +480,10 @@ class Directory {
         has %.by-name{Name}     of Unit;
         has %.to-defn{Name}     of Defn();  #known names incl. postfix (values may be dupes)
         has %.to-syns{Name}     of Syns();  #list of synonyms (excl. user defined, incl. plurals)
+
+        method names( --> Names() ) {
+            %.by-name.keys.sort
+        }
     }
 
     my class Dx::Bases {
@@ -518,17 +522,7 @@ class Directory {
     has Dx::Prefix  $.prefix  .= new;
     has Dx::Postfix $.postfix .= new;
 
-
-
-    #units
-#    has %.defn-by-name;         #name => defn Str of known names incl. postfix (values may be dupes)
-#    has %.unit.to-syns;         #name => list of synonyms (excl. user defined, incl. plurals)
-#    has %.unit-by-name;         #name => Unit object cache (when instantiated)
-    method get-syns(:$name) {       # type as Name?
-        $.unit.to-syns{$name}
-    }
-
-
+    ### Main Loader ###
     method load {
         # FIXME - load general config & inject to loader
 
@@ -582,23 +576,23 @@ sub GetPostfixSynsByName is export {
 }
 
 #units
-sub ListSyns is export {       # FIXME make Unit class method (revert to $!dx)
-    my $dx := Directory.instance;
-
-    $dx.unit.to-syns;
-    #	return sort keys $dx.unit.to-defn;
-}
-sub ListDefns is export {       # FIXME make Unit class method (revert to $!dx)
-    my $dx := Directory.instance;
-
-    $dx.unit.to-defn;
-    #	return sort keys $dx.unit.to-defn;
-}
-sub ListUnits is export {       # FIXME make Unit class method (revert to $!dx)
-    my $dx := Directory.instance;
-
-    return sort keys $dx.unit.to-defn;
-}
+#sub ListSyns is export {       # FIXME make Unit class method (revert to $!dx)
+#    my $dx := Directory.instance;
+#
+#    $dx.unit.to-syns;
+#    #	return sort keys $dx.unit.to-defn;
+#}
+#sub ListDefns is export {       # FIXME make Unit class method (revert to $!dx)
+#    my $dx := Directory.instance;
+#
+#    $dx.unit.to-defn;
+#    #	return sort keys $dx.unit.to-defn;
+#}
+#sub ListUnits is export {       # FIXME make Unit class method (revert to $!dx)
+#    my $dx := Directory.instance;
+#
+#    return sort keys $dx.unit.to-defn;
+#}
 
 
 ######## Subroutines (Internal) #######

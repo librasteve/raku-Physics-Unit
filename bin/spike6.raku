@@ -17,24 +17,9 @@ use Physics::Unit;
 my $u = Unit.find: 'henry';
 say $u.raku;
 
-my $dx := Directory.instance;
-#say $dx.bases.names;
-#say $dx.prefix.by-name;
-#say $dx.prefix.by-symbol;
-#say $dx.prefix.to-factor;
-#say $dx.types.to-name;
-#say $dx.bases.by-type;
-#say ~$dx.types.to-unit: <Angle>;
-#say $dx.types.names;
-
 
 exit;
 
-#dd GetAffixByName;
-#dd GetPrototype('Torque');
-#dd ListUnits;
-#dd ListDefns;
-#dd ListSyns;
 
 #say $u.WHICH;   #Physics::Unit::Unit|4267563835920   #PU4267563835920
 
@@ -54,7 +39,7 @@ say $ff.pretty;			# 'm⋅s⁻¹' SI recommended string representation
 say $ff.raku;			#  or 'say $ff;' or 'dd $ff;' for details
 
 #Unit.new( factor => 0.00016631, offset => 0, defn => 'furlong / fortnight', type => Speed,
-#			  dims => [1,0,-1,0,0,0,0,0], dmix => ("fortnight"=>-1,"furlong"=>1).MixHash, names => ['ff'] );
+#			 dims => [1,0,-1,0,0,0,0,0], dmix => ("fortnight"=>-1,"furlong"=>1).MixHash, names => ['ff'] );
 
 # New Unit by renaming an existing one
 my $fh = $ff.new( <fh fi> );
@@ -69,8 +54,9 @@ my $u3 = Unit.find( 'kg m^2/s^2' );
 say ~$u3;
 say "compare $u1, $u2... " ~ $u2.same-dims($u1);
 
+my $dx := Directory.instance;
 put $dx.types.names;
-#put ListUnits;
+put $dx.units.names;
 
 #`[[
 ##### Principles & Behaviours ######
