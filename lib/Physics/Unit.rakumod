@@ -113,7 +113,7 @@ class Unit {
         }
 
         @!names.map( { $.dx.unit.to-defn{$_} = $.defn } );
-        @!names.map( { $.dx.unit-by-name{$_} =   self } );
+        @!names.map( { $.dx.unit.by-name{$_} =   self } );
 
         say "load-names: {@!names}" if $cg.db;
     }
@@ -235,13 +235,13 @@ class Unit {
         # ... requires eg. 'J' to be instantiated first
 
         my @same-dims;
-        for $dx.unit-by-name.kv -> $k,$v {
+        for $dx.unit.by-name.kv -> $k,$v {
             @same-dims.push($k) if $v.same-dims($u)
         }
 
         if @same-dims {
             my @sort-by-size = @same-dims.sort({$^a.chars cmp $^b.chars});
-            return $dx.unit-by-name{@sort-by-size[0]};  #shortest
+            return $dx.unit.by-name{@sort-by-size[0]};  #shortest
         } else {
             return $u;
         }
@@ -260,7 +260,7 @@ class Unit {
         #2 if name or prefix already instantiated
         say "UF2 from $u" if $cg.db;
 
-        return $_ with $dx.unit-by-name{$u};
+        return $_ with $dx.unit.by-name{$u};
         return $_ with $dx.prefix.to-unit{$u};
 
         #3 if name in our defns, instantiate it
@@ -477,9 +477,9 @@ class Directory {
     # a microcosm #
 
     my class Dx::Unit {
-        has %.to-defn{Name}     of Defn();         #known names incl. postfix (values may be dupes)
+        has %.by-name{Name}     of Unit;
+        has %.to-defn{Name}     of Defn();  #known names incl. postfix (values may be dupes)
         has %.to-syns{Name}     of Syns();  #list of synonyms (excl. user defined, incl. plurals)
-
     }
 
     my class Dx::Bases {
@@ -495,7 +495,7 @@ class Directory {
             Unit.find: %.to-name{$t}
         }
 
-        method names( --> Array[Name]() ) {
+        method names( --> Names() ) {
             %.to-name.keys.sort
         }
     }
@@ -503,11 +503,11 @@ class Directory {
     my class Dx::Prefix {
         has %.to-unit{Name}     of Unit;
         has %.to-factor{Name}   of Real;
-        has %.by-symbol{Symbol} of Name();         #prefix has one symbol plus one name
+        has %.by-symbol{Symbol} of Name();  #prefix has one symbol plus one name
     }
 
     my class Dx::Postfix {
-        has %.to-defn{Name}     of Defn();         #extended defn (eg. cm => 'centimetre') to decongest Grammar namespace
+        has %.to-defn{Name}     of Defn();  #extended defn (eg. cm => 'centimetre') to decongest Grammar namespace
         has %.to-syns{Name}     of Syns();  #list of synonyms [n, nano] X~ [m, metre, meter, metres, meters]
     }
 
@@ -523,7 +523,7 @@ class Directory {
     #units
 #    has %.defn-by-name;         #name => defn Str of known names incl. postfix (values may be dupes)
 #    has %.unit.to-syns;         #name => list of synonyms (excl. user defined, incl. plurals)
-    has %.unit-by-name;         #name => Unit object cache (when instantiated)
+#    has %.unit-by-name;         #name => Unit object cache (when instantiated)
     method get-syns(:$name) {       # type as Name?
         $.unit.to-syns{$name}
     }
