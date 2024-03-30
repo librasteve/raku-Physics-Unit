@@ -21,10 +21,12 @@ class Config {
     }
 
     #some global type defs
-    subset Defn of Str is export;
-    subset Type of Str is export;
-    subset Name of Str is export;
+    subset Defn   of Str is export;
+    subset Type   of Str is export;
+    subset Name   of Str is export;
     subset Symbol of Str is export;
+    subset Names  of Array[Name] is export;
+    subset Syns   of Array[Name] is export;
 
 }
 
