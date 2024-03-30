@@ -593,10 +593,6 @@ sub ListUnits is export {       # FIXME make Unit class method (revert to $!dx)
     return sort keys $dx.defn-by-name;
 }
 
-#| DEPRECATED - rm with Measure ver 2
-sub GetUnit( $u ) is export {
-    Unit.find: $u
-}
 
 ######## Subroutines (Internal) #######
 
