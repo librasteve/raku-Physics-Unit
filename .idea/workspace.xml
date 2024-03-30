@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="GetPostfixByName =&gt; Unit.postfix-by-defn ..." />
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="try to unify $dx">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -93,13 +96,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00035" summary="drop odd type exceptions">
-      <created>1708366549501</created>
-      <option name="number" value="00035" />
-      <option name="presentableId" value="LOCAL-00035" />
-      <option name="project" value="LOCAL" />
-      <updated>1708366549501</updated>
     </task>
     <task id="LOCAL-00036" summary="Array[Int]() %.type-to-dims">
       <created>1708367873878</created>
@@ -437,7 +433,14 @@
       <option name="project" value="LOCAL" />
       <updated>1711803483228</updated>
     </task>
-    <option name="localTasksCounter" value="84" />
+    <task id="LOCAL-00084" summary="try to unify $dx">
+      <created>1711804131011</created>
+      <option name="number" value="00084" />
+      <option name="presentableId" value="LOCAL-00084" />
+      <option name="project" value="LOCAL" />
+      <updated>1711804131011</updated>
+    </task>
+    <option name="localTasksCounter" value="85" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -455,7 +458,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="move stuff to roles" />
     <MESSAGE value="add Defn, Name, Type types" />
     <MESSAGE value="base =&gt; bases" />
     <MESSAGE value="microcosm spike" />
@@ -480,7 +482,8 @@
     <MESSAGE value="rm ListSyns, ListDefns, ListUnits" />
     <MESSAGE value="GetPrefixToFactor =&gt; Unit.prefix-to-factor" />
     <MESSAGE value="GetPostfixByName =&gt; Unit.postfix-by-defn ..." />
-    <option name="LAST_COMMIT_MESSAGE" value="GetPostfixByName =&gt; Unit.postfix-by-defn ..." />
+    <MESSAGE value="try to unify $dx" />
+    <option name="LAST_COMMIT_MESSAGE" value="try to unify $dx" />
   </component>
   <component name="edument.perl6idea.pm.RakuPackageManagerManager">
     <pmList />

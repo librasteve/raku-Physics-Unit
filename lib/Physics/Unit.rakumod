@@ -158,7 +158,7 @@ class Unit {
     #| loader
     method load( %config ) {
 
-        #| just ignore the outer keys FIXME autoload Measure classes
+        #| just ignore the outer keys FIXME autoload Measure classes (ie for localization)
         my @a;
         for %config.keys -> $k {
             @a.append: |%config{$k};
@@ -177,7 +177,7 @@ class Unit {
 
             #| for each name (ie. synonym)
             for |$names -> $singular {
-                if naive-plural($singular) -> $plural {
+                if plural($singular) -> $plural {
                     @synonyms.push: $plural;
                 }
             }
@@ -305,8 +305,7 @@ class Unit {
         return $dx.postfix.to-syns;
     }
 
-    #| Manually attach NewType when no preset type, eg. m-1
-    #| FIXME - put in Type class (reverse args)
+    #| Manually attach NewType when no preset type, eg. m-1   #iamerejh - rename me
     method NewType( Str $type-name ) {
         for @!names -> $name {
             $.dx.types.to-name{$type-name} = $name;
@@ -325,11 +324,11 @@ class Unit::Bases {
         for @a -> %h {
             my ( $type, $names ) = %h.kv;
 
-            my @synonyms = |$names;                     # FIXME do this in a Synonym class?
+            my @synonyms = |$names;
 
             #| for each name (ie. synonym)
             for |$names -> $singular {                  # FIXME do this in a Plurals class?
-                if naive-plural($singular) -> $plural {
+                if plural($singular) -> $plural {
                     @synonyms.push: $plural;
                 }
             }
@@ -344,6 +343,7 @@ class Unit::Bases {
             $u.dmix{$u.name} = 1;
             $u.type: $type;
 
+            # update Directory
             $.dx.types.to-name{$type} = $u.name;
             $.dx.bases.by-type{$type} = $u;
 
@@ -581,7 +581,7 @@ sub type-hint( @t ) {
 	}
 }
 
-sub naive-plural( $n ) {
+sub plural( $n ) {
     #naive plurals - append 's' ...
     unless $n.chars <= 2                #...too short
         || $n.comb.first(:end) eq 's'	  #...already ends with 's'
