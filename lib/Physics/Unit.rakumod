@@ -20,6 +20,8 @@ our %type-hints = %(
 # todo
 # externailze all but Unit
 # appenders
+# synthetics
+# spike => synopsis => README
 # FIXME s
 
 #class Unit {...}
@@ -247,7 +249,7 @@ class Unit {
         }
     }
     multi method find( Unit:U: Unit:D $u ) {
-        my $dx = Directory.instance;    # no instance means no attrs
+        my $dx := Directory.instance;    # no instance means no attrs
 
         #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
         say "UF1 from $u" if $cg.db;
@@ -279,12 +281,18 @@ class Unit {
     }
 
     multi method type-to-unit(Unit:U: Type $t ) {
-        my $dx = Directory.instance;    # no instance means no attrs
+        my $dx := Directory.instance;    # no instance means no attrs
 
         $dx.types.to-unit( $t );
     }
     multi method type-to-unit(Unit:D:) {
         $.dx.types.to-unit( $.type );
+    }
+
+    multi method prefix-to-factor(Unit:U:) {
+        my $dx := Directory.instance;    # no instance means no attrs
+
+        return $dx.prefix.to-factor;
     }
 
 
@@ -556,13 +564,6 @@ class Directory {
 
 ######## Subroutines (Exported) ########
 
-#prefix
-sub GetPrefixToFactor is export {
-    my $dx := Directory.instance;
-
-    return $dx.prefix.to-factor;
-}
-
 #postfix
 sub GetPostfixByName is export {
     my $dx := Directory.instance;
@@ -575,24 +576,7 @@ sub GetPostfixSynsByName is export {
     return $dx.postfix.to-syns;
 }
 
-#units
-#sub ListSyns is export {       # FIXME make Unit class method (revert to $!dx)
-#    my $dx := Directory.instance;
-#
-#    $dx.unit.to-syns;
-#    #	return sort keys $dx.unit.to-defn;
-#}
-#sub ListDefns is export {       # FIXME make Unit class method (revert to $!dx)
-#    my $dx := Directory.instance;
-#
-#    $dx.unit.to-defn;
-#    #	return sort keys $dx.unit.to-defn;
-#}
-#sub ListUnits is export {       # FIXME make Unit class method (revert to $!dx)
-#    my $dx := Directory.instance;
-#
-#    return sort keys $dx.unit.to-defn;
-#}
+
 
 
 ######## Subroutines (Internal) #######

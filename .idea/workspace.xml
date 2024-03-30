@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="rm get-syns">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/spike6.raku" beforeDir="false" afterPath="$PROJECT_DIR$/bin/spike6.raku" afterDir="false" />
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="rm ListSyns, ListDefns, ListUnits">
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -98,13 +95,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00032" summary="drop ft-lb">
-      <created>1708365854797</created>
-      <option name="number" value="00032" />
-      <option name="presentableId" value="LOCAL-00032" />
-      <option name="project" value="LOCAL" />
-      <updated>1708365854797</updated>
     </task>
     <task id="LOCAL-00033" summary="drop odd type exceptions">
       <created>1708365969476</created>
@@ -442,7 +432,14 @@
       <option name="project" value="LOCAL" />
       <updated>1711801728799</updated>
     </task>
-    <option name="localTasksCounter" value="81" />
+    <task id="LOCAL-00081" summary="rm ListSyns, ListDefns, ListUnits">
+      <created>1711802549967</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1711802549967</updated>
+    </task>
+    <option name="localTasksCounter" value="82" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -460,7 +457,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="encapsulate .final" />
     <MESSAGE value="expunge GetUnit" />
     <MESSAGE value="stet !dims !dmix" />
     <MESSAGE value="move stuff to roles" />
@@ -485,7 +481,8 @@
     <MESSAGE value="Array[Int] =&gt; Dims" />
     <MESSAGE value="unit-by-name =&gt; unit.by-name" />
     <MESSAGE value="rm get-syns" />
-    <option name="LAST_COMMIT_MESSAGE" value="rm get-syns" />
+    <MESSAGE value="rm ListSyns, ListDefns, ListUnits" />
+    <option name="LAST_COMMIT_MESSAGE" value="rm ListSyns, ListDefns, ListUnits" />
   </component>
   <component name="edument.perl6idea.pm.RakuPackageManagerManager">
     <pmList />
