@@ -332,10 +332,10 @@ class Unit::Bases {
 
             $.dx.bases.names.push: $u.name;
             
-            $.dx.postfix.by-name{$u.name} = @synonyms[1];    #extended name as value
+            $.dx.postfix.to-defn{$u.name} = @synonyms[1];    #extended name as value
             $.dx.postfix.synonyms{$u.name} = @synonyms;       #all synonyms as value
 
-            $.dx.postfix.by-name;
+            $.dx.postfix.to-defn;
             say "Initialized Base $names[0]" if $cg.db;
         }
     }
@@ -370,7 +370,7 @@ class Unit::Derived is Unit {
 
             my @synonyms = |$names;
 
-            $.dx.postfix.by-name{@synonyms[0]} = @synonyms[1];
+            $.dx.postfix.to-defn{@synonyms[0]} = @synonyms[1];
             $.dx.postfix.synonyms{@synonyms[0]} = @synonyms;
         }
 
@@ -414,38 +414,38 @@ class Unit::Postfix {
 
     #Load SI Prefix code / Unit combos to data map hashes for postfix operators
     method load {
-        # so far %.postfix.by-name has been initialized with base and derived unit names
+        # so far %.postfix.to-defn has been initialized with base and derived unit names
 
         # replace kg with g
-        $.dx.postfix.by-name<kg>:delete;
+        $.dx.postfix.to-defn<kg>:delete;
         $.dx.postfix.synonyms<kg>:delete;
-        $.dx.postfix.by-name<g> = 'gram';
+        $.dx.postfix.to-defn<g> = 'gram';
         $.dx.postfix.synonyms<g> = <g gram grams gramme grammes>;
 
-        # delete non-declining singletons from %.postfix.by-name so that they do not generate unwanted postfixes
+        # delete non-declining singletons from %.postfix.to-defn so that they do not generate unwanted postfixes
         # leave them in %postfix-syns-by-name as we will want the syns for the singletons in do-postfix
-        #$.dx.postfix.by-name<°>:delete;   (Angle does not make it to %.postfix.by-name)
-        $.dx.postfix.by-name<°C>:delete;
-        $.dx.postfix.by-name<radian>:delete;
-        $.dx.postfix.by-name<steradian>:delete;
+        #$.dx.postfix.to-defn<°>:delete;   (Angle does not make it to %.postfix.to-defn)
+        $.dx.postfix.to-defn<°C>:delete;
+        $.dx.postfix.to-defn<radian>:delete;
+        $.dx.postfix.to-defn<steradian>:delete;
 
         # Angle does not make it to %postfix-syns-by-name ?!
         $.dx.postfix.synonyms<°> = <° degree degrees deg degs º>;
 
         # pour in 'l' ie. ml, cl, etc quite common
-        $.dx.postfix.by-name<l> = 'litre';
+        $.dx.postfix.to-defn<l> = 'litre';
         $.dx.postfix.synonyms<l> = <l L litre litres liter liters>;
 
-        # now %.postfix.by-name has the right simple-names
+        # now %.postfix.to-defn has the right simple-names
         # so now can copy these across and us them to spin up all the combos
-        my %simple-names = $.dx.postfix.by-name;
+        my %simple-names = $.dx.postfix.to-defn;
 
         for %simple-names.keys -> $n {
             for $.dx.prefix.by-symbol.kv -> $c, $p {
 
                 # combine short keys and values, then extend both codes & names to decongest namespace
                 my $combo = $c ~ $n;                                                #eg. 'ml' (used by custom Postfix op)
-                $.dx.postfix.by-name{$combo} = $.dx.prefix.by-symbol{$c} ~ %simple-names{$n};   #eg. 'millilitres' (used by Grammar)
+                $.dx.postfix.to-defn{$combo} = $.dx.prefix.by-symbol{$c} ~ %simple-names{$n};   #eg. 'millilitres' (used by Grammar)
 
                 # set up synonym list for population of Unit object name
                 my $syns = $.dx.postfix.synonyms{$n};
@@ -506,7 +506,7 @@ class Directory {
     }
 
     my class Dx::Postfix {
-        has %.by-name{Name}     of Defn();        #extended defn (eg. cm => 'centimetre') to decongest Grammar namespace
+        has %.to-defn{Name}     of Defn();        #extended defn (eg. cm => 'centimetre') to decongest Grammar namespace
         has %.synonyms{Name}    of Array[Str]();  #list of synonyms [n, nano] X~ [m, metre, meter, metres, meters]
     }
 
@@ -572,7 +572,7 @@ sub GetPrefixToFactor is export {
 sub GetPostfixByName is export {
     my $dx := Directory.instance;
 
-    return $dx.postfix.by-name;
+    return $dx.postfix.to-defn;
 }
 sub GetPostfixSynsByName is export {
     my $dx := Directory.instance;
