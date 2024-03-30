@@ -261,7 +261,7 @@ class Unit {
         say "UF2 from $u" if $cg.db;
 
         return $_ with $dx.unit-by-name{$u};
-        return $_ with $dx.prefix.by-name{$u};
+        return $_ with $dx.prefix.to-unit{$u};
 
         #3 if name in our defns, instantiate it
         say "UF3 from $u" if $cg.db;
@@ -400,7 +400,7 @@ class Unit::Prefix is Unit {
                 type   => 'prefix',
             );
 
-            $.dx.prefix.by-name{$name} = $u;
+            $.dx.prefix.to-unit{$name} = $u;
             $.dx.prefix.by-symbol{$code} = $u;
             $.dx.prefix.to-factor{$name} = %h<defn>;
 
@@ -476,6 +476,11 @@ class Directory {
     ### Classes ###
     # a microcosm #
 
+    my class Dx::Unit {
+        has %.by-name{Name}     of Defn();
+
+    }
+    
     my class Dx::Bases {
         has @.names             of Name;
         has %.by-type{Type}     of Unit;
@@ -495,9 +500,9 @@ class Directory {
     }
     
     my class Dx::Prefix {
-        has %.by-name{Name}     of Unit;
-        has %.by-symbol{Symbol} of Name();   #Prefix has one symbol plus one name
+        has %.to-unit{Name}     of Unit;
         has %.to-factor{Name}   of Real;
+        has %.by-symbol{Symbol} of Name();   #Prefix has one symbol plus one name
     }
 
     my class Dx::Postfix {
@@ -506,6 +511,7 @@ class Directory {
     }
 
     ### Attributes ###
+    has Dx::Unit    $.unit    .= new;
     has Dx::Bases   $.bases   .= new;
     has Dx::Types   $.types   .= new;
     has Dx::Prefix  $.prefix  .= new;
