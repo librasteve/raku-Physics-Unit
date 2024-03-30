@@ -103,7 +103,7 @@ class Unit {
             }
         } else {
             #3 lookup defn in the postfix synonyms (eg. 'mm')
-            for $.dx.postfix.synonyms.kv -> $k, $v {
+            for $.dx.postfix.to-syns.kv -> $k, $v {
                 if $v.grep($.defn) {
                     @!names = |$v;
                 }
@@ -181,7 +181,7 @@ class Unit {
             }
             for @synonyms -> $name {
                 $.dx.unit.to-defn{$name} = $defn;
-                $.dx.syns-by-name{$name} = @synonyms;
+                $.dx.unit.to-syns{$name} = @synonyms;
             }
         }
 
@@ -316,7 +316,7 @@ class Unit::Bases {
                     @synonyms.push: $plural;
                 }
             }
-            @synonyms.map({ $.dx.syns-by-name{$_} = |@synonyms });
+            @synonyms.map({ $.dx.unit.to-syns{$_} = |@synonyms });
 
             my $u = Unit.new;
             $u.names: @synonyms;
@@ -331,9 +331,9 @@ class Unit::Bases {
             $.dx.bases.by-type{$type} = $u;
 
             $.dx.bases.names.push: $u.name;
-            
+
             $.dx.postfix.to-defn{$u.name} = @synonyms[1];    #extended name as value
-            $.dx.postfix.synonyms{$u.name} = @synonyms;       #all synonyms as value
+            $.dx.postfix.to-syns{$u.name} = @synonyms;       #all synonyms as value
 
             $.dx.postfix.to-defn;
             say "Initialized Base $names[0]" if $cg.db;
@@ -371,7 +371,7 @@ class Unit::Derived is Unit {
             my @synonyms = |$names;
 
             $.dx.postfix.to-defn{@synonyms[0]} = @synonyms[1];
-            $.dx.postfix.synonyms{@synonyms[0]} = @synonyms;
+            $.dx.postfix.to-syns{@synonyms[0]} = @synonyms;
         }
 
         callsame
@@ -418,23 +418,23 @@ class Unit::Postfix {
 
         # replace kg with g
         $.dx.postfix.to-defn<kg>:delete;
-        $.dx.postfix.synonyms<kg>:delete;
+        $.dx.postfix.to-syns<kg>:delete;
         $.dx.postfix.to-defn<g> = 'gram';
-        $.dx.postfix.synonyms<g> = <g gram grams gramme grammes>;
+        $.dx.postfix.to-syns<g> = <g gram grams gramme grammes>;
 
         # delete non-declining singletons from %.postfix.to-defn so that they do not generate unwanted postfixes
-        # leave them in %postfix-syns-by-name as we will want the syns for the singletons in do-postfix
+        # leave them in %postfix-unit.to-syns as we will want the syns for the singletons in do-postfix
         #$.dx.postfix.to-defn<°>:delete;   (Angle does not make it to %.postfix.to-defn)
         $.dx.postfix.to-defn<°C>:delete;
         $.dx.postfix.to-defn<radian>:delete;
         $.dx.postfix.to-defn<steradian>:delete;
 
-        # Angle does not make it to %postfix-syns-by-name ?!
-        $.dx.postfix.synonyms<°> = <° degree degrees deg degs º>;
+        # Angle does not make it to %postfix-unit.to-syns ?!
+        $.dx.postfix.to-syns<°> = <° degree degrees deg degs º>;
 
         # pour in 'l' ie. ml, cl, etc quite common
         $.dx.postfix.to-defn<l> = 'litre';
-        $.dx.postfix.synonyms<l> = <l L litre litres liter liters>;
+        $.dx.postfix.to-syns<l> = <l L litre litres liter liters>;
 
         # now %.postfix.to-defn has the right simple-names
         # so now can copy these across and us them to spin up all the combos
@@ -448,12 +448,12 @@ class Unit::Postfix {
                 $.dx.postfix.to-defn{$combo} = $.dx.prefix.by-symbol{$c} ~ %simple-names{$n};   #eg. 'millilitres' (used by Grammar)
 
                 # set up synonym list for population of Unit object name
-                my $syns = $.dx.postfix.synonyms{$n};
+                my $syns = $.dx.postfix.to-syns{$n};
                 $syns = [ $p X~ @$syns ];   # using @$ to prevent ~ from stringifying the whole array
                 $syns.shift;                # drop eg. 'millil'
                 $syns.unshift: $combo;      # insert eg. 'ml'
 
-                $.dx.postfix.synonyms{$combo} = $syns;
+                $.dx.postfix.to-syns{$combo} = $syns;
             }
         }
     }
@@ -477,10 +477,11 @@ class Directory {
     # a microcosm #
 
     my class Dx::Unit {
-        has %.to-defn{Name}     of Defn();
+        has %.to-defn{Name}     of Defn();         #known names incl. postfix (values may be dupes)
+        has %.to-syns{Name}     of Array[Name]();  #list of synonyms (excl. user defined, incl. plurals)
 
     }
-    
+
     my class Dx::Bases {
         has @.names             of Name;
         has %.by-type{Type}     of Unit;
@@ -488,7 +489,7 @@ class Directory {
 
     my class Dx::Types {
         has %.to-name{Type}     of Name();
-        has %.to-dims{Type} of Array[Int]();
+        has %.to-dims{Type}     of Array[Int]();
 
         method to-unit(Type $t --> Unit ) {
             Unit.find: %.to-name{$t}
@@ -498,16 +499,16 @@ class Directory {
             %.to-name.keys.sort
         }
     }
-    
+
     my class Dx::Prefix {
         has %.to-unit{Name}     of Unit;
         has %.to-factor{Name}   of Real;
-        has %.by-symbol{Symbol} of Name();   #Prefix has one symbol plus one name
+        has %.by-symbol{Symbol} of Name();         #prefix has one symbol plus one name
     }
 
     my class Dx::Postfix {
-        has %.to-defn{Name}     of Defn();        #extended defn (eg. cm => 'centimetre') to decongest Grammar namespace
-        has %.synonyms{Name}    of Array[Str]();  #list of synonyms [n, nano] X~ [m, metre, meter, metres, meters]
+        has %.to-defn{Name}     of Defn();         #extended defn (eg. cm => 'centimetre') to decongest Grammar namespace
+        has %.to-syns{Name}     of Array[Name]();  #list of synonyms [n, nano] X~ [m, metre, meter, metres, meters]
     }
 
     ### Attributes ###
@@ -520,13 +521,13 @@ class Directory {
 
 
     #units
-#    has %.unit.to-defn;         #name => defn Str of known names incl. postfix (values may be dupes)
-    has %.syns-by-name;         #name => list of synonyms (excl. user defined, incl. plurals)
+#    has %.defn-by-name;         #name => defn Str of known names incl. postfix (values may be dupes)
+#    has %.unit.to-syns;         #name => list of synonyms (excl. user defined, incl. plurals)
     has %.unit-by-name;         #name => Unit object cache (when instantiated)
     method get-syns(:$name) {       # type as Name?
-        %!syns-by-name{$name}
+        $.unit.to-syns{$name}
     }
-    
+
 
     method load {
         # FIXME - load general config & inject to loader
@@ -577,14 +578,14 @@ sub GetPostfixByName is export {
 sub GetPostfixSynsByName is export {
     my $dx := Directory.instance;
 
-    return $dx.postfix.synonyms;
+    return $dx.postfix.to-syns;
 }
 
 #units
 sub ListSyns is export {       # FIXME make Unit class method (revert to $!dx)
     my $dx := Directory.instance;
 
-    $dx.syns-by-name;
+    $dx.unit.to-syns;
     #	return sort keys $dx.unit.to-defn;
 }
 sub ListDefns is export {       # FIXME make Unit class method (revert to $!dx)
