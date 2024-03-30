@@ -27,6 +27,7 @@ class Config {
     subset Symbol of Str is export;
     subset Names  of Array[Name] is export;
     subset Syns   of Array[Name] is export;
+    subset Dims   of Array[Int]  is export;
 
 }
 

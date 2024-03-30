@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="defn-by-name =&gt; unit.to-defn">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
-    </list>
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Array[Name] =&gt; Syns" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -96,20 +93,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00027" summary="Rename Affix =&gt; Postfix">
-      <created>1708248196104</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1708248196104</updated>
-    </task>
-    <task id="LOCAL-00028" summary="Rename Affix =&gt; Postfix">
-      <created>1708248631967</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1708248631967</updated>
     </task>
     <task id="LOCAL-00029" summary="Maths -&gt; role ok">
       <created>1708360704707</created>
@@ -440,7 +423,21 @@
       <option name="project" value="LOCAL" />
       <updated>1711799787514</updated>
     </task>
-    <option name="localTasksCounter" value="76" />
+    <task id="LOCAL-00076" summary="Str =&gt; Name">
+      <created>1711800466611</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1711800466611</updated>
+    </task>
+    <task id="LOCAL-00077" summary="Array[Name] =&gt; Syns">
+      <created>1711800793651</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1711800793651</updated>
+    </task>
+    <option name="localTasksCounter" value="78" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -458,8 +455,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="final type and names" />
-    <MESSAGE value="role Parser ok" />
     <MESSAGE value="rm non preload" />
     <MESSAGE value="GetUnit =&gt; Unit.find" />
     <MESSAGE value="encapsulate subst-shortest" />
@@ -483,7 +478,9 @@
     <MESSAGE value="prefix.by-name =&gt; .to-unit" />
     <MESSAGE value="postfix.by-name =&gt; .to-defn" />
     <MESSAGE value="defn-by-name =&gt; unit.to-defn" />
-    <option name="LAST_COMMIT_MESSAGE" value="defn-by-name =&gt; unit.to-defn" />
+    <MESSAGE value="Str =&gt; Name" />
+    <MESSAGE value="Array[Name] =&gt; Syns" />
+    <option name="LAST_COMMIT_MESSAGE" value="Array[Name] =&gt; Syns" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

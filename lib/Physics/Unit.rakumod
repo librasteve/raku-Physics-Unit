@@ -477,7 +477,7 @@ class Directory {
     # a microcosm #
 
     my class Dx::Unit {
-        has %.to-defn{Name}     of Defn();  #known names incl. postfix (values may be dupes)
+        has %.to-defn{Name}     of Defn();         #known names incl. postfix (values may be dupes)
         has %.to-syns{Name}     of Syns();  #list of synonyms (excl. user defined, incl. plurals)
 
     }
@@ -489,13 +489,13 @@ class Directory {
 
     my class Dx::Types {
         has %.to-name{Type}     of Name();
-        has %.to-dims{Type}     of Syns();
+        has %.to-dims{Type}     of Dims();
 
         method to-unit(Type $t --> Unit ) {
             Unit.find: %.to-name{$t}
         }
 
-        method names( --> Names() ) {
+        method names( --> Array[Name]() ) {
             %.to-name.keys.sort
         }
     }
@@ -503,11 +503,11 @@ class Directory {
     my class Dx::Prefix {
         has %.to-unit{Name}     of Unit;
         has %.to-factor{Name}   of Real;
-        has %.by-symbol{Symbol} of Name();  #prefix has one symbol plus one name
+        has %.by-symbol{Symbol} of Name();         #prefix has one symbol plus one name
     }
 
     my class Dx::Postfix {
-        has %.to-defn{Name}     of Defn();  #extended defn (eg. cm => 'centimetre') to decongest Grammar namespace
+        has %.to-defn{Name}     of Defn();         #extended defn (eg. cm => 'centimetre') to decongest Grammar namespace
         has %.to-syns{Name}     of Syns();  #list of synonyms [n, nano] X~ [m, metre, meter, metres, meters]
     }
 
