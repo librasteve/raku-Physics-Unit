@@ -112,7 +112,7 @@ class Unit {
             @!names = [$.defn] unless @!names;
         }
 
-        @!names.map( { $.dx.defn-by-name{$_} = $.defn } );
+        @!names.map( { $.dx.unit.to-defn{$_} = $.defn } );
         @!names.map( { $.dx.unit-by-name{$_} =   self } );
 
         say "load-names: {@!names}" if $cg.db;
@@ -180,7 +180,7 @@ class Unit {
                 }
             }
             for @synonyms -> $name {
-                $.dx.defn-by-name{$name} = $defn;
+                $.dx.unit.to-defn{$name} = $defn;
                 $.dx.syns-by-name{$name} = @synonyms;
             }
         }
@@ -266,7 +266,7 @@ class Unit {
         #3 if name in our defns, instantiate it
         say "UF3 from $u" if $cg.db;
 
-        for $dx.defn-by-name -> %p {
+        for $dx.unit.to-defn -> %p {
             if %p.key.grep($u) {
                 return Unit.new( defn => %p.value, names => [%p.key] );
             }
@@ -477,7 +477,7 @@ class Directory {
     # a microcosm #
 
     my class Dx::Unit {
-        has %.by-name{Name}     of Defn();
+        has %.to-defn{Name}     of Defn();
 
     }
     
@@ -520,7 +520,7 @@ class Directory {
 
 
     #units
-    has %.defn-by-name;         #name => defn Str of known names incl. postfix (values may be dupes)
+#    has %.unit.to-defn;         #name => defn Str of known names incl. postfix (values may be dupes)
     has %.syns-by-name;         #name => list of synonyms (excl. user defined, incl. plurals)
     has %.unit-by-name;         #name => Unit object cache (when instantiated)
     method get-syns(:$name) {       # type as Name?
@@ -585,18 +585,18 @@ sub ListSyns is export {       # FIXME make Unit class method (revert to $!dx)
     my $dx := Directory.instance;
 
     $dx.syns-by-name;
-    #	return sort keys $dx.defn-by-name;
+    #	return sort keys $dx.unit.to-defn;
 }
 sub ListDefns is export {       # FIXME make Unit class method (revert to $!dx)
     my $dx := Directory.instance;
 
-    $dx.defn-by-name;
-    #	return sort keys $dx.defn-by-name;
+    $dx.unit.to-defn;
+    #	return sort keys $dx.unit.to-defn;
 }
 sub ListUnits is export {       # FIXME make Unit class method (revert to $!dx)
     my $dx := Directory.instance;
 
-    return sort keys $dx.defn-by-name;
+    return sort keys $dx.unit.to-defn;
 }
 
 

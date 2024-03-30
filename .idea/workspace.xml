@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="rm GetUnit">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="postfix.by-name =&gt; .to-defn">
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Parser.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Parser.rakumod" afterDir="false" />
     </list>
@@ -96,20 +96,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00024" summary="Add Build.pm">
-      <created>1708247074084</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1708247074084</updated>
-    </task>
-    <task id="LOCAL-00025" summary="Add Comma config">
-      <created>1708247090393</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1708247090393</updated>
     </task>
     <task id="LOCAL-00026" summary="Reorder load">
       <created>1708247805061</created>
@@ -440,7 +426,21 @@
       <option name="project" value="LOCAL" />
       <updated>1711798928435</updated>
     </task>
-    <option name="localTasksCounter" value="73" />
+    <task id="LOCAL-00073" summary="prefix.by-name =&gt; .to-unit">
+      <created>1711799430873</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1711799430873</updated>
+    </task>
+    <task id="LOCAL-00074" summary="postfix.by-name =&gt; .to-defn">
+      <created>1711799599592</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1711799599592</updated>
+    </task>
+    <option name="localTasksCounter" value="75" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -458,8 +458,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="drop given in twmd" />
-    <MESSAGE value="fix indent 2" />
     <MESSAGE value="explicit final" />
     <MESSAGE value="final type and names" />
     <MESSAGE value="role Parser ok" />
@@ -483,7 +481,9 @@
     <MESSAGE value="tighten NewType" />
     <MESSAGE value="types.to-basetype =&gt; bases.by-type" />
     <MESSAGE value="rm GetUnit" />
-    <option name="LAST_COMMIT_MESSAGE" value="rm GetUnit" />
+    <MESSAGE value="prefix.by-name =&gt; .to-unit" />
+    <MESSAGE value="postfix.by-name =&gt; .to-defn" />
+    <option name="LAST_COMMIT_MESSAGE" value="postfix.by-name =&gt; .to-defn" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -19,7 +19,7 @@ role Parser[::Unit] {
         $defn = $dx.postfix.to-defn{$defn} // $defn;
 
         #| rm compound names from element unit-name match candidates (to force regen of dmix)
-        my $unit-names = $dx.defn-by-name.keys.grep({ !/<[\s*^./]>/ }).join('|');
+        my $unit-names = $dx.unit.to-defn.keys.grep({ !/<[\s*^./]>/ }).join('|');
 
         my $prefix-names = $dx.prefix.to-unit.keys.join('|');
 
