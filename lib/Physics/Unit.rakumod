@@ -227,7 +227,7 @@ class Unit {
         return @dim-str.join('⋅')
     }
 
-    ### behavioural & class methods ###
+    ### general & class methods ###
 
     sub subst-shortest( $u ) {
         my $dx = Directory.instance;

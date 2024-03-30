@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="GetPrefixToFactor =&gt; Unit.prefix-to-factor">
-      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
-    </list>
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="GetPostfixByName =&gt; Unit.postfix-by-defn ..." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -95,13 +93,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00034" summary="revert odd type exceptions">
-      <created>1708366497388</created>
-      <option name="number" value="00034" />
-      <option name="presentableId" value="LOCAL-00034" />
-      <option name="project" value="LOCAL" />
-      <updated>1708366497388</updated>
     </task>
     <task id="LOCAL-00035" summary="drop odd type exceptions">
       <created>1708366549501</created>
@@ -439,7 +430,14 @@
       <option name="project" value="LOCAL" />
       <updated>1711803054274</updated>
     </task>
-    <option name="localTasksCounter" value="83" />
+    <task id="LOCAL-00083" summary="GetPostfixByName =&gt; Unit.postfix-by-defn ...">
+      <created>1711803483228</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1711803483228</updated>
+    </task>
+    <option name="localTasksCounter" value="84" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -457,7 +455,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stet !dims !dmix" />
     <MESSAGE value="move stuff to roles" />
     <MESSAGE value="add Defn, Name, Type types" />
     <MESSAGE value="base =&gt; bases" />
@@ -482,7 +479,8 @@
     <MESSAGE value="rm get-syns" />
     <MESSAGE value="rm ListSyns, ListDefns, ListUnits" />
     <MESSAGE value="GetPrefixToFactor =&gt; Unit.prefix-to-factor" />
-    <option name="LAST_COMMIT_MESSAGE" value="GetPrefixToFactor =&gt; Unit.prefix-to-factor" />
+    <MESSAGE value="GetPostfixByName =&gt; Unit.postfix-by-defn ..." />
+    <option name="LAST_COMMIT_MESSAGE" value="GetPostfixByName =&gt; Unit.postfix-by-defn ..." />
   </component>
   <component name="edument.perl6idea.pm.RakuPackageManagerManager">
     <pmList />
