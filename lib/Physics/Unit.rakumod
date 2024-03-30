@@ -294,7 +294,16 @@ class Unit {
 
         return $dx.prefix.to-factor;
     }
+    multi method postfix-to-defn(Unit:U:) {
+        my $dx := Directory.instance;    # no instance means no attrs
 
+        return $dx.postfix.to-defn;
+    }
+    multi method postfix-to-syns(Unit:U:) {
+        my $dx := Directory.instance;    # no instance means no attrs
+
+        return $dx.postfix.to-syns;
+    }
 
     #| Manually attach NewType when no preset type, eg. m-1
     #| FIXME - put in Type class (reverse args)
@@ -560,22 +569,6 @@ class Directory {
         }
     }
 }
-
-
-######## Subroutines (Exported) ########
-
-#postfix
-sub GetPostfixByName is export {
-    my $dx := Directory.instance;
-
-    return $dx.postfix.to-defn;
-}
-sub GetPostfixSynsByName is export {
-    my $dx := Directory.instance;
-
-    return $dx.postfix.to-syns;
-}
-
 
 
 
