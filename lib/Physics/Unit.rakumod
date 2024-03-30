@@ -93,7 +93,7 @@ class Unit {
     multi method names(@n)  {
 
         if @n {
-            if $.dx.get-syns(name => @n.first) -> @syns {
+            if $.dx.unit.to-syns{@n.first} -> @syns {
                 #1 predefined Unit, assign synonyms
                 @!names = @syns;
 
