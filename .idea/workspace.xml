@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="plural wip">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="NewType =&gt; type-bind">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,13 +95,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00037" summary="type getter ok">
-      <created>1708371183105</created>
-      <option name="number" value="00037" />
-      <option name="presentableId" value="LOCAL-00037" />
-      <option name="project" value="LOCAL" />
-      <updated>1708371183105</updated>
     </task>
     <task id="LOCAL-00038" summary="@.names to @!names wip">
       <created>1708476910270</created>
@@ -440,7 +432,14 @@
       <option name="project" value="LOCAL" />
       <updated>1711810104911</updated>
     </task>
-    <option name="localTasksCounter" value="86" />
+    <task id="LOCAL-00086" summary="NewType =&gt; type-bind">
+      <created>1711897513458</created>
+      <option name="number" value="00086" />
+      <option name="presentableId" value="LOCAL-00086" />
+      <option name="project" value="LOCAL" />
+      <updated>1711897513459</updated>
+    </task>
+    <option name="localTasksCounter" value="87" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -458,7 +457,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="base =&gt; bases" />
     <MESSAGE value="microcosm spike" />
     <MESSAGE value="Dx::Bases, Dx::Prefix ok" />
     <MESSAGE value="drop method prefix-by-name" />
@@ -483,7 +481,8 @@
     <MESSAGE value="GetPostfixByName =&gt; Unit.postfix-by-defn ..." />
     <MESSAGE value="try to unify $dx" />
     <MESSAGE value="plural wip" />
-    <option name="LAST_COMMIT_MESSAGE" value="plural wip" />
+    <MESSAGE value="NewType =&gt; type-bind" />
+    <option name="LAST_COMMIT_MESSAGE" value="NewType =&gt; type-bind" />
   </component>
   <component name="edument.perl6idea.pm.RakuPackageManagerManager">
     <pmList />

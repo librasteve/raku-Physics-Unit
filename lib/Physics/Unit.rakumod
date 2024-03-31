@@ -177,7 +177,7 @@ class Unit {
 
             #| for each name (ie. synonym)
             for |$names -> $singular {
-                if plural($singular) -> $plural {
+                if $cg.plural($singular) -> $plural {
                     @synonyms.push: $plural;
                 }
             }
@@ -328,7 +328,7 @@ class Unit::Bases {
 
             #| for each name (ie. synonym)
             for |$names -> $singular {                  # FIXME do this in a Plurals class?
-                if plural($singular) -> $plural {
+                if $cg.plural($singular) -> $plural {
                     @synonyms.push: $plural;
                 }
             }
@@ -581,15 +581,5 @@ sub type-hint( @t ) {
 	}
 }
 
-sub plural( $n ) {
-    #naive plurals - append 's' ...
-    unless $n.chars <= 2                #...too short
-        || $n.comb.first(:end) eq 's'	  #...already ends with 's'
-        || $n.comb.first(:end) eq 'z'     #...already ends with 'z'
-        || $n ~~ /<[\d\/^*]>/             #...contains a digit or a symbol
-    {
-        return $n ~ 's';
-    }
-}
 
 #EOF
