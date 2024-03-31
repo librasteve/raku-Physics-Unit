@@ -305,8 +305,8 @@ class Unit {
         return $dx.postfix.to-syns;
     }
 
-    #| Manually attach NewType when no preset type, eg. m-1   #iamerejh - rename me
-    method NewType( Str $type-name ) {
+    #| Manually attach type-bind when no preset type, eg. m-1   #iamerejh - rename me
+    method type-bind( Str $type-name ) {
         for @!names -> $name {
             $.dx.types.to-name{$type-name} = $name;
         }
@@ -334,7 +334,7 @@ class Unit::Bases {
             }
             @synonyms.map({ $.dx.unit.to-syns{$_} = |@synonyms });
 
-            my $u = Unit.new;
+            my $u = Unit.new;                           #iamerejh
             $u.names: @synonyms;
             $u.defn: $u.name;
 
