@@ -397,86 +397,37 @@ class Unit::Derived is Unit {
     }
 }
 
-class Unit::Prefix is Unit {
-    my $cg = Config.new;
-
-    #| new for Unit::Prefix
-    #| skips Grammar, no dims, no dmix
-    multi method new( :$factor!, :$defn!, :@names!, :$type! where * ~~ 'prefix' ) {
-        callsame
-    }
-
-    method load( %config ) {
-        my @a = |%config<Prefix>;
-
-        for @a -> %h {
-            my ($code, $name) = %h<names>;
-
-            my $u = Unit.new(
-                factor => %h<defn>,
-                defn   => %h<defn>,
-                names  => [$name],
-                type   => 'prefix',
-            );
-
-            $.dx.prefix.to-unit{$name} = $u;
-            $.dx.prefix.by-symbol{$code} = $u;
-            $.dx.prefix.to-factor{$name} = %h<defn>;
-
-            say "Initialized Prefix $name" if $cg.db;
-        }
-    }
-}
-
-#class Unit::Postfix {
-#    has $.dx = Directory.instance;
+#class Unit::Prefix is Unit {
+#    my $cg = Config.new;
 #
-#    #Load SI Prefix code / Unit combos to data map hashes for postfix operators
-#    method load {
-#        # so far %.postfix.to-defn has been initialized with base and derived unit names
+#    #| new for Unit::Prefix
+#    #| skips Grammar, no dims, no dmix
+#    multi method new( :$factor!, :$defn!, :@names!, :$type! where * ~~ 'prefix' ) {
+#        callsame
+#    }
 #
-#        # replace kg with g
-#        $.dx.postfix.to-defn<kg>:delete;
-#        $.dx.postfix.to-syns<kg>:delete;
-#        $.dx.postfix.to-defn<g> = 'gram';
-#        $.dx.postfix.to-syns<g> = <g gram grams gramme grammes>;
+#    method load( %config ) {
+#        my @a = |%config<Prefix>;
 #
-#        # delete non-declining singletons from %.postfix.to-defn so that they do not generate unwanted postfixes
-#        # leave them in %postfix-unit.to-syns as we will want the syns for the singletons in do-postfix
-#        #$.dx.postfix.to-defn<°>:delete;   (Angle does not make it to %.postfix.to-defn)
-#        $.dx.postfix.to-defn<°C>:delete;
-#        $.dx.postfix.to-defn<radian>:delete;
-#        $.dx.postfix.to-defn<steradian>:delete;
+#        for @a -> %h {
+#            my ($code, $name) = %h<names>;
 #
-#        # Angle does not make it to %postfix-unit.to-syns ?!
-#        $.dx.postfix.to-syns<°> = <° degree degrees deg degs º>;
+#            my $u = Unit.new(
+#                factor => %h<defn>,
+#                defn   => %h<defn>,
+#                names  => [$name],
+#                type   => 'prefix',
+#            );
 #
-#        # pour in 'l' ie. ml, cl, etc quite common
-#        $.dx.postfix.to-defn<l> = 'litre';
-#        $.dx.postfix.to-syns<l> = <l L litre litres liter liters>;
+#            $.dx.prefix.to-unit{$name} = $u;
+#            $.dx.prefix.by-symbol{$code} = $u;
+#            $.dx.prefix.to-factor{$name} = %h<defn>;
 #
-#        # now %.postfix.to-defn has the right simple-names
-#        # so now can copy these across and us them to spin up all the combos
-#        my %simple-names = $.dx.postfix.to-defn;
-#
-#        for %simple-names.keys -> $n {
-#            for $.dx.prefix.by-symbol.kv -> $c, $p {
-#
-#                # combine short keys and values, then extend both codes & names to decongest namespace
-#                my $combo = $c ~ $n;                                                #eg. 'ml' (used by custom Postfix op)
-#                $.dx.postfix.to-defn{$combo} = $.dx.prefix.by-symbol{$c} ~ %simple-names{$n};   #eg. 'millilitres' (used by Grammar)
-#
-#                # set up synonym list for population of Unit object name
-#                my $syns = $.dx.postfix.to-syns{$n};
-#                $syns = [ $p X~ @$syns ];   # using @$ to prevent ~ from stringifying the whole array
-#                $syns.shift;                # drop eg. 'millil'
-#                $syns.unshift: $combo;      # insert eg. 'ml'
-#
-#                $.dx.postfix.to-syns{$combo} = $syns;
-#            }
+#            say "Initialized Prefix $name" if $cg.db;
 #        }
 #    }
 #}
+
 
 
 #EOF
