@@ -1,6 +1,7 @@
 use YAMLish;
 use Physics::Unit;
 
+use Physics::Unit::Dims;
 use Physics::Unit::Base;
 use Physics::Unit::Derived;
 use Physics::Unit::Prefix;
