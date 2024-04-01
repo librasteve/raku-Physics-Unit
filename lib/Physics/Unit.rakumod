@@ -380,54 +380,22 @@ class Unit::Base is Unit {
     }
 }
 
-class Unit::Derived is Unit {
-    method load( %config ) {
-        my @a = |%config<Derived>;
-
-        for @a -> %h {
-            my ($defn, $names) = %h<defn>, %h<names>;
-
-            my @synonyms = |$names;
-
-            $.dx.postfix.to-defn{@synonyms[0]} = @synonyms[1];
-            $.dx.postfix.to-syns{@synonyms[0]} = @synonyms;
-        }
-
-        callsame
-    }
-}
-
-#class Unit::Prefix is Unit {
-#    my $cg = Config.new;
-#
-#    #| new for Unit::Prefix
-#    #| skips Grammar, no dims, no dmix
-#    multi method new( :$factor!, :$defn!, :@names!, :$type! where * ~~ 'prefix' ) {
-#        callsame
-#    }
-#
+#class Unit::Derived is Unit {
 #    method load( %config ) {
-#        my @a = |%config<Prefix>;
+#        my @a = |%config<Derived>;
 #
 #        for @a -> %h {
-#            my ($code, $name) = %h<names>;
+#            my ($defn, $names) = %h<defn>, %h<names>;
 #
-#            my $u = Unit.new(
-#                factor => %h<defn>,
-#                defn   => %h<defn>,
-#                names  => [$name],
-#                type   => 'prefix',
-#            );
+#            my @synonyms = |$names;
 #
-#            $.dx.prefix.to-unit{$name} = $u;
-#            $.dx.prefix.by-symbol{$code} = $u;
-#            $.dx.prefix.to-factor{$name} = %h<defn>;
-#
-#            say "Initialized Prefix $name" if $cg.db;
+#            $.dx.postfix.to-defn{@synonyms[0]} = @synonyms[1];
+#            $.dx.postfix.to-syns{@synonyms[0]} = @synonyms;
 #        }
+#
+#        callsame
 #    }
 #}
-
 
 
 #EOF
