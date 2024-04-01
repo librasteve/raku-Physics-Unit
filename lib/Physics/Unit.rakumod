@@ -5,16 +5,6 @@ use Physics::Unit::Config;
 use Physics::Unit::Maths;
 use Physics::Unit::Parser;
 
-# FIXME TYPE HINTS TO TYPE CLASS METHOD
-#some units have the same dimensions but are different types - type hints steer type inference
-our %type-hints = %(
-    Area           => <Area FuelConsumption>,
-    Energy         => <Energy Torque>,
-    Momentum       => <Momentum Impulse>,
-    Frequency      => <Frequency Radioactivity>,
-    SpecificEnergy => <SpecificEnergy Dose>,
-);
-
 #-------------------------- NEW SHIT
 
 # todo
@@ -305,16 +295,58 @@ class Unit {
         return $dx.postfix.to-syns;
     }
 
-    #| Manually attach type-bind when no preset type, eg. m-1   #iamerejh - rename me
+    #| Manually bind type when no preset type, eg. m-1
     method type-bind( Str $type-name ) {
         for @!names -> $name {
             $.dx.types.to-name{$type-name} = $name;
         }
         $.dx.types.to-dims{$type-name} = self.dims;
     }
+
+    #| Set and adjust type hints
+#    my %type-hints = %(
+#        Area           => <Area FuelConsumption>,
+#        Energy         => <Energy Torque>,
+#        Momentum       => <Momentum Impulse>,
+#        Frequency      => <Frequency Radioactivity>,
+#        SpecificEnergy => <SpecificEnergy Dose>,
+#    );
+#    method type-hint( @t ) {
+#        #type hints help when multiple types are found
+#        for %type-hints.kv -> $k,$v {
+#            return $k if @t.sort eq $v.sort
+#        }
+#    }
+#    method get-type-hints {
+#        %type-hints
+#    }
+#    multi method type-hints( %th ) {
+#
+#    }
+
 }
 
-class Unit::Bases {
+class Unit::Types {
+    has $.dx = Directory.instance;
+
+    method load( @a ) {
+        for @a -> %h {
+            $.dx.types.to-name{%h.keys} = %h.values;
+        }
+    }
+}
+
+class Unit::Dims {
+    has $.dx = Directory.instance;
+
+    method load( @a ) {
+        for @a -> %h {
+            $.dx.types.to-dims{%h.keys} = %h.values;
+        }
+    }
+}
+
+class Unit::Base is Unit {
     my $cg = Config.new;
     has $.dx = Directory.instance;
 
@@ -354,26 +386,6 @@ class Unit::Bases {
 
             $.dx.postfix.to-defn;
             say "Initialized Base $names[0]" if $cg.db;
-        }
-    }
-}
-
-class Unit::Types {
-    has $.dx = Directory.instance;
-
-    method load( @a ) {
-        for @a -> %h {
-            $.dx.types.to-name{%h.keys} = %h.values;
-        }
-    }
-}
-
-class Unit::Dims {
-    has $.dx = Directory.instance;
-
-    method load( @a ) {
-        for @a -> %h {
-            $.dx.types.to-dims{%h.keys} = %h.values;
         }
     }
 }
@@ -503,11 +515,6 @@ class Directory {
         }
     }
 
-    my class Dx::Bases {
-        has @.names             of Name;
-        has %.by-type{Type}     of Unit;
-    }
-
     my class Dx::Types {
         has %.to-name{Type}     of Name();
         has %.to-dims{Type}     of Dims();
@@ -519,6 +526,11 @@ class Directory {
         method names( --> Names() ) {
             %.to-name.keys.sort
         }
+    }
+
+    my class Dx::Base {
+        has @.names             of Name;
+        has %.by-type{Type}     of Unit;
     }
 
     my class Dx::Prefix {
@@ -534,7 +546,7 @@ class Directory {
 
     ### Attributes ###
     has Dx::Unit    $.unit    .= new;
-    has Dx::Bases   $.bases   .= new;
+    has Dx::Base   $.bases   .= new;
     has Dx::Types   $.types   .= new;
     has Dx::Prefix  $.prefix  .= new;
     has Dx::Postfix $.postfix .= new;
@@ -547,11 +559,11 @@ class Directory {
         my $load = Physics::Unit::Definitions::en_SI.new;
 
         # core type info
-        Unit::Bases.new.load:    $load.config<bases>;
         Unit::Types.new.load:   $load.config<types>;
         Unit::Dims.new.load:    $load.config<dims>;
 
         # unit children
+        Unit::Base.new.load:    $load.config<bases>;
         Unit::Derived.new.load: $load.config<derived>;
         Unit::Prefix.new.load:  $load.config<prefix>;
 
@@ -573,6 +585,15 @@ class Directory {
 
 
 ######## Subroutines (Internal) #######
+# FIXME TYPE HINTS TO TYPE CLASS METHOD
+#some units have the same dimensions but are different types - type hints steer type inference
+our %type-hints = %(
+    Area           => <Area FuelConsumption>,
+    Energy         => <Energy Torque>,
+    Momentum       => <Momentum Impulse>,
+    Frequency      => <Frequency Radioactivity>,
+    SpecificEnergy => <SpecificEnergy Dose>,
+);
 
 sub type-hint( @t ) {
 	#type hints help when multiple types are found
@@ -580,6 +601,7 @@ sub type-hint( @t ) {
 		return $k if @t.sort eq $v.sort
 	}
 }
+
 
 
 #EOF
