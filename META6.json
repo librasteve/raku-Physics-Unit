@@ -13,10 +13,9 @@
   "provides": {
     "Physics::Unit": "lib/Physics/Unit.rakumod",
     "Physics::Unit::Config": "lib/Physics/Unit/Config.rakumod",
-    "Physics::Unit::Definitions::en_SI": "lib/Physics/Unit/Definitions/en_SI.rakumod",
     "Physics::Unit::Directory": "lib/Physics/Unit/Directory.rakumod",
     "Physics::Unit::Maths": "lib/Physics/Unit/Maths.rakumod",
-    "Physics::Unit::Directory": "lib/Physics/Unit/Directory.rakumod"
+    "Physics::Unit::en_SI": "lib/Physics/Unit/en_SI.rakumod"
   },
   "resources": [
     "Unit/Definitions/en_SI/derived.yaml",

@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Physics::Unit::type-hint -&gt; Unit.type-hint">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="spike defile">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/META6.json" beforeDir="false" afterPath="$PROJECT_DIR$/META6.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Definitions/en_SI.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/en_SI.rakumod" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,6 +78,7 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/lib/Physics/Unit" />
       <recent name="$PROJECT_DIR$/lib/Physics/Unit/Definitions/SI" />
       <recent name="$PROJECT_DIR$/bin" />
     </key>
@@ -95,13 +99,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00041" summary="review method type">
-      <created>1708565848163</created>
-      <option name="number" value="00041" />
-      <option name="presentableId" value="LOCAL-00041" />
-      <option name="project" value="LOCAL" />
-      <updated>1708565848163</updated>
     </task>
     <task id="LOCAL-00042" summary="method type ==&gt;">
       <created>1708565987947</created>
@@ -439,7 +436,14 @@
       <option name="project" value="LOCAL" />
       <updated>1711981463201</updated>
     </task>
-    <option name="localTasksCounter" value="90" />
+    <task id="LOCAL-00090" summary="spike defile">
+      <created>1711993513754</created>
+      <option name="number" value="00090" />
+      <option name="presentableId" value="LOCAL-00090" />
+      <option name="project" value="LOCAL" />
+      <updated>1711993513754</updated>
+    </task>
+    <option name="localTasksCounter" value="91" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -457,7 +461,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="drop ListBases" />
     <MESSAGE value="Dictionary =&gt; Directory" />
     <MESSAGE value="rm ListTypeNames" />
     <MESSAGE value="rm ListProtoTypes" />
@@ -482,7 +485,8 @@
     <MESSAGE value="plural -&gt; Config" />
     <MESSAGE value="Bases =&gt; Base" />
     <MESSAGE value="Physics::Unit::type-hint -&gt; Unit.type-hint" />
-    <option name="LAST_COMMIT_MESSAGE" value="Physics::Unit::type-hint -&gt; Unit.type-hint" />
+    <MESSAGE value="spike defile" />
+    <option name="LAST_COMMIT_MESSAGE" value="spike defile" />
   </component>
   <component name="edument.perl6idea.pm.RakuPackageManagerManager">
     <pmList />

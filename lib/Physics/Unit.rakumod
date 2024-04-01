@@ -5,18 +5,19 @@ unit module Physics::Unit:ver<1.1.26>:auth<Steve Roe (librasteve@furnival.net)>;
 use Physics::Unit::Config;
 use Physics::Unit::Maths;
 use Physics::Unit::Parser;
+use Physics::Unit::Directory;
 
 #-------------------------- NEW SHIT
 
 # todo
-# externailze all but Unit
+# defile
 # appenders
 # synthetics
 # spike => synopsis => README
 # unify Config and en_SI, put general loader in en_SI [move Unit:: lcasses to files first
 # FIXME s
 
-class Directory is export {...}
+#class Directory is export {...}
 
 class Unit {
     also does Maths[Unit];
@@ -275,10 +276,10 @@ class Unit {
     multi method type-to-unit(Unit:U: Type $t ) {
         my $dx := Directory.instance;    # no instance means no attrs
 
-        $dx.types.to-unit( $t );
+        Unit.find: $dx.types.to-name{ $t };
     }
     multi method type-to-unit(Unit:D:) {
-        $.dx.types.to-unit( $.type );
+        Unit.find: $.dx.types.to-name{ $.type };
     }
 
     multi method prefix-to-factor(Unit:U:) {
@@ -478,98 +479,70 @@ class Unit::Postfix {
     }
 }
 
-class Directory {
-    my $cg = Config.new;
-
-    ### Singleton ###
-    my Directory $instance;
-    method new {!!!}
-    method instance {
-        unless $instance {
-            $instance = Directory.bless;
-            $instance.load;
-        }
-        $instance;
-    }
-
-    ### Classes ###
-    # a microcosm #
-
-    my class Dx::Unit {
-        has %.by-name{Name}     of Unit;
-        has %.to-defn{Name}     of Defn();  #known names incl. postfix (values may be dupes)
-        has %.to-syns{Name}     of Syns();  #list of synonyms (excl. user defined, incl. plurals)
-
-        method names( --> Names() ) {
-            %.by-name.keys.sort
-        }
-    }
-
-    my class Dx::Types {
-        has %.to-name{Type}     of Name();
-        has %.to-dims{Type}     of Dims();
-
-        method to-unit(Type $t --> Unit ) {
-            Unit.find: %.to-name{$t}
-        }
-
-        method names( --> Names() ) {
-            %.to-name.keys.sort
-        }
-    }
-
-    my class Dx::Base {
-        has @.names             of Name;
-        has %.by-type{Type}     of Unit;
-    }
-
-    my class Dx::Prefix {
-        has %.to-unit{Name}     of Unit;
-        has %.to-factor{Name}   of Real;
-        has %.by-symbol{Symbol} of Name();  #prefix has one symbol plus one name
-    }
-
-    my class Dx::Postfix {
-        has %.to-defn{Name}     of Defn();  #extended defn (eg. cm => 'centimetre') to decongest Grammar namespace
-        has %.to-syns{Name}     of Syns();  #list of synonyms [n, nano] X~ [m, metre, meter, metres, meters]
-    }
-
-    ### Attributes ###
-    has Dx::Unit    $.unit    .= new;
-    has Dx::Base    $.bases   .= new;
-    has Dx::Types   $.types   .= new;
-    has Dx::Prefix  $.prefix  .= new;
-    has Dx::Postfix $.postfix .= new;
-
-    ### Main Loader ###
-    method load {
-
-        require Physics::Unit::Definitions::en_SI;
-        my $load = Physics::Unit::Definitions::en_SI.new;
-
-        # core type info
-        Unit::Types.new.load:   $load.config<types>;
-        Unit::Dims.new.load:    $load.config<dims>;
-
-        # unit children
-        Unit::Base.new.load:    $load.config<base>;
-        Unit::Derived.new.load: $load.config<derived>;
-        Unit::Prefix.new.load:  $load.config<prefix>;
-
-        # load dx for non-core units
-        Unit.new.load:          $load.config<units>;
-
-        # prep for postfix exports
-        Unit::Postfix.new.load;
-
-        if $cg.db {
-            say "+++++++++++++++++++";
-            say "INITIALIZATION DONE";
-            say "+++++++++++++++++++";
-            say "";
-        }
-
-    }
-}
+#class Directory {
+#    my $cg = Config.new;
+#
+#    ### Singleton ###
+#    my Directory $instance;
+#    method new {!!!}
+#    method instance {
+#        unless $instance {
+#            $instance = Directory.bless;
+#            $instance.load;
+#        }
+#        $instance;
+#    }
+#
+#    ### Classes ###
+#    # a microcosm #
+#
+#    my class Dx::Unit {
+#        has %.by-name{Name}; #     of Unit;
+#        has %.to-defn{Name}     of Defn();  #known names incl. postfix (values may be dupes)
+#        has %.to-syns{Name}     of Syns();  #list of synonyms (excl. user defined, incl. plurals)
+#
+#        method names( --> Names() ) {
+#            %.by-name.keys.sort
+#        }
+#    }
+#
+#    my class Dx::Types {
+#        has %.to-name{Type}     of Name();
+#        has %.to-dims{Type}     of Dims();
+#
+#        method names( --> Names() ) {
+#            %.to-name.keys.sort
+#        }
+#    }
+#
+#    my class Dx::Base {
+#        has @.names             of Name;
+#        has %.by-type{Type}; #     of Unit;
+#    }
+#
+#    my class Dx::Prefix {
+#        has %.to-unit{Name}; #     of Unit;
+#        has %.to-factor{Name}   of Real;
+#        has %.by-symbol{Symbol} of Name();  #prefix has one symbol plus one name
+#    }
+#
+#    my class Dx::Postfix {
+#        has %.to-defn{Name}     of Defn();  #extended defn (eg. cm => 'centimetre') to decongest Grammar namespace
+#        has %.to-syns{Name}     of Syns();  #list of synonyms [n, nano] X~ [m, metre, meter, metres, meters]
+#    }
+#
+#    ### Attributes ###
+#    has Dx::Unit    $.unit    .= new;
+#    has Dx::Base    $.bases   .= new;
+#    has Dx::Types   $.types   .= new;
+#    has Dx::Prefix  $.prefix  .= new;
+#    has Dx::Postfix $.postfix .= new;
+#
+#    ### Main Loader ###
+#    method load {
+#        require Physics::Unit::en_SI;
+#        Physics::Unit::en_SI.new;
+#    }
+#}
 
 #EOF

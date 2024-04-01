@@ -1,4 +1,5 @@
 use YAMLish;
+use Physics::Unit;
 
 grammar Schema::Core::NoBools is Schema::Core {
     token element:<yes> {
@@ -11,7 +12,7 @@ grammar Schema::Core::NoBools is Schema::Core {
     }
 }
 
-class Physics::Unit::Definitions::en_SI {
+class Physics::Unit::en_SI {
 
     my $raph = '.raph-config';
 
@@ -20,12 +21,27 @@ class Physics::Unit::Definitions::en_SI {
     has %.config;
 
     submethod TWEAK {
-        my $path = $?CLASS.^name.split("::").[*-3..*-1].join('/');
+        my $path = 'Unit/Definitions/en_SI';
 
         for @!parts -> $part {
             #e.g. /Unit/Definitions/en_SI/base.yaml
             %!config{$part} = "$*HOME/$raph/$path/$part.yaml".IO.slurp.&load-yaml: :schema(Schema::Core::NoBools);
         }
+
+        # core type info
+        Unit::Types.new.load:   %!config<types>;
+        Unit::Dims.new.load:    %!config<dims>;
+
+        # unit children
+        Unit::Base.new.load:    %!config<base>;
+        Unit::Derived.new.load: %!config<derived>;
+        Unit::Prefix.new.load:  %!config<prefix>;
+
+        # load dx for non-core units
+        Unit.new.load:          %!config<units>;
+
+        # prep for postfix exports
+        Unit::Postfix.new.load;
     }
 
 }
