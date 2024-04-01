@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Postfix ok ok">
-      <change afterPath="$PROJECT_DIR$/lib/Physics/Unit/Prefix.rakumod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Derived ok">
+      <change afterPath="$PROJECT_DIR$/lib/Physics/Unit/Base.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/META6.json" beforeDir="false" afterPath="$PROJECT_DIR$/META6.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/en_SI.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/en_SI.rakumod" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -99,20 +100,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00044" summary="clear fn -&gt; role Maths">
-      <created>1708586488877</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1708586488878</updated>
-    </task>
-    <task id="LOCAL-00045" summary="drop given in twmd">
-      <created>1708646777617</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1708646777617</updated>
     </task>
     <task id="LOCAL-00046" summary="fix indent 2">
       <created>1710633514062</created>
@@ -443,7 +430,21 @@
       <option name="project" value="LOCAL" />
       <updated>1711996114123</updated>
     </task>
-    <option name="localTasksCounter" value="93" />
+    <task id="LOCAL-00093" summary="Prefix ok">
+      <created>1711997992804</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1711997992804</updated>
+    </task>
+    <task id="LOCAL-00094" summary="Derived ok">
+      <created>1711998143201</created>
+      <option name="number" value="00094" />
+      <option name="presentableId" value="LOCAL-00094" />
+      <option name="project" value="LOCAL" />
+      <updated>1711998143201</updated>
+    </task>
+    <option name="localTasksCounter" value="95" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -461,8 +462,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="rm ListProtoTypes" />
-    <MESSAGE value="drop ListPrototypes" />
     <MESSAGE value="tighten NewType" />
     <MESSAGE value="types.to-basetype =&gt; bases.by-type" />
     <MESSAGE value="rm GetUnit" />
@@ -486,7 +485,9 @@
     <MESSAGE value="spike defile" />
     <MESSAGE value="Directory ok" />
     <MESSAGE value="Postfix ok ok" />
-    <option name="LAST_COMMIT_MESSAGE" value="Postfix ok ok" />
+    <MESSAGE value="Prefix ok" />
+    <MESSAGE value="Derived ok" />
+    <option name="LAST_COMMIT_MESSAGE" value="Derived ok" />
   </component>
   <component name="edument.perl6idea.pm.RakuPackageManagerManager">
     <pmList />
