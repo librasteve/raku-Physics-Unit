@@ -1,5 +1,6 @@
 unit module Physics::Unit:ver<1.1.26>:auth<Steve Roe (librasteve@furnival.net)>;
 #viz. https://en.wikipedia.org/wiki/International_System_of_Units
+#viz. https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
 
 use Physics::Unit::Config;
 use Physics::Unit::Maths;
@@ -12,9 +13,9 @@ use Physics::Unit::Parser;
 # appenders
 # synthetics
 # spike => synopsis => README
+# unify Config and en_SI, put general loader in en_SI [move Unit:: lcasses to files first
 # FIXME s
 
-#class Unit {...}
 class Directory is export {...}
 
 class Unit {
@@ -71,7 +72,8 @@ class Unit {
         {
             when * == 0 { '' }
             when * == 1 { .first }
-            when * >= 2 { .&type-hint }
+            when * >= 2 { self.type-hint($_) }
+
         }(
             gather {
                 for $.dx.types.to-dims.kv -> $key, $value {
@@ -145,10 +147,10 @@ class Unit {
         @!names = [];
     }
 
-    #| loader
+    #| loader  FIXME autoload Measure classes aka types (ie for localization)
     method load( %config ) {
 
-        #| just ignore the outer keys FIXME autoload Measure classes (ie for localization)
+        #| just ignore the outer keys
         my @a;
         for %config.keys -> $k {
             @a.append: |%config{$k};
@@ -295,7 +297,7 @@ class Unit {
         return $dx.postfix.to-syns;
     }
 
-    #| Manually bind type when no preset type, eg. m-1
+    #| Bind new type eg. m-1
     method type-bind( Str $type-name ) {
         for @!names -> $name {
             $.dx.types.to-name{$type-name} = $name;
@@ -303,26 +305,15 @@ class Unit {
         $.dx.types.to-dims{$type-name} = self.dims;
     }
 
-    #| Set and adjust type hints
-#    my %type-hints = %(
-#        Area           => <Area FuelConsumption>,
-#        Energy         => <Energy Torque>,
-#        Momentum       => <Momentum Impulse>,
-#        Frequency      => <Frequency Radioactivity>,
-#        SpecificEnergy => <SpecificEnergy Dose>,
-#    );
-#    method type-hint( @t ) {
-#        #type hints help when multiple types are found
-#        for %type-hints.kv -> $k,$v {
-#            return $k if @t.sort eq $v.sort
-#        }
-#    }
-#    method get-type-hints {
-#        %type-hints
-#    }
-#    multi method type-hints( %th ) {
-#
-#    }
+    #| Apply or provide type hints
+    multi method type-hint( @t ) {
+        for $cg.type-hint.kv -> $k,$v {
+            return $k if @t.sort eq $v.sort
+        }
+    }
+    multi method type-hint {
+        $cg.type-hint
+    }
 
 }
 
@@ -348,7 +339,6 @@ class Unit::Dims {
 
 class Unit::Base is Unit {
     my $cg = Config.new;
-    has $.dx = Directory.instance;
 
     method load( @a ) {
 
@@ -546,14 +536,13 @@ class Directory {
 
     ### Attributes ###
     has Dx::Unit    $.unit    .= new;
-    has Dx::Base   $.bases   .= new;
+    has Dx::Base    $.bases   .= new;
     has Dx::Types   $.types   .= new;
     has Dx::Prefix  $.prefix  .= new;
     has Dx::Postfix $.postfix .= new;
 
     ### Main Loader ###
     method load {
-        # FIXME - load general config & inject to loader
 
         require Physics::Unit::Definitions::en_SI;
         my $load = Physics::Unit::Definitions::en_SI.new;
@@ -563,15 +552,15 @@ class Directory {
         Unit::Dims.new.load:    $load.config<dims>;
 
         # unit children
-        Unit::Base.new.load:    $load.config<bases>;
+        Unit::Base.new.load:    $load.config<base>;
         Unit::Derived.new.load: $load.config<derived>;
         Unit::Prefix.new.load:  $load.config<prefix>;
 
-        # prep for postfix exports
-        Unit::Postfix.new.load;
-
         # load dx for non-core units
         Unit.new.load:          $load.config<units>;
+
+        # prep for postfix exports
+        Unit::Postfix.new.load;
 
         if $cg.db {
             say "+++++++++++++++++++";
@@ -579,29 +568,8 @@ class Directory {
             say "+++++++++++++++++++";
             say "";
         }
+
     }
 }
-
-
-
-######## Subroutines (Internal) #######
-# FIXME TYPE HINTS TO TYPE CLASS METHOD
-#some units have the same dimensions but are different types - type hints steer type inference
-our %type-hints = %(
-    Area           => <Area FuelConsumption>,
-    Energy         => <Energy Torque>,
-    Momentum       => <Momentum Impulse>,
-    Frequency      => <Frequency Radioactivity>,
-    SpecificEnergy => <SpecificEnergy Dose>,
-);
-
-sub type-hint( @t ) {
-	#type hints help when multiple types are found
-	for %type-hints.kv -> $k,$v {
-		return $k if @t.sort eq $v.sort
-	}
-}
-
-
 
 #EOF

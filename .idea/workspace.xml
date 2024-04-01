@@ -4,9 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="plural -&gt; Config">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Bases =&gt; Base">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Build.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/Build.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/META6.json" beforeDir="false" afterPath="$PROJECT_DIR$/META6.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/spike6.raku" beforeDir="false" afterPath="$PROJECT_DIR$/bin/spike6.raku" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Config.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Config.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Definitions/en_SI.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Definitions/en_SI.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/Unit/Definitions/en_SI/bases.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/resources/Unit/Definitions/en_SI/base.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,13 +102,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00039" summary="drop check-change">
-      <created>1708478087136</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1708478087136</updated>
     </task>
     <task id="LOCAL-00040" summary="@.names =&gt; @!names wip">
       <created>1708478265657</created>
@@ -440,7 +439,14 @@
       <option name="project" value="LOCAL" />
       <updated>1711910347276</updated>
     </task>
-    <option name="localTasksCounter" value="88" />
+    <task id="LOCAL-00088" summary="Bases =&gt; Base">
+      <created>1711966553029</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1711966553030</updated>
+    </task>
+    <option name="localTasksCounter" value="89" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -458,7 +464,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Dx::Bases, Dx::Prefix ok" />
     <MESSAGE value="drop method prefix-by-name" />
     <MESSAGE value="drop ListBases" />
     <MESSAGE value="Dictionary =&gt; Directory" />
@@ -483,7 +488,8 @@
     <MESSAGE value="plural wip" />
     <MESSAGE value="NewType =&gt; type-bind" />
     <MESSAGE value="plural -&gt; Config" />
-    <option name="LAST_COMMIT_MESSAGE" value="plural -&gt; Config" />
+    <MESSAGE value="Bases =&gt; Base" />
+    <option name="LAST_COMMIT_MESSAGE" value="Bases =&gt; Base" />
   </component>
   <component name="edument.perl6idea.pm.RakuPackageManagerManager">
     <pmList />

@@ -20,6 +20,14 @@ class Config {
         $!locale = ($_ ~~ /en_US/) ?? 'us' !! $!locale with %*ENV<RAKULANG>;
     }
 
+    has %.type-hint = %(
+        Area           => <Area FuelConsumption>,
+        Energy         => <Energy Torque>,
+        Momentum       => <Momentum Impulse>,
+        Frequency      => <Frequency Radioactivity>,
+        SpecificEnergy => <SpecificEnergy Dose>,
+    );
+
     #some global type defs
     subset Defn   of Str is export;
     subset Type   of Str is export;
@@ -29,7 +37,7 @@ class Config {
     subset Syns   of Array[Name] is export;
     subset Dims   of Array[Int]  is export;
 
-    #handy sub
+    #handy routines
     method plural( $n ) {
         #naive plurals - append 's' ...
         unless $n.chars <= 2                #...too short
