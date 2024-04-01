@@ -15,6 +15,7 @@
     "Physics::Unit::Config": "lib/Physics/Unit/Config.rakumod",
     "Physics::Unit::Directory": "lib/Physics/Unit/Directory.rakumod",
     "Physics::Unit::Maths": "lib/Physics/Unit/Maths.rakumod",
+    "Physics::Unit::Postfix": "lib/Physics/Unit/Postfix.rakumod",
     "Physics::Unit::en_SI": "lib/Physics/Unit/en_SI.rakumod"
   },
   "resources": [
