@@ -37,16 +37,5 @@ class Config {
     subset Syns   of Array[Name] is export;
     subset Dims   of Array[Int]  is export;
 
-    #handy routines
-    method plural( $n ) {
-        #naive plurals - append 's' ...
-        unless $n.chars <= 2                #...too short
-            || $n.comb.first(:end) eq 's'	  #...already ends with 's'
-            || $n.comb.first(:end) eq 'z'     #...already ends with 'z'
-            || $n ~~ /<[\d\/^*]>/             #...contains a digit or a symbol
-        {
-            return $n ~ 's';
-        }
-    }
 }
 

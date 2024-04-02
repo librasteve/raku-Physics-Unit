@@ -1,19 +1,7 @@
-unit module Physics::Unit:ver<1.1.26>:auth<Steve Roe (librasteve@furnival.net)>;
-
-
 use Physics::Unit::Config;
 use Physics::Unit::Maths;
 use Physics::Unit::Parser;
 use Physics::Unit::Directory;
-
-
-# TODO s
-# defile
-# appenders
-# synthetics
-# spike => synopsis => README
-# unify Config and en_SI, put general loader in en_SI [move Unit:: lcasses to files first
-# FIXME s
 
 #| viz. https://en.wikipedia.org/wiki/International_System_of_Units
 #| viz. https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
@@ -168,7 +156,7 @@ class Unit {
 
             #| for each name (ie. synonym)
             for |$names -> $singular {
-                if $cg.plural($singular) -> $plural {
+                if Unit.name-plural($singular) -> $plural {
                     @synonyms.push: $plural;
                 }
             }
@@ -314,30 +302,15 @@ class Unit {
         $cg.type-hint
     }
 
-}
-
-class Unit::Dims {
-    has $.dx = Directory.instance;
-
-    method load( @a ) {
-        for @a -> %h {
-            $.dx.types.to-dims{%h.keys} = %h.values;
+    #| Naive plurals - append 's' ...
+    method name-plural(Unit:U: Name $n ) {
+        unless $n.chars <= 2                #...too short
+            || $n.comb.first(:end) eq 's'	  #...already ends with 's'
+            || $n.comb.first(:end) eq 'z'     #...already ends with 'z'
+            || $n ~~ /<[\d\/^*]>/             #...contains a digit or a symbol
+        {
+            return $n ~ 's';
         }
     }
+
 }
-
-class Unit::Txxx {
-    has $.dx = Directory.instance;
-
-    method load( @a ) {
-        for @a -> %h {
-            $.dx.types.to-name{%h.keys} = %h.values;
-        }
-    }
-}
-
-
-
-
-
-#EOF

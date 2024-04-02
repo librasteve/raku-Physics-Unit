@@ -1,8 +1,6 @@
 use Physics::Unit;
-use Physics::Unit::Config;
 
-class Unit::Base is Unit {   #iamerejh
-    my $cg = Config.new;
+class Unit::Base is Unit {
 
     method load( @a ) {
 
@@ -13,14 +11,14 @@ class Unit::Base is Unit {   #iamerejh
             my @synonyms = |$names;
 
             #| for each name (ie. synonym)
-            for |$names -> $singular {                  # FIXME do this in a Plurals class?
-                if $cg.plural($singular) -> $plural {
+            for |$names -> $singular {
+                if Unit.name-plural($singular) -> $plural {
                     @synonyms.push: $plural;
                 }
             }
             @synonyms.map({ $.dx.unit.to-syns{$_} = |@synonyms });
 
-            my $u = Unit.new;                           #iamerejh
+            my $u = Unit.new;
             $u.names: @synonyms;
             $u.defn: $u.name;
 
@@ -39,7 +37,7 @@ class Unit::Base is Unit {   #iamerejh
             $.dx.postfix.to-syns{$u.name} = @synonyms;       #all synonyms as value
 
             $.dx.postfix.to-defn;
-            say "Initialized Base $names[0]" if $cg.db;
         }
     }
+
 }

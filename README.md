@@ -2,6 +2,15 @@
 [![raku-physics-unit -> DH](https://github.com/librasteve/raku-Physics-Unit/actions/workflows/unit-weekly.yaml/badge.svg)](https://github.com/librasteve/raku-Physics-Unit/actions/workflows/unit-weekly.yaml)
 
 
+# TODO s
+# defile
+# appenders
+# synthetics
+# spike => synopsis => README
+# unify Config and en_SI, put general loader in en_SI [move Unit:: lcasses to files first
+# FIXME s
+
+
 # Version 2
 
 ## Issues / Opportunities
@@ -169,6 +178,59 @@ class Longueur is Length {}
 
 Length.names.append: ['m', 'mètre',],
 
+# Dependency Tree
+
+
+- Unit
+  - Base.rakumod
+    - use Physics::Unit;
+      use Physics::Unit::Config;
+    
+  - Config.rakumod
+    - na
+    
+  - Derived.rakumod
+    - use Physics::Unit;
+    
+  - Dims.rakumod
+    - use Physics::Unit::Directory;
+    
+  - Directory.rakumod
+    - use Physics::Unit::Config;
+    
+  - Maths.rakumod
+    - na;
+    
+  - Parser.rakumod
+    - use Physics::Unit::Config;
+    
+  - Postfix.rakumod
+    - use Physics::Unit::Directory;
+    
+  - Prefix.rakumod
+    - use Physics::Unit;
+    - use Physics::Unit::Config;
+    
+  - Types.rakumod
+    - use Physics::Unit::Directory;
+    
+  - en_SI.rakumod
+    - use YAMLish;
+    - use Physics::Unit;
+    - use Physics::Unit::Base;
+    - use Physics::Unit::Derived;
+    - use Physics::Unit::Prefix;
+    - use Physics::Unit::Postfix;
+    - use Physics::Unit::Types;
+    - use Physics::Unit::Dims;
+    
+- Unit.rakumod
+  - use Physics::Unit::Config;
+  - use Physics::Unit::Maths;
+  - use Physics::Unit::Parser;
+  - use Physics::Unit::Directory;
+
+2 directories, 12 files
 
 
 # Physics::Unit

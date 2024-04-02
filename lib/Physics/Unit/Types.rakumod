@@ -1,6 +1,6 @@
 use Physics::Unit::Directory;
 
-class Unit::Txxx {
+class Unit::Types {
     has $.dx = Directory.instance;
 
     method load( @a ) {

@@ -4,14 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Dims ok">
-      <change afterPath="$PROJECT_DIR$/lib/Physics/Unit/Txxx.rakumod" afterDir="false" />
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Types / Base wip">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/META6.json" beforeDir="false" afterPath="$PROJECT_DIR$/META6.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Base.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Base.rakumod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Derived.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Derived.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Config.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Config.rakumod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Prefix.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Prefix.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Types.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Types.rakumod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/en_SI.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/en_SI.rakumod" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -104,13 +104,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00048" summary="explicit final">
-      <created>1711385856470</created>
-      <option name="number" value="00048" />
-      <option name="presentableId" value="LOCAL-00048" />
-      <option name="project" value="LOCAL" />
-      <updated>1711385856470</updated>
     </task>
     <task id="LOCAL-00049" summary="final type and names">
       <created>1711394281168</created>
@@ -448,7 +441,14 @@
       <option name="project" value="LOCAL" />
       <updated>1711998492687</updated>
     </task>
-    <option name="localTasksCounter" value="97" />
+    <task id="LOCAL-00097" summary="Types / Base wip">
+      <created>1712050297326</created>
+      <option name="number" value="00097" />
+      <option name="presentableId" value="LOCAL-00097" />
+      <option name="project" value="LOCAL" />
+      <updated>1712050297326</updated>
+    </task>
+    <option name="localTasksCounter" value="98" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -466,7 +466,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="rm GetUnit" />
     <MESSAGE value="prefix.by-name =&gt; .to-unit" />
     <MESSAGE value="postfix.by-name =&gt; .to-defn" />
     <MESSAGE value="defn-by-name =&gt; unit.to-defn" />
@@ -491,7 +490,8 @@
     <MESSAGE value="Derived ok" />
     <MESSAGE value="Base ok" />
     <MESSAGE value="Dims ok" />
-    <option name="LAST_COMMIT_MESSAGE" value="Dims ok" />
+    <MESSAGE value="Types / Base wip" />
+    <option name="LAST_COMMIT_MESSAGE" value="Types / Base wip" />
   </component>
   <component name="edument.perl6idea.pm.RakuPackageManagerManager">
     <pmList />
