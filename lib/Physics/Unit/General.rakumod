@@ -2,7 +2,7 @@ use Physics::Unit;
 
 class Unit::General is Unit {
 
-    method load( %config ) {
+    method load( %data ) {
         callsame        # just a passthrough
     }
 }

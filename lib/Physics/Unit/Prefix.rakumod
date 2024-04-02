@@ -7,8 +7,8 @@ class Unit::Prefix is Unit {
         callsame
     }
 
-    method load( %config ) {
-        my @a = |%config<Prefix>;
+    method load( %data ) {
+        my @a = |%data<Prefix>;
 
         for @a -> %h {
             my ($code, $name) = %h<names>;

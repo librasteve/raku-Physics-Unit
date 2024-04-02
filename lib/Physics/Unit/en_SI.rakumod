@@ -25,7 +25,9 @@ class Physics::Unit::en_SI is Unit {
         # read the .yaml files
         for @!parts -> $part {
             #e.g. /Unit/Definitions/en_SI/base.yaml
-            %data{$part} = "$*HOME/$!raph/$!path/$part.yaml".IO.slurp.&load-yaml: :schema(Schema::Core::NoBools);
+            %data{$part} =
+                "$*HOME/$!raph/$!path/$part.yaml".IO.slurp.&load-yaml:
+                    :schema(Schema::Core::NoBools);
         }
 
         # run each Unit::Part loader

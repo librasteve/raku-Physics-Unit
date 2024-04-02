@@ -135,12 +135,13 @@ class Unit {
     }
 
     #| loader  FIXME autoload Measure classes aka types (ie for localization)
-    method load( %config ) {
+    method load( %data ) {
 
-        #| just ignore the outer keys
+        $.dx.classes.names.append: %data.keys;
+
         my @a;
-        for %config.keys -> $k {
-            @a.append: |%config{$k};
+        for %data.keys -> $k {
+            @a.append: |%data{$k};
         }
 
         #eg. ['N',  'newton'],           'kg m / s^2',
@@ -282,6 +283,12 @@ class Unit {
         my $dx := Directory.instance;    # no instance means no attrs
 
         return $dx.postfix.to-syns;
+    }
+
+    method classes(Unit:U:) {
+        my $dx := Directory.instance;    # no instance means no attrs
+
+        $dx.classes.names;
     }
 
     #| Bind new type eg. m-1

@@ -11,7 +11,6 @@ class Directory {
     method instance {
         unless $instance {
             $instance = Directory.bless;
-#            $instance.load;
             $cg.load;
         }
         $instance;
@@ -21,7 +20,7 @@ class Directory {
     # a microcosm #
 
     my class Dx::Unit {
-        has %.by-name{Name}; #     of Unit;
+        has %.by-name{Name};  # of Unit;
         has %.to-defn{Name}     of Defn();  #known names incl. postfix (values may be dupes)
         has %.to-syns{Name}     of Syns();  #list of synonyms (excl. user defined, incl. plurals)
 
@@ -41,11 +40,11 @@ class Directory {
 
     my class Dx::Base {
         has @.names             of Name;
-        has %.by-type{Type}; #     of Unit;
+        has %.by-type{Type};  # of Unit;
     }
 
     my class Dx::Prefix {
-        has %.to-unit{Name}; #     of Unit;
+        has %.to-unit{Name};  # of Unit;
         has %.to-factor{Name}   of Real;
         has %.by-symbol{Symbol} of Name();  #prefix has one symbol plus one name
     }
@@ -55,11 +54,16 @@ class Directory {
         has %.to-syns{Name}     of Syns();  #list of synonyms [n, nano] X~ [m, metre, meter, metres, meters]
     }
 
+    my class Dx::Classes {
+        has @.names             of Name;   #iamerejh make me a % and delete Derived
+    }
+
     ### Attributes ###
     has Dx::Unit    $.unit    .= new;
     has Dx::Base    $.bases   .= new;
     has Dx::Types   $.types   .= new;
     has Dx::Prefix  $.prefix  .= new;
     has Dx::Postfix $.postfix .= new;
+    has Dx::Classes $.classes .= new;
 }
 

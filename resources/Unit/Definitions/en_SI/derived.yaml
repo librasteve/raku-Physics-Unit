@@ -3,10 +3,8 @@
 #SI Derived Units
 
 # Format key:
-#Derived
 #- {names: [symbol, synonym-one, synonym-two ...], defn: 'definition string'}
 
-Derived:
 - {names: [sr, steradian],           defn: 'radian^2'        }
 - {names: [Hz, hertz],               defn: '1 / s'           }
 - {names: [N,  newton],              defn: 'kg m / s^2'      }

@@ -4,16 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="make parts dynamic">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="config =&gt; Config">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Build.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/Build.rakumod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/META6.json" beforeDir="false" afterPath="$PROJECT_DIR$/META6.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/spike6.raku" beforeDir="false" afterPath="$PROJECT_DIR$/bin/spike6.raku" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Config.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Config.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Derived.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Derived.rakumod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Directory.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Directory.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/General.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/General.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Prefix.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Prefix.rakumod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/en_SI.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/en_SI.rakumod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/raku-Physics-Unit.iml" beforeDir="false" afterPath="$PROJECT_DIR$/raku-Physics-Unit.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/Unit/Definitions/en_SI/derived.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/resources/Unit/Definitions/en_SI/derived.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,13 +106,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00054" summary="encapsulate subst-shortest">
-      <created>1711551458018</created>
-      <option name="number" value="00054" />
-      <option name="presentableId" value="LOCAL-00054" />
-      <option name="project" value="LOCAL" />
-      <updated>1711551458018</updated>
     </task>
     <task id="LOCAL-00055" summary="encapsulate .final">
       <created>1711551676189</created>
@@ -449,7 +443,14 @@
       <option name="project" value="LOCAL" />
       <updated>1712072615842</updated>
     </task>
-    <option name="localTasksCounter" value="103" />
+    <task id="LOCAL-00103" summary="config =&gt; Config">
+      <created>1712076321013</created>
+      <option name="number" value="00103" />
+      <option name="presentableId" value="LOCAL-00103" />
+      <option name="project" value="LOCAL" />
+      <updated>1712076321013</updated>
+    </task>
+    <option name="localTasksCounter" value="104" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -467,7 +468,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Array[Name] =&gt; Syns" />
     <MESSAGE value="Array[Int] =&gt; Dims" />
     <MESSAGE value="unit-by-name =&gt; unit.by-name" />
     <MESSAGE value="rm get-syns" />
@@ -492,7 +492,8 @@
     <MESSAGE value="units.yaml =&gt; general.yaml" />
     <MESSAGE value="add General.rakumod" />
     <MESSAGE value="make parts dynamic" />
-    <option name="LAST_COMMIT_MESSAGE" value="make parts dynamic" />
+    <MESSAGE value="config =&gt; Config" />
+    <option name="LAST_COMMIT_MESSAGE" value="config =&gt; Config" />
   </component>
   <component name="edument.perl6idea.pm.RakuPackageManagerManager">
     <pmList />
