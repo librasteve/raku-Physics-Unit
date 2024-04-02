@@ -8,7 +8,7 @@ class Unit::Prefix is Unit {
     #| skips Grammar, no dims, no dmix
     multi method new( :$factor!, :$defn!, :@names!, :$type! where * ~~ 'prefix' ) {
         callsame
-        }
+    }
 
     method load( %config ) {
         my @a = |%config<Prefix>;

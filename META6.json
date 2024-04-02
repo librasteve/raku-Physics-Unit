@@ -20,6 +20,7 @@
     "Physics::Unit::Maths": "lib/Physics/Unit/Maths.rakumod",
     "Physics::Unit::Postfix": "lib/Physics/Unit/Postfix.rakumod",
     "Physics::Unit::Prefix": "lib/Physics/Unit/Prefix.rakumod",
+    "Physics::Unit::Types": "lib/Physics/Unit/Types.rakumod",
     "Physics::Unit::en_SI": "lib/Physics/Unit/en_SI.rakumod"
   },
   "resources": [

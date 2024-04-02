@@ -1,6 +1,7 @@
 use Physics::Unit;
 
 class Unit::Derived is Unit {
+
     method load( %config ) {
         my @a = |%config<Derived>;
 
@@ -14,5 +15,5 @@ class Unit::Derived is Unit {
         }
 
         callsame
-        }
+    }
 }

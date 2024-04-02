@@ -1,15 +1,13 @@
 unit module Physics::Unit:ver<1.1.26>:auth<Steve Roe (librasteve@furnival.net)>;
-#viz. https://en.wikipedia.org/wiki/International_System_of_Units
-#viz. https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
+
 
 use Physics::Unit::Config;
 use Physics::Unit::Maths;
 use Physics::Unit::Parser;
 use Physics::Unit::Directory;
 
-#-------------------------- NEW SHIT
 
-# todo
+# TODO s
 # defile
 # appenders
 # synthetics
@@ -17,7 +15,8 @@ use Physics::Unit::Directory;
 # unify Config and en_SI, put general loader in en_SI [move Unit:: lcasses to files first
 # FIXME s
 
-
+#| viz. https://en.wikipedia.org/wiki/International_System_of_Units
+#| viz. https://en.wikipedia.org/wiki/Dimensional_analysis#Definition
 class Unit {
     also does Maths[Unit];
     also does Parser[Unit];
@@ -317,7 +316,17 @@ class Unit {
 
 }
 
-class Unit::Types {
+class Unit::Dims {
+    has $.dx = Directory.instance;
+
+    method load( @a ) {
+        for @a -> %h {
+            $.dx.types.to-dims{%h.keys} = %h.values;
+        }
+    }
+}
+
+class Unit::Txxx {
     has $.dx = Directory.instance;
 
     method load( @a ) {
@@ -327,15 +336,7 @@ class Unit::Types {
     }
 }
 
-#class Unit::Dims {
-#    has $.dx = Directory.instance;
-#
-#    method load( @a ) {
-#        for @a -> %h {
-#            $.dx.types.to-dims{%h.keys} = %h.values;
-#        }
-#    }
-#}
+
 
 
 

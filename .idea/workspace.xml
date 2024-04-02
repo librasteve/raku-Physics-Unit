@@ -4,10 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Derived ok">
-      <change afterPath="$PROJECT_DIR$/lib/Physics/Unit/Base.rakumod" afterDir="false" />
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Dims ok">
+      <change afterPath="$PROJECT_DIR$/lib/Physics/Unit/Txxx.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/META6.json" beforeDir="false" afterPath="$PROJECT_DIR$/META6.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Base.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Base.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Derived.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Derived.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Prefix.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Prefix.rakumod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/en_SI.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/en_SI.rakumod" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -100,20 +104,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00046" summary="fix indent 2">
-      <created>1710633514062</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1710633514062</updated>
-    </task>
-    <task id="LOCAL-00047" summary="fix indent 2">
-      <created>1711380748005</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
-      <option name="project" value="LOCAL" />
-      <updated>1711380748005</updated>
     </task>
     <task id="LOCAL-00048" summary="explicit final">
       <created>1711385856470</created>
@@ -444,7 +434,21 @@
       <option name="project" value="LOCAL" />
       <updated>1711998143201</updated>
     </task>
-    <option name="localTasksCounter" value="95" />
+    <task id="LOCAL-00095" summary="Base ok">
+      <created>1711998305882</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1711998305882</updated>
+    </task>
+    <task id="LOCAL-00096" summary="Dims ok">
+      <created>1711998492687</created>
+      <option name="number" value="00096" />
+      <option name="presentableId" value="LOCAL-00096" />
+      <option name="project" value="LOCAL" />
+      <updated>1711998492687</updated>
+    </task>
+    <option name="localTasksCounter" value="97" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -462,8 +466,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="tighten NewType" />
-    <MESSAGE value="types.to-basetype =&gt; bases.by-type" />
     <MESSAGE value="rm GetUnit" />
     <MESSAGE value="prefix.by-name =&gt; .to-unit" />
     <MESSAGE value="postfix.by-name =&gt; .to-defn" />
@@ -487,7 +489,9 @@
     <MESSAGE value="Postfix ok ok" />
     <MESSAGE value="Prefix ok" />
     <MESSAGE value="Derived ok" />
-    <option name="LAST_COMMIT_MESSAGE" value="Derived ok" />
+    <MESSAGE value="Base ok" />
+    <MESSAGE value="Dims ok" />
+    <option name="LAST_COMMIT_MESSAGE" value="Dims ok" />
   </component>
   <component name="edument.perl6idea.pm.RakuPackageManagerManager">
     <pmList />
