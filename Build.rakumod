@@ -9,6 +9,8 @@ class Build {
 		mkdir "$*HOME/$raph/Unit/Definitions/en_SI";
 
 		my $path = 'Unit/Definitions/en_SI';
+
+		#| parts are also defined in en_SI.rakumod
 		my @parts = <base types dims derived prefix general>;
 
 		for @parts -> $part {

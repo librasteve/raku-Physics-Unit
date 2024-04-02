@@ -17,6 +17,7 @@ class Physics::Unit::en_SI {
 
     my $raph = '.raph-config';
 
+    #| parts is also specified in Build.rakumod
     has @.parts = <base types dims derived prefix general>;
 
     has %.config;
