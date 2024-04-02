@@ -9,7 +9,7 @@ class Build {
 		mkdir "$*HOME/$raph/Unit/Definitions/en_SI";
 
 		my $path = 'Unit/Definitions/en_SI';
-		my @parts = <base types dims derived prefix units>;
+		my @parts = <base types dims derived prefix general>;
 
 		for @parts -> $part {
 				copy "resources/$path/$part.yaml", "$*HOME/$raph/$path/$part.yaml";

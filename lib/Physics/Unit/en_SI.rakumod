@@ -1,13 +1,13 @@
 use YAMLish;
 
-use Physics::Unit;
-
+use Physics::Unit::Types;
+use Physics::Unit::Dims;
 use Physics::Unit::Base;
 use Physics::Unit::Derived;
 use Physics::Unit::Prefix;
+use Physics::Unit::General;
 use Physics::Unit::Postfix;
-use Physics::Unit::Types;
-use Physics::Unit::Dims;
+
 
 grammar Schema::Core::NoBools is Schema::Core {
     token element:<yes> {
@@ -24,7 +24,7 @@ class Physics::Unit::en_SI {
 
     my $raph = '.raph-config';
 
-    has @.parts = <base types dims derived prefix units>;
+    has @.parts = <base types dims derived prefix general>;
 
     has %.config;
 
@@ -46,7 +46,7 @@ class Physics::Unit::en_SI {
         Unit::Prefix.new.load:  %!config<prefix>;
 
         # load dx for non-core units
-        Unit.new.load:          %!config<units>;
+        Unit::General.new.load: %!config<general>;
 
         # prep for postfix exports
         Unit::Postfix.new.load;

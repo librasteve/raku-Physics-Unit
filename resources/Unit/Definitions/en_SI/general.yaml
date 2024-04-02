@@ -1,6 +1,8 @@
-#Physics::Units::Definitions::en_SI - units.yaml
+#Physics::Units::Definitions::en_SI - general.yaml
 
-#SI Units
+#General Units
+
+# Definition is built on SI Base and Derived Units
 
 # %LOCALE% is substituted to 'us' or 'imp' gallons, pints, mpg etc.
 

@@ -17,6 +17,7 @@
     "Physics::Unit::Derived": "lib/Physics/Unit/Derived.rakumod",
     "Physics::Unit::Dims": "lib/Physics/Unit/Dims.rakumod",
     "Physics::Unit::Directory": "lib/Physics/Unit/Directory.rakumod",
+    "Physics::Unit::General": "lib/Physics/Unit/General.rakumod",
     "Physics::Unit::Maths": "lib/Physics/Unit/Maths.rakumod",
     "Physics::Unit::Postfix": "lib/Physics/Unit/Postfix.rakumod",
     "Physics::Unit::Prefix": "lib/Physics/Unit/Prefix.rakumod",
@@ -28,8 +29,8 @@
     "Unit/Definitions/en_SI/prefix.yaml",
     "Unit/Definitions/en_SI/types.yaml",
     "Unit/Definitions/en_SI/dims.yaml",
-    "Unit/Definitions/en_SI/units.yaml",
-    "Unit/Definitions/en_SI/base.yaml"
+    "Unit/Definitions/en_SI/base.yaml",
+    "Unit/Definitions/en_SI/general.yaml"
   ],
   "license": "Artistic-2.0",
   "tags": [
