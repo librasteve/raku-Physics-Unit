@@ -16,7 +16,7 @@ class Config {
     has $.locale = 'imp';
 
     submethod TWEAK{
-        $!locale = ($_ ~~ /en_US/) ?? 'us' !! 'imp'   with %*ENV<LANG>;
+        $!locale = ($_ ~~ /en_US/) ?? 'us' !! 'imp'    with %*ENV<LANG>;
         $!locale = ($_ ~~ /en_US/) ?? 'us' !! $!locale with %*ENV<RAKULANG>;
     }
 
@@ -27,6 +27,20 @@ class Config {
         Frequency      => <Frequency Radioactivity>,
         SpecificEnergy => <SpecificEnergy Dose>,
     );
+
+    # main Loader
+    method load {
+        require Physics::Unit::en_SI;
+
+        #| also specified in Build.rakumod
+        my $pul = Physics::Unit::en_SI.new(
+            raph => '.raph-config',
+            path => 'Unit/Definitions/en_SI',
+            parts => <base types dims derived prefix general>,
+        );
+
+        $pul.load;
+    }
 
     #some global type defs
     subset Defn   of Str is export;

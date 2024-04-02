@@ -12,7 +12,7 @@ class Unit {
     my $cg = Config.new;
     has $.dx = Directory.instance;
 
-    constant \NumBases = 8;
+    my \NumBases = 8;
 
     has Bool    $!final  = False;
     has Real    $!factor = 1;

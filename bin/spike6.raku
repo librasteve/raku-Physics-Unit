@@ -6,6 +6,8 @@ use Data::Dump::Tree;
 
 use Physics::Unit;
 
+
+
 #SYNOPSIS
 
 #`[
@@ -54,11 +56,11 @@ my $u3 = Unit.find( 'kg m^2/s^2' );
 say ~$u3;
 say "compare $u1, $u2... " ~ $u2.same-dims($u1);
 
-use Physics::Unit::Directory;
-
-my $dx := Directory.instance;
-put $dx.types.names;
-put $dx.units.names;
+#use Physics::Unit::Directory;
+#
+#my $dx := Directory.instance;
+#put $dx.types.names;
+#put $dx.units.names;
 
 #`[[
 ##### Principles & Behaviours ######

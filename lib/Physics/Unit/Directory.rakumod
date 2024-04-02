@@ -11,7 +11,8 @@ class Directory {
     method instance {
         unless $instance {
             $instance = Directory.bless;
-            $instance.load;
+#            $instance.load;
+            $cg.load;
         }
         $instance;
     }
@@ -60,11 +61,5 @@ class Directory {
     has Dx::Types   $.types   .= new;
     has Dx::Prefix  $.prefix  .= new;
     has Dx::Postfix $.postfix .= new;
-
-    ### Main Loader ###
-    method load {
-        require Physics::Unit::en_SI;
-        Physics::Unit::en_SI.new;
-    }
 }
 

@@ -1,6 +1,7 @@
 use YAMLish;
 
-#use Physics::Unit::Config;
+use Physics::Unit;
+use Physics::Unit::Postfix;
 
 grammar Schema::Core::NoBools is Schema::Core {
     token element:<yes> {
@@ -13,32 +14,30 @@ grammar Schema::Core::NoBools is Schema::Core {
     }
 }
 
-class Physics::Unit::en_SI {
+class Physics::Unit::en_SI is Unit {
+    has $.raph;
+    has $.path;
+    has @.parts;
 
-    my $raph = '.raph-config';
+    method load {
+        my %data;
 
-    #| parts is also specified in Build.rakumod
-    has @.parts = <base types dims derived prefix general>;
-
-    has %.config;
-
-    submethod TWEAK {
-        my $path = 'Unit/Definitions/en_SI';
-
+        # read the .yaml files
         for @!parts -> $part {
             #e.g. /Unit/Definitions/en_SI/base.yaml
-            %!config{$part} = "$*HOME/$raph/$path/$part.yaml".IO.slurp.&load-yaml: :schema(Schema::Core::NoBools);
+            %data{$part} = "$*HOME/$!raph/$!path/$part.yaml".IO.slurp.&load-yaml: :schema(Schema::Core::NoBools);
         }
 
+        # run each Unit::Part loader
         for @!parts -> $part {
             my $fqn = "Physics::Unit::" ~ $part.tc;
             require ::($fqn);
 
             my $pqn = "Unit::" ~ $part.tc;
-            ::($pqn).new.load: %!config{$part};
+            ::($pqn).new.load: %data{$part};
         }
 
-
+        # don't forget to load postfix
+        Unit::Postfix.new.load;
     }
-
 }
