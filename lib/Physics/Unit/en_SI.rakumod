@@ -1,13 +1,6 @@
 use YAMLish;
 
-use Physics::Unit::Types;
-use Physics::Unit::Dims;
-use Physics::Unit::Base;
-use Physics::Unit::Derived;
-use Physics::Unit::Prefix;
-use Physics::Unit::General;
-use Physics::Unit::Postfix;
-
+#use Physics::Unit::Config;
 
 grammar Schema::Core::NoBools is Schema::Core {
     token element:<yes> {
@@ -36,20 +29,15 @@ class Physics::Unit::en_SI {
             %!config{$part} = "$*HOME/$raph/$path/$part.yaml".IO.slurp.&load-yaml: :schema(Schema::Core::NoBools);
         }
 
-        # core type info
-        Unit::Types.new.load:   %!config<types>;
-        Unit::Dims.new.load:    %!config<dims>;
+        for @!parts -> $part {
+            my $fqn = "Physics::Unit::" ~ $part.tc;
+            require ::($fqn);
 
-        # unit children
-        Unit::Base.new.load:    %!config<base>;
-        Unit::Derived.new.load: %!config<derived>;
-        Unit::Prefix.new.load:  %!config<prefix>;
+            my $pqn = "Unit::" ~ $part.tc;
+            ::($pqn).new.load: %!config{$part};
+        }
 
-        # load dx for non-core units
-        Unit::General.new.load: %!config<general>;
 
-        # prep for postfix exports
-        Unit::Postfix.new.load;
     }
 
 }
