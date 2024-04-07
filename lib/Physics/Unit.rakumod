@@ -41,6 +41,19 @@ class Unit {
     multi method defn($d)   { self.check-final; $!defn = $d }
     multi method defn       { $!defn }
 
+    method type-synthetic {
+        my $defn = self.canonical;
+        my $type = 'Synthetic:' ~ $defn;
+        my @names = [$defn];
+
+        my $u = Unit.new(factor => 1, :$defn, :@names, :$type);
+
+        $.dx.unit.by-name{$defn} = $u;
+        $.dx.unit.to-defn{$defn} = $defn;
+
+        return $type;
+    }
+
     multi method type($t)   { $!type = $t }
     multi method type       {
 
@@ -57,7 +70,7 @@ class Unit {
 
         #3 look up types with matching dims
         {
-            when * == 0 { '' }
+            when * == 0 { self.type-synthetic }
             when * == 1 { .first }
             when * >= 2 { self.type-hint($_) }
 
@@ -93,8 +106,8 @@ class Unit {
             @!names = [$.defn] unless @!names;
         }
 
-        @!names.map( { $.dx.unit.to-defn{$_} = $.defn } );
         @!names.map( { $.dx.unit.by-name{$_} =   self } );
+        @!names.map( { $.dx.unit.to-defn{$_} = $.defn } );
 
         say "load-names: {@!names}" if $cg.db;
     }
@@ -106,7 +119,6 @@ class Unit {
 
     #| new by parsing defn
     multi method new( :$defn!,  :@names ) {
-#        my $n = CreateUnit( $defn );
         my $n = self.parse( $defn, Directory.instance );
         $n.names: @names;
         $n.finalize;
@@ -134,10 +146,8 @@ class Unit {
         @!names = [];
     }
 
-    #| loader  FIXME autoload Measure classes aka types (ie for localization)
+    #| loader populates Directory, but does not (yet) instatiate Unit objects
     method load( %data ) {
-
-        $.dx.classes.names.append: %data.keys;
 
         my @a;
         for %data.keys -> $k {
@@ -233,14 +243,17 @@ class Unit {
 
         #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
         say "UF1 from $u" if $cg.db;
+        say 42;
 
         return $u;
     }
-    multi method find( Unit:U: Str()  $u ) {
+    multi method find( Unit:U: Str() $u ) {
         my $dx = Directory.instance;    # no instance means no attrs
 
         #2 if name or prefix already instantiated
         say "UF2 from $u" if $cg.db;
+
+        say 43;
 
         return $_ with $dx.unit.by-name{$u};
         return $_ with $dx.prefix.to-unit{$u};
@@ -263,7 +276,7 @@ class Unit {
     multi method type-to-unit(Unit:U: Type $t ) {
         my $dx := Directory.instance;    # no instance means no attrs
 
-        Unit.find: $dx.types.to-name{ $t };
+        Unit.find: $dx.types.to-name{ $t } with $t;
     }
     multi method type-to-unit(Unit:D:) {
         Unit.find: $.dx.types.to-name{ $.type };
@@ -283,12 +296,6 @@ class Unit {
         my $dx := Directory.instance;    # no instance means no attrs
 
         return $dx.postfix.to-syns;
-    }
-
-    method classes(Unit:U:) {
-        my $dx := Directory.instance;    # no instance means no attrs
-
-        $dx.classes.names;
     }
 
     #| Bind new type eg. m-1

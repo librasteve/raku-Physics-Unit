@@ -31,7 +31,7 @@ role Parser[::Unit] {
         $unit-names ~~ s:g/ (<-[a..z A..Z 0..9 \|]>) / '$0' /;
         $pwr-superscripts ~~ s:g/ (<-[a..z A..Z 0..9 \|]>) / '$0' /;
 
-#        Grammar::Tracer;
+        ##use Grammar::Tracer;
         my grammar UnitGrammar {
             token TOP {
                 ^  \s* <numerator=.compound>

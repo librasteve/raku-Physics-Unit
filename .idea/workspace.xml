@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="autoload Measure classes wip">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="autoload Measure classes drop">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/META6.json" beforeDir="false" afterPath="$PROJECT_DIR$/META6.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,13 +97,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00055" summary="encapsulate .final">
-      <created>1711551676189</created>
-      <option name="number" value="00055" />
-      <option name="presentableId" value="LOCAL-00055" />
-      <option name="project" value="LOCAL" />
-      <updated>1711551676189</updated>
     </task>
     <task id="LOCAL-00056" summary="expunge GetUnit">
       <created>1711562161187</created>
@@ -442,7 +434,14 @@
       <option name="project" value="LOCAL" />
       <updated>1712076321013</updated>
     </task>
-    <option name="localTasksCounter" value="104" />
+    <task id="LOCAL-00104" summary="autoload Measure classes drop">
+      <created>1712256585176</created>
+      <option name="number" value="00104" />
+      <option name="presentableId" value="LOCAL-00104" />
+      <option name="project" value="LOCAL" />
+      <updated>1712256585176</updated>
+    </task>
+    <option name="localTasksCounter" value="105" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -460,7 +459,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Array[Int] =&gt; Dims" />
     <MESSAGE value="unit-by-name =&gt; unit.by-name" />
     <MESSAGE value="rm get-syns" />
     <MESSAGE value="rm ListSyns, ListDefns, ListUnits" />
@@ -485,7 +483,8 @@
     <MESSAGE value="add General.rakumod" />
     <MESSAGE value="make parts dynamic" />
     <MESSAGE value="config =&gt; Config" />
-    <option name="LAST_COMMIT_MESSAGE" value="config =&gt; Config" />
+    <MESSAGE value="autoload Measure classes drop" />
+    <option name="LAST_COMMIT_MESSAGE" value="autoload Measure classes drop" />
   </component>
   <component name="edument.perl6idea.pm.RakuPackageManagerManager">
     <pmList />

@@ -54,16 +54,11 @@ class Directory {
         has %.to-syns{Name}     of Syns();  #list of synonyms [n, nano] X~ [m, metre, meter, metres, meters]
     }
 
-    my class Dx::Classes {
-        has @.names             of Name;   #iamerejh make me a % and delete Derived
-    }
-
     ### Attributes ###
     has Dx::Unit    $.unit    .= new;
     has Dx::Base    $.bases   .= new;
     has Dx::Types   $.types   .= new;
     has Dx::Prefix  $.prefix  .= new;
     has Dx::Postfix $.postfix .= new;
-    has Dx::Classes $.classes .= new;
 }
 

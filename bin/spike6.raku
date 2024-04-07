@@ -18,7 +18,6 @@ use Physics::Unit;
 my $u = Unit.find: 'henry';
 say $u.raku;
 
-
 exit;
 
 

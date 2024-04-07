@@ -2,19 +2,13 @@
 
 role Maths[::Unit] {
 
-    ### Scaling by Real factor ###
-    multi submethod times( Real $t ) {
+    #| linear combinations - eg. Distance / Time -> Speed
+    #| times helps multiply
+    multi method times( Real $t ) {
         self.factor: self.factor * $t;
         self
     }
-
-    multi submethod share( Real $d ) {
-        self.factor: self.factor / $d;
-        self
-    }
-
-    ### Combining with another Unit ###
-    multi submethod times( Unit $t ) {
+    multi method times( Unit $t ) {
         self.clear;
 
         self.factor: self.factor * $t.factor;
@@ -24,7 +18,8 @@ role Maths[::Unit] {
         self
     }
 
-    submethod invert {
+    #| invert and share help divide
+    method invert {
         self.clear;
 
         self.factor: 1 / self.factor;
@@ -33,8 +28,11 @@ role Maths[::Unit] {
 
         self
     }
-
-    multi submethod share( Unit $d ) {
+    multi method share( Real $d ) {
+        self.factor: self.factor / $d;
+        self
+    }
+    multi method share( Unit $d ) {
         self.clear;
 
         my $u = Unit.find($d).clone;
@@ -68,11 +66,14 @@ role Maths[::Unit] {
     }
 
     method divide( Unit $r ) {
+        say 1;
         my $l = self.clone;
-        my $x = $l.share( $r );
+        dd my $x = $l.share( $r );
 
-        my $t = $x.type;
-        my $u = Unit.type-to-unit( $t );
+        say 2;
+        dd my $t = $x.type;
+        say 3;
+        say my $u = Unit.type-to-unit( $t );
         return( $t, $u )
     }
 
