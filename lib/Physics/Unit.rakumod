@@ -1108,7 +1108,7 @@ InitUnit (
 
 	# Flow
 	['m^3/s'],                                  'm^3 / second',
-  ['Sv'],                                     '1000000 m^3/s',
+  ['sverdrup'],                               '1000000 m^3/s',
 	['gpd'],                                    'gallons / day',
 
 	# SpecificEnergy 
