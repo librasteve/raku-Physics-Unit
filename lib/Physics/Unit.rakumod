@@ -823,8 +823,8 @@ InitTypes (
     'CatalyticActivity'  => 'kat',
     'FuelConsumption'    => 'm^3/m',
     'FuelEfficiency'     => 'm/m^3',
-	'Flow'               => 'm^3/s',
-	'SpecificEnergy'     => 'J/kg',
+	  'Flow'               => 'm^3/s',
+	  'SpecificEnergy'     => 'J/kg',
     'Irradiance'         => 'W/m^2',
     'Insolation'         => 'kWh/m^2',
     'ThermalResistance'  => 'Km^2/W',
@@ -1095,8 +1095,8 @@ InitUnit (
 	['°F', 'Fahrenheit'],                       '5/9 * K + 459.67',
 
 	# Dose
-	['rad'],									'gray / 100',
-	['rem'],									'sievert / 100',
+	['rad'],									                  'gray / 100',
+	['rem'],									                  'sievert / 100',
 
 	# FuelConsumption
 	['m^3/m'],                                  'm^3 / metre',
@@ -1108,6 +1108,7 @@ InitUnit (
 
 	# Flow
 	['m^3/s'],                                  'm^3 / second',
+  ['Sv'],                                     '1000000 m^3/s',
 	['gpd'],                                    'gallons / day',
 
 	# SpecificEnergy 
