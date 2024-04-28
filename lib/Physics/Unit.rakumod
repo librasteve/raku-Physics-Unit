@@ -17,7 +17,7 @@ class Unit {
     has Bool    $!final  = False;
     has Real    $!factor = 1;
     has Real    $!offset = 0;
-    has Defn()  $!defn   = '';
+    has Defn()  $!defn   is default('');
     has Type    $!type;
     has Name    @!names  = [];
     has Int     @.dims = 0 xx NumBases;
@@ -111,9 +111,9 @@ class Unit {
 
         say "load-names: {@!names}" if $cg.db;
     }
-    multi method names      { @!names }
+    multi method names      { @!names || '' }
 
-    method name             { @!names.first }
+    method name             { @!names.first || '' }
 
     ### new & clone methods ###
 
@@ -138,7 +138,7 @@ class Unit {
         nextwith :names([]), :dims(@!dims.clone), :dmix($!dmix.clone);
     }
 
-    #| clear all but dims and dmix (used by role Maths)
+    #| clear non-numeric attrs (used by role Maths)
     method clear {
         $!final = False;
         $!defn  = Nil;
@@ -182,13 +182,16 @@ class Unit {
     ### output methods ###
 
     method Str       { self.name }
+
     method gist      { self.Str }
+
     method raku      {
         return qq:to/END/;
-          Unit.new( factor => $!factor, offset => $!offset, defn => '$.defn', type => {$.type},
-          dims => [{@!dims.join(',')}], dmix => {$!dmix.raku}, names => [{@!names.map( ->$n {"'$n'"}).join(',')}] );
+          Unit.new( factor => $.factor, offset => $.offset, defn => '$.defn', type => {$.type},
+          dims => [{@!dims.join(',')}], dmix => {$!dmix.raku}, names => [{@.names.map( ->$n {"'$n'"}).join(',')}] );
         END
     }
+
     method canonical {
         #reset to SI base names
         my ( $ds, @dim-str );
@@ -202,6 +205,7 @@ class Unit {
         }
         return @dim-str.join('.')
     }
+
     method pretty    {
         #following SI recommendation
         my %pwr-sup-rev = $cg.pwr-superscript.kv.reverse;
@@ -238,22 +242,25 @@ class Unit {
             return $u;
         }
     }
+
     multi method find( Unit:U: Unit:D $u ) {
         my $dx := Directory.instance;    # no instance means no attrs
 
         #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
         say "UF1 from $u" if $cg.db;
-        say 42;
+
+        #say 42;   #iamerejh vvv
 
         return $u;
     }
+
     multi method find( Unit:U: Str() $u ) {
         my $dx = Directory.instance;    # no instance means no attrs
 
         #2 if name or prefix already instantiated
         say "UF2 from $u" if $cg.db;
 
-        say 43;
+        #say 43;
 
         return $_ with $dx.unit.by-name{$u};
         return $_ with $dx.prefix.to-unit{$u};
@@ -276,8 +283,9 @@ class Unit {
     multi method type-to-unit(Unit:U: Type $t ) {
         my $dx := Directory.instance;    # no instance means no attrs
 
-        Unit.find: $dx.types.to-name{ $t } with $t;
+        (Unit.find: $dx.types.to-name{ $t }) with $t;
     }
+
     multi method type-to-unit(Unit:D:) {
         Unit.find: $.dx.types.to-name{ $.type };
     }
@@ -287,11 +295,13 @@ class Unit {
 
         return $dx.prefix.to-factor;
     }
+
     multi method postfix-to-defn(Unit:U:) {
         my $dx := Directory.instance;    # no instance means no attrs
 
         return $dx.postfix.to-defn;
     }
+
     multi method postfix-to-syns(Unit:U:) {
         my $dx := Directory.instance;    # no instance means no attrs
 

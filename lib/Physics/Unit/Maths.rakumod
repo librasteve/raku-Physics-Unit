@@ -2,7 +2,8 @@
 
 role Maths[::Unit] {
 
-    #| linear combinations - eg. Distance / Time -> Speed
+    # linear combinations - eg. Distance / Time -> Speed
+
     #| times helps multiply
     multi method times( Real $t ) {
         self.factor: self.factor * $t;
@@ -68,12 +69,14 @@ role Maths[::Unit] {
     method divide( Unit $r ) {
         say 1;
         my $l = self.clone;
-        dd my $x = $l.share( $r );
+        dd my $x = $l.share( $r );   #iamerejh
 
         say 2;
         dd my $t = $x.type;
+
         say 3;
         say my $u = Unit.type-to-unit( $t );
+
         return( $t, $u )
     }
 

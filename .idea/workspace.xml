@@ -4,8 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="autoload Measure classes drop">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Synthetic wip">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/raku-Physics-Unit.iml" beforeDir="false" afterPath="$PROJECT_DIR$/raku-Physics-Unit.iml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,7 +65,7 @@
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;raku.project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;raku.project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;raku.project.structure.proportion&quot;: &quot;0.0&quot;,
     &quot;raku.project.structure.side.proportion&quot;: &quot;0.0&quot;,
     &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.sourceCode.Raku&quot;,
@@ -97,13 +102,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00056" summary="expunge GetUnit">
-      <created>1711562161187</created>
-      <option name="number" value="00056" />
-      <option name="presentableId" value="LOCAL-00056" />
-      <option name="project" value="LOCAL" />
-      <updated>1711562161187</updated>
     </task>
     <task id="LOCAL-00057" summary="stet !dims !dmix">
       <created>1711566028173</created>
@@ -441,7 +439,14 @@
       <option name="project" value="LOCAL" />
       <updated>1712256585176</updated>
     </task>
-    <option name="localTasksCounter" value="105" />
+    <task id="LOCAL-00105" summary="Synthetic wip">
+      <created>1712496199065</created>
+      <option name="number" value="00105" />
+      <option name="presentableId" value="LOCAL-00105" />
+      <option name="project" value="LOCAL" />
+      <updated>1712496199066</updated>
+    </task>
+    <option name="localTasksCounter" value="106" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -459,7 +464,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="unit-by-name =&gt; unit.by-name" />
     <MESSAGE value="rm get-syns" />
     <MESSAGE value="rm ListSyns, ListDefns, ListUnits" />
     <MESSAGE value="GetPrefixToFactor =&gt; Unit.prefix-to-factor" />
@@ -484,7 +488,8 @@
     <MESSAGE value="make parts dynamic" />
     <MESSAGE value="config =&gt; Config" />
     <MESSAGE value="autoload Measure classes drop" />
-    <option name="LAST_COMMIT_MESSAGE" value="autoload Measure classes drop" />
+    <MESSAGE value="Synthetic wip" />
+    <option name="LAST_COMMIT_MESSAGE" value="Synthetic wip" />
   </component>
   <component name="edument.perl6idea.pm.RakuPackageManagerManager">
     <pmList />

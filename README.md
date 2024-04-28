@@ -2,6 +2,25 @@
 [![raku-physics-unit -> DH](https://github.com/librasteve/raku-Physics-Unit/actions/workflows/unit-weekly.yaml/badge.svg)](https://github.com/librasteve/raku-Physics-Unit/actions/workflows/unit-weekly.yaml)
 
 
+$ cat Physics.rakumod
+unit module Physics;
+
+my class Length {
+has Int $.value;
+}
+
+my package EXPORT::en {
+OUR::<Length> := Length;
+}
+
+my package EXPORT::de {
+OUR::<Länge> := Length;
+}
+$ raku -I. -e 'use Physics :en; say Length;'
+(Length)
+$ raku -I. -e 'use Physics :de; say Länge;'
+(Length)
+
 # TODO s
 # defile
 # appenders

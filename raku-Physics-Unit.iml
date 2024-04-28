@@ -17,5 +17,14 @@
         </SOURCES>
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library name="MIME::Base64" type="perl6">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES>
+          <root url="raku://1166070978:MIME::Base64!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
   </component>
 </module>
