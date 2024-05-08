@@ -808,6 +808,7 @@ InitTypes (
     'Density'			 => 'kg/m^3',
     'Energy'             => 'joule',
     'Power'              => 'watt',
+    'SpecificPower'      => 'kW/kg',
     'Charge'             => 'coulomb',
     'Potential'			 => 'volt',
     'Resistance'         => 'ohm',
