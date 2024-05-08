@@ -1073,6 +1073,10 @@ InitUnit (
 	['us-horsepower', 'us-hp'],                 '550 foot pound-force / s',
 	['PS', 'horsepower', 'hp'],                 '75 kg * g0 * m / s',
 
+  # Specific Power
+  ['kW/kg'],                                   'kW / kg',
+  ['hp/lb'],                                   'hp / lb',
+
 	# Current (Base Unit)
 
 	# Potential (Derived Unit)
