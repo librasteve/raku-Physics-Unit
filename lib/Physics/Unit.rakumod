@@ -808,7 +808,6 @@ InitTypes (
     'Density'			 => 'kg/m^3',
     'Energy'             => 'joule',
     'Power'              => 'watt',
-    'SpecificPower'      => 'kilowatt/kg',
     'Charge'             => 'coulomb',
     'Potential'			 => 'volt',
     'Resistance'         => 'ohm',
@@ -826,6 +825,7 @@ InitTypes (
     'FuelEfficiency'     => 'm/m^3',
 	  'Flow'               => 'm^3/s',
 	  'SpecificEnergy'     => 'J/kg',
+    'SpecificPower'      => 'kW/kg',
     'Irradiance'         => 'W/m^2',
     'Insolation'         => 'kWh/m^2',
     'ThermalResistance'  => 'Km^2/W',
@@ -1075,10 +1075,6 @@ InitUnit (
 	['us-horsepower', 'us-hp'],                 '550 foot pound-force / s',
 	['PS', 'horsepower', 'hp'],                 '75 kg * g0 * m / s',
 
-  # Specific Power
-  ['kW/kg'],                                   'kW / kg',
-  ['hp/lb'],                                   'hp / lb',
-
 	# Current (Base Unit)
 
 	# Potential (Derived Unit)
@@ -1120,6 +1116,10 @@ InitUnit (
 	# SpecificEnergy 
 	['J/kg'],                                   'joules / kg',
 	['MJ/kg'],                                  'mega joules / kg',
+
+  # Specific Power
+  ['kW/kg'],                                   'kilo W / kg',
+  ['hp/lb'],                                   'hp / lb',
 
 	# Irradiance 
 	['W/m^2'],                                  'W / m^2',
