@@ -228,10 +228,15 @@ FuelEfficiency:
 Flow:
   - {names: [m^3/s],                     defn: 'm^3 / second'}
   - {names: [gpd],                       defn: 'gallon / day'}
+  - {names: [sv, sverdup],               defn: '1000000 m^3/s'}
 
 SpecificEnergy:
   - {names: [J/kg],                      defn: 'joule / kg'}
   - {names: [MJ/kg],                     defn: 'mega joule / kg'}
+
+SpecificPower:
+  - {names: [kW/kg],                     defn: 'kilo W / kg'}
+  - {names: [hp/lb],                     defn: 'hp / lb'}
 
 Irradiance:
   - {names: [W/m^2],                     defn: 'W / m^2'}

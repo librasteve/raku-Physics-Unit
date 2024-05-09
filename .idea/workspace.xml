@@ -4,13 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Synthetic wip">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="defn default">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/raku-Physics-Unit.iml" beforeDir="false" afterPath="$PROJECT_DIR$/raku-Physics-Unit.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/Unit/Definitions/en_SI/general.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/resources/Unit/Definitions/en_SI/general.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,13 +99,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00057" summary="stet !dims !dmix">
-      <created>1711566028173</created>
-      <option name="number" value="00057" />
-      <option name="presentableId" value="LOCAL-00057" />
-      <option name="project" value="LOCAL" />
-      <updated>1711566028173</updated>
     </task>
     <task id="LOCAL-00058" summary="move stuff to roles">
       <created>1711622470232</created>
@@ -446,7 +436,14 @@
       <option name="project" value="LOCAL" />
       <updated>1712496199066</updated>
     </task>
-    <option name="localTasksCounter" value="106" />
+    <task id="LOCAL-00106" summary="defn default">
+      <created>1714316286866</created>
+      <option name="number" value="00106" />
+      <option name="presentableId" value="LOCAL-00106" />
+      <option name="project" value="LOCAL" />
+      <updated>1714316286866</updated>
+    </task>
+    <option name="localTasksCounter" value="107" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -464,7 +461,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="rm get-syns" />
     <MESSAGE value="rm ListSyns, ListDefns, ListUnits" />
     <MESSAGE value="GetPrefixToFactor =&gt; Unit.prefix-to-factor" />
     <MESSAGE value="GetPostfixByName =&gt; Unit.postfix-by-defn ..." />
@@ -489,7 +485,8 @@
     <MESSAGE value="config =&gt; Config" />
     <MESSAGE value="autoload Measure classes drop" />
     <MESSAGE value="Synthetic wip" />
-    <option name="LAST_COMMIT_MESSAGE" value="Synthetic wip" />
+    <MESSAGE value="defn default" />
+    <option name="LAST_COMMIT_MESSAGE" value="defn default" />
   </component>
   <component name="edument.perl6idea.pm.RakuPackageManagerManager">
     <pmList />

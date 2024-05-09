@@ -17,17 +17,17 @@ class Unit {
     has Bool    $!final  = False;
     has Real    $!factor = 1;
     has Real    $!offset = 0;
-    has Defn()  $!defn   is default('');
+    has Defn()  $!defn is default('');
     has Type    $!type;
     has Name    @!names  = [];
-    has Int     @.dims = 0 xx NumBases;
+    has Int     @.dims   = 0 xx NumBases;
     has MixHash $.dmix is rw = ∅.MixHash;
 
     ### accessor methods ###
 
     method check-final      {
         #type and names are exempt and may be manually set at any time
-        die "You're not allowed to change a finalized Unit!" if $!final;
+        die "You are not allowed to change a finalized Unit!" if $!final;
     }
     method finalize         { $!final = True }
 
@@ -283,6 +283,7 @@ class Unit {
     multi method type-to-unit(Unit:U: Type $t ) {
         my $dx := Directory.instance;    # no instance means no attrs
 
+        print $dx.types.to-name;
         (Unit.find: $dx.types.to-name{ $t }) with $t;
     }
 
