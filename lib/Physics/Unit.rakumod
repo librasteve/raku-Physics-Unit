@@ -10,8 +10,6 @@ class Unit {
     also does Parser[Unit];
 
     my $cg = Config.new;
-#    my $dx = Directory.instance;
-
     has $.dx = Directory.instance;
 
     my \NumBases = 8;
@@ -43,15 +41,15 @@ class Unit {
     multi method defn($d)   { self.check-final; $!defn = $d }
     multi method defn       { $!defn }
 
-    method type-synth {
+    #| make new synthetic Unit when we find no definition
+    method make-synth {
         my $defn = self.canonical;
-        my $type = 'Synthetic:' ~ $defn;
-        my @names = [$defn];
+        my $type = 'synthetic:' ~ $defn;
 
-        my $u = Unit.new(factor => 1, :$defn, :@names, :$type);
+        my $u = Unit.new(:$defn, names => [$defn]);
+        $u.type: $type;
 
-        $.dx.unit.by-name{$defn} = $u;
-        $.dx.unit.to-defn{$defn} = $defn;
+        $.dx.types.to-name{$type} = $defn;
 
         return $type;
     }
@@ -60,7 +58,7 @@ class Unit {
     multi method type       {
 
         #1 type has been set
-        #eg. on Prefix.load or explicitly to clarify an ambiguity
+        #eg. prefix & synthetic or explicitly to clarify an ambiguity
         return when $!type;
 
         #2 check if name (if set) is a base type
@@ -72,7 +70,7 @@ class Unit {
 
         #3 look up types with matching dims
         {
-            when * == 0 { self.type-synth }
+            when * == 0 { self.make-synth}
             when * == 1 { .first }
             when * >= 2 { self.type-hint($_) }
 
@@ -248,69 +246,68 @@ class Unit {
     }
 
     multi method find( Unit:U: Unit:D $u ) {
-        my $dx := Directory.instance;    # no instance means no attrs
+        my $dx := Directory.instance;    # class method cant use attr
 
         #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
-        say "UF1 from $u"; # if $cg.db;
+        say "UF1 from $u" if $cg.db;
 
         return $u;
     }
 
     multi method find( Unit:U: Str() $u ) {
-        my $dx = Directory.instance;    # no instance means no attrs
+        my $dx = Directory.instance;    # class method cant use attr
 
         #2 if name or prefix already instantiated
-        say "UF2 from $u"; # if $cg.db;
+        say "UF2 from $u" if $cg.db;
 
         return $_ with $dx.unit.by-name{$u};
         return $_ with $dx.prefix.to-unit{$u};
 
         #3 if name in our defns, instantiate it
-        say "UF3 from $u"; # if $cg.db;
+        say "UF3 from $u" if $cg.db;
 
         for $dx.unit.to-defn -> %p {
             if %p.key.grep($u) {
-                say 44;
                 return Unit.new( defn => %p.value, names => [%p.key] );
             }
         }
 
         #4 if no match, instantiate new Unit as (shortest) object from definition
-        say "UF4 from $u"; # if $cg.db;
+        say "UF4 from $u" if $cg.db;
 
-        return subst-shortest(Unit.new( defn => $u ));
+        subst-shortest(Unit.new( defn => $u ));
     }
 
-    multi method type-to-unit(Unit:U: Type $t ) {
-        my $dx := Directory.instance;    # no instance means no attrs
+    multi method type-to-unit(Unit:U: Any:U) {         # FIXME does test need this multi?
+        die "Cannot get the Unit of an undefined Type";
+    }
 
-##        print $dx.types.to-name;
-        (Unit.find: $dx.types.to-name{ $t }) with $t;
-#        (Unit.new: defn => $dx.types.to-name{ $t }) with $t;
+    multi method type-to-unit(Unit:U: Type:D $t ) {
+        my $dx := Directory.instance;    # class method cant use attr
+
+        Unit.find: $dx.types.to-name{ $t };
     }
 
     multi method type-to-unit(Unit:D:) {
-##        print $.dx.types.to-name<Distance>.^name;
         Unit.find: $.dx.types.to-name{ $.type };
-#        Unit.new: defn => $.dx.types.to-name{ $.type };
     }
 
     multi method prefix-to-factor(Unit:U:) {
-        my $dx := Directory.instance;    # no instance means no attrs
+        my $dx := Directory.instance;    # class method cant use attr
 
-        return $dx.prefix.to-factor;
+        $dx.prefix.to-factor;
     }
 
     multi method postfix-to-defn(Unit:U:) {
-        my $dx := Directory.instance;    # no instance means no attrs
+        my $dx := Directory.instance;    # class method cant use attr
 
-        return $dx.postfix.to-defn;
+        $dx.postfix.to-defn;
     }
 
     multi method postfix-to-syns(Unit:U:) {
-        my $dx := Directory.instance;    # no instance means no attrs
+        my $dx := Directory.instance;    # class method cant use attr
 
-        return $dx.postfix.to-syns;
+        $dx.postfix.to-syns;
     }
 
     #| Bind new type eg. m-1
@@ -333,7 +330,7 @@ class Unit {
 
     #| Naive plurals - append 's' ...
     method name-plural(Unit:U: Name $n ) {
-        unless $n.chars <= 2                #...too short
+        unless $n.chars <= 2                  #...too short
             || $n.comb.first(:end) eq 's'	  #...already ends with 's'
             || $n.comb.first(:end) eq 'z'     #...already ends with 'z'
             || $n ~~ /<[\d\/^*]>/             #...contains a digit or a symbol

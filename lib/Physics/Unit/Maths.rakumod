@@ -65,30 +65,22 @@ role Maths[::Unit] {
     ### Units part of Measure operations ###
     method multiply( Unit $r ) {
         my $l = self.clone;
+
         my $x = $l.times( $r );
 
         my $t = $x.type;
         my $u = Unit.type-to-unit( $t );
+
         return( $t, $u )
     }
 
     method divide( Unit $r ) {
-        say 1;
-
         my $l = self.clone;
 
         my $x = $l.share( $r );
 
-        say $x.raku;
-        say 2;
-
-        say my $t = $x.type;
-        say 3;
-
-        my $u = Unit.type-to-unit( $t );  #iamerejh
-
-        say $u.raku;
-        say 4;
+        my $t = $x.type;
+        my $u = Unit.type-to-unit( $t );
 
         return( $t, $u );
     }
@@ -97,7 +89,8 @@ role Maths[::Unit] {
         #only when all dims divisible by root
         my $l = self.clone;
            $l.clear;
-        die 'Taking roots only works where factor == 1' unless $l.factor == 1;
+
+        die 'Taking roots with factor != 1 is not implemented' unless $l.factor == 1;
 
         $l.dims = $l.dims.map({($_/$n).Int});
 
@@ -107,6 +100,7 @@ role Maths[::Unit] {
 
         my $t = $l.type;
         my $u = Unit.type-to-unit( $t );
+
         return( $t, $u );
     }
 

@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="add SpecificPower">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="pre my dx spike">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" afterDir="false" />
@@ -24,6 +24,7 @@
     </disable_hints>
   </component>
   <component name="Git.Settings">
+    <option name="PUSH_AUTO_UPDATE" value="true" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
         <entry key="$PROJECT_DIR$" value="main" />
@@ -100,13 +101,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00059" summary="add Defn, Name, Type types">
-      <created>1711624131080</created>
-      <option name="number" value="00059" />
-      <option name="presentableId" value="LOCAL-00059" />
-      <option name="project" value="LOCAL" />
-      <updated>1711624131080</updated>
     </task>
     <task id="LOCAL-00060" summary="base =&gt; bases">
       <created>1711625402848</created>
@@ -444,7 +438,14 @@
       <option name="project" value="LOCAL" />
       <updated>1715266130428</updated>
     </task>
-    <option name="localTasksCounter" value="108" />
+    <task id="LOCAL-00108" summary="pre my dx spike">
+      <created>1715430941847</created>
+      <option name="number" value="00108" />
+      <option name="presentableId" value="LOCAL-00108" />
+      <option name="project" value="LOCAL" />
+      <updated>1715430941848</updated>
+    </task>
+    <option name="localTasksCounter" value="109" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -462,7 +463,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="GetPrefixToFactor =&gt; Unit.prefix-to-factor" />
     <MESSAGE value="GetPostfixByName =&gt; Unit.postfix-by-defn ..." />
     <MESSAGE value="try to unify $dx" />
     <MESSAGE value="plural wip" />
@@ -487,14 +487,15 @@
     <MESSAGE value="Synthetic wip" />
     <MESSAGE value="defn default" />
     <MESSAGE value="add SpecificPower" />
-    <option name="LAST_COMMIT_MESSAGE" value="add SpecificPower" />
+    <MESSAGE value="pre my dx spike" />
+    <option name="LAST_COMMIT_MESSAGE" value="pre my dx spike" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="perl6LineBreakpoint">
           <url>file://$PROJECT_DIR$/lib/Physics/Unit.rakumod</url>
-          <line>332</line>
+          <line>331</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

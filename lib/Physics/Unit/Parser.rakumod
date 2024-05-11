@@ -6,7 +6,6 @@ role Parser[::Unit] {
     my $cg = Config.new;
 
     method parse($defn is copy, $dx) {
-
         # Generally defn parsing proceeds by finding elements which are themselves
         # Unit objects and then recursively getting them (which can invoice recursive
         # calls to this parser). The class method Unit.find is used to do this.
@@ -132,7 +131,7 @@ role Parser[::Unit] {
                 my $defn = $<name>.made<defn>;
                 my $pfix = $<prefix>.made<unit>;
                 $unit.times($pfix) if $pfix;
-                make %( defn => $defn, unit => $unit);
+                make %(:$defn, :$unit);
             }
             method prefix($/) {
                 make %( unit => Unit.find($/.Str).clone);
@@ -142,7 +141,7 @@ role Parser[::Unit] {
                 my $defn = $/.Str;
                 my $unit = Unit.find($defn).clone;
                 $unit.dmix = ∅.MixHash;
-                make %( defn => $defn, unit => $unit);
+                make %(:$defn, :$unit);
             }
 
             #| extract (signed) power digits from various grammar options
