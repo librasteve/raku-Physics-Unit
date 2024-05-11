@@ -62,6 +62,8 @@ $ raku -I. -e 'use Physics :de; say Länge;'
 ## TODOS
 - [ ] cc info to main (check preload = 1)
 - [ ] general config (ie core definitions)
+- [ ] regimes eg pint
+- [ ] merge SpecificPower from v1.x
 
 
 en_US - English (United States)
