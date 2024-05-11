@@ -5,18 +5,21 @@ role Maths[::Unit] {
     # linear combinations - eg. Distance / Time -> Speed
 
     #| times helps multiply
-    multi method times( Real $t ) {
-        self.factor: self.factor * $t;
-        self
+    multi method times( Real $r ) {
+
+        self.factor: self.factor * $r;
+
+        return self;
     }
-    multi method times( Unit $t ) {
+
+    multi method times( Unit $r ) {
         self.clear;
 
-        self.factor: self.factor * $t.factor;
-        self.dims >>+=<< $t.dims;
-        self.dmix = ( self.dmix (+) $t.dmix ).MixHash;
+        self.factor: self.factor * $r.factor;
+        self.dims >>+=<< $r.dims;
+        self.dmix = ( self.dmix (+) $r.dmix ).MixHash;
 
-        self
+        return self;
     }
 
     #| invert and share help divide
@@ -27,19 +30,22 @@ role Maths[::Unit] {
         self.dims = -<< self.dims;
         self.dmix = ( ∅ (-) self.dmix ).MixHash;
 
-        self
+        return self;
     }
-    multi method share( Real $d ) {
-        self.factor: self.factor / $d;
-        self
+
+    multi method share( Real $r ) {
+
+        self.factor: self.factor / $r;
+
+        return self;
     }
-    multi method share( Unit $d ) {
+
+    multi method share( Unit $r ) {
         self.clear;
 
-        my $u = Unit.find($d).clone;
-        self.times: $u.invert;
+        self.times: $r.invert;
 
-        self
+        return self;
     }
 
     #| raise a one-element unit $e to power of $d digits
@@ -53,7 +59,7 @@ role Maths[::Unit] {
         my $e-can = $.dx.unit.to-syns{$e}[0];   #lookup the canonical name
         self.dmix{$e-can} = $d;
 
-        self
+        return self;
     }
 
     ### Units part of Measure operations ###
@@ -68,16 +74,23 @@ role Maths[::Unit] {
 
     method divide( Unit $r ) {
         say 1;
+
         my $l = self.clone;
-        dd my $x = $l.share( $r );   #iamerejh
 
+        my $x = $l.share( $r );
+
+        say $x.raku;
         say 2;
-        dd my $t = $x.type;
 
+        say my $t = $x.type;
         say 3;
-        say my $u = Unit.type-to-unit( $t );
 
-        return( $t, $u )
+        my $u = Unit.type-to-unit( $t );  #iamerejh
+
+        say $u.raku;
+        say 4;
+
+        return( $t, $u );
     }
 
     method root-extract( Int $n where 1 <= * <= 4 ) {
@@ -94,7 +107,7 @@ role Maths[::Unit] {
 
         my $t = $l.type;
         my $u = Unit.type-to-unit( $t );
-        return( $t, $u )
+        return( $t, $u );
     }
 
     #### convert & compare methods ####
@@ -104,7 +117,7 @@ role Maths[::Unit] {
     method same-dims( Unit $u ) {
         return 0 unless $u.dmix  eqv self.dmix;
         return 0 unless $u.factor == self.factor;
-        return 1
+        return 1;
     }
 
     #| used by Measure cmp
@@ -112,7 +125,7 @@ role Maths[::Unit] {
     method same-unit( Unit $u ) {
         return 0 unless $u.dims  eqv self.dims;
         return 0 unless $u.factor == self.factor;
-        return 1
+        return 1;
     }
 }
 

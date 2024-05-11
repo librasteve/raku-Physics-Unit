@@ -10,6 +10,8 @@ class Unit {
     also does Parser[Unit];
 
     my $cg = Config.new;
+#    my $dx = Directory.instance;
+
     has $.dx = Directory.instance;
 
     my \NumBases = 8;
@@ -41,7 +43,7 @@ class Unit {
     multi method defn($d)   { self.check-final; $!defn = $d }
     multi method defn       { $!defn }
 
-    method type-synthetic {
+    method type-synth {
         my $defn = self.canonical;
         my $type = 'Synthetic:' ~ $defn;
         my @names = [$defn];
@@ -58,7 +60,7 @@ class Unit {
     multi method type       {
 
         #1 type has been set
-        #eg. on Prefix.load or explicitly to avoid ambiguous state
+        #eg. on Prefix.load or explicitly to clarify an ambiguity
         return when $!type;
 
         #2 check if name (if set) is a base type
@@ -70,7 +72,7 @@ class Unit {
 
         #3 look up types with matching dims
         {
-            when * == 0 { self.type-synthetic }
+            when * == 0 { self.type-synth }
             when * == 1 { .first }
             when * >= 2 { self.type-hint($_) }
 
@@ -186,9 +188,11 @@ class Unit {
     method gist      { self.Str }
 
     method raku      {
+        my $name-string = $.name ?? qq|[{@.names.map( {"'$_'"} ).join(',')}]| !! '[]';
+
         return qq:to/END/;
-          Unit.new( factor => $.factor, offset => $.offset, defn => '$.defn', type => {$.type},
-          dims => [{@!dims.join(',')}], dmix => {$!dmix.raku}, names => [{@.names.map( ->$n {"'$n'"}).join(',')}] );
+          Unit.new( factor => $.factor, offset => $.offset, defn => '$.defn', type => '{$.type}',
+          dims => [{@!dims.join(',')}], dmix => {$!dmix.raku}, names => $name-string );
         END
     }
 
@@ -228,7 +232,7 @@ class Unit {
 
         # substitutes shortest name if >1 unit name has same dimensions
         # ... so that eg. 'J' beats 'kg m^2 / s^2'
-        # ... requires eg. 'J' to be instantiated first
+        # ... needs 'J' to be instantiated first
 
         my @same-dims;
         for $dx.unit.by-name.kv -> $k,$v {
@@ -247,9 +251,7 @@ class Unit {
         my $dx := Directory.instance;    # no instance means no attrs
 
         #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
-        say "UF1 from $u" if $cg.db;
-
-        #say 42;   #iamerejh vvv
+        say "UF1 from $u"; # if $cg.db;
 
         return $u;
     }
@@ -258,24 +260,23 @@ class Unit {
         my $dx = Directory.instance;    # no instance means no attrs
 
         #2 if name or prefix already instantiated
-        say "UF2 from $u" if $cg.db;
-
-        #say 43;
+        say "UF2 from $u"; # if $cg.db;
 
         return $_ with $dx.unit.by-name{$u};
         return $_ with $dx.prefix.to-unit{$u};
 
         #3 if name in our defns, instantiate it
-        say "UF3 from $u" if $cg.db;
+        say "UF3 from $u"; # if $cg.db;
 
         for $dx.unit.to-defn -> %p {
             if %p.key.grep($u) {
+                say 44;
                 return Unit.new( defn => %p.value, names => [%p.key] );
             }
         }
 
         #4 if no match, instantiate new Unit as (shortest) object from definition
-        say "UF4 from $u" if $cg.db;
+        say "UF4 from $u"; # if $cg.db;
 
         return subst-shortest(Unit.new( defn => $u ));
     }
@@ -283,12 +284,15 @@ class Unit {
     multi method type-to-unit(Unit:U: Type $t ) {
         my $dx := Directory.instance;    # no instance means no attrs
 
-        print $dx.types.to-name;
+##        print $dx.types.to-name;
         (Unit.find: $dx.types.to-name{ $t }) with $t;
+#        (Unit.new: defn => $dx.types.to-name{ $t }) with $t;
     }
 
     multi method type-to-unit(Unit:D:) {
+##        print $.dx.types.to-name<Distance>.^name;
         Unit.find: $.dx.types.to-name{ $.type };
+#        Unit.new: defn => $.dx.types.to-name{ $.type };
     }
 
     multi method prefix-to-factor(Unit:U:) {
