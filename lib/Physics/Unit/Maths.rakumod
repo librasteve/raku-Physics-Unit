@@ -70,12 +70,12 @@ role Maths[::Unit] {
 
         my $t = $x.type;
 
-        say 23;
+#        say 23;
 
-#        my $u = Unit.type-to-unit( $t );    #iamerejh
-        my $u = Unit.type-to-xxxx( $t );
+        my $u = Unit.type-to-unit( $t );    #iamerejh
+#        my $u = Unit.type-to-xxxx( $t );
 
-        say 24;
+#        say 24;
 
         return( $t, $u )
     }
