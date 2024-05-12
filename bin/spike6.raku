@@ -52,7 +52,7 @@ my $u1 = Unit.find( 'J' );
 my $u2 = Unit.find( 'kg m^2 / s^2' );
 my $u3 = Unit.find( 'kg m^2/s^2' );
 say ~$u3;
-say "compare $u1, $u2... " ~ $u2.same-dims($u1);
+say "compare $u1, $u2... " ~ $u2.same-dmix($u1);
 
 #use Physics::Unit::Directory;
 #

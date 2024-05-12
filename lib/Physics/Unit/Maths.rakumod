@@ -4,7 +4,7 @@ role Maths[::Unit] {
 
     # linear combinations - eg. Distance / Time -> Speed
 
-    #| times helps multiply
+    #| times helps multiply and Parser
     multi method times( Real $r ) {
 
         self.factor: self.factor * $r;
@@ -22,7 +22,7 @@ role Maths[::Unit] {
         return self;
     }
 
-    #| invert and share help divide
+    #| invert and share help divide and Parser
     method invert {
         self.clear;
 
@@ -66,10 +66,16 @@ role Maths[::Unit] {
     method multiply( Unit $r ) {
         my $l = self.clone;
 
-        my $x = $l.times( $r );
+        my $x = $l.times( $r.clone );    #clone r too, otherwise subtle bug if self eqv $r
 
         my $t = $x.type;
-        my $u = Unit.type-to-unit( $t );
+
+        say 23;
+
+#        my $u = Unit.type-to-unit( $t );    #iamerejh
+        my $u = Unit.type-to-xxxx( $t );
+
+        say 24;
 
         return( $t, $u )
     }
@@ -77,7 +83,7 @@ role Maths[::Unit] {
     method divide( Unit $r ) {
         my $l = self.clone;
 
-        my $x = $l.share( $r );
+        my $x = $l.share( $r.clone );    #clone r too, otherwise subtle bug if self eqv $r
 
         my $t = $x.type;
         my $u = Unit.type-to-unit( $t );
@@ -108,7 +114,7 @@ role Maths[::Unit] {
 
     #| used to provide shortest name
     #| note the equal factor constraint
-    method same-dims( Unit $u ) {
+    method same-dmix( Unit $u ) {
         return 0 unless $u.dmix  eqv self.dmix;
         return 0 unless $u.factor == self.factor;
         return 1;

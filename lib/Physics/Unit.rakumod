@@ -77,7 +77,7 @@ class Unit {
         }(
             gather {
                 for $.dx.types.to-dims.kv -> $key, $value {
-                    take $key if $value eqv self.dims
+                    take $key if $value eqv self.dims;
                 }
             }
         )
@@ -135,7 +135,7 @@ class Unit {
 
     #| deep clone
     method clone {
-        nextwith :names([]), :dims(@!dims.clone), :dmix($!dmix.clone);
+        nextwith :names([]), :dims(@!dims.clone), :dmix($!dmix.clone);   # FIXME rm names?
     }
 
     #| clear non-numeric attrs (used by role Maths)
@@ -232,13 +232,13 @@ class Unit {
         # ... so that eg. 'J' beats 'kg m^2 / s^2'
         # ... needs 'J' to be instantiated first
 
-        my @same-dims;
+        my @same-dmix;
         for $dx.unit.by-name.kv -> $k,$v {
-            @same-dims.push($k) if $v.same-dims($u)
+            @same-dmix.push($k) if $v.same-dmix($u)
         }
 
-        if @same-dims {
-            my @sort-by-size = @same-dims.sort({$^a.chars cmp $^b.chars});
+        if @same-dmix {
+            my @sort-by-size = @same-dmix.sort({$^a.chars cmp $^b.chars});
             return $dx.unit.by-name{@sort-by-size[0]};  #shortest
         } else {
             return $u;
@@ -249,7 +249,7 @@ class Unit {
         my $dx := Directory.instance;    # class method cant use attr
 
         #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
-        say "UF1 from $u" if $cg.db;
+        say "UF1 from $u"; #  if $cg.db;
 
         return $u;
     }
@@ -257,14 +257,14 @@ class Unit {
     multi method find( Unit:U: Str() $u ) {
         my $dx = Directory.instance;    # class method cant use attr
 
-        #2 if name or prefix already instantiated
-        say "UF2 from $u" if $cg.db;
+        #2 if unit or prefix already instantiated
+        say "UF2 from $u"; # if $cg.db;
 
         return $_ with $dx.unit.by-name{$u};
         return $_ with $dx.prefix.to-unit{$u};
 
         #3 if name in our defns, instantiate it
-        say "UF3 from $u" if $cg.db;
+        say "UF3 from $u"; #  if $cg.db;
 
         for $dx.unit.to-defn -> %p {
             if %p.key.grep($u) {
@@ -273,7 +273,7 @@ class Unit {
         }
 
         #4 if no match, instantiate new Unit as (shortest) object from definition
-        say "UF4 from $u" if $cg.db;
+        say "UF4 from $u"; #  if $cg.db;
 
         subst-shortest(Unit.new( defn => $u ));
     }
@@ -290,6 +290,18 @@ class Unit {
 
     multi method type-to-unit(Unit:D:) {
         Unit.find: $.dx.types.to-name{ $.type };
+    }
+
+    method type-to-xxxx(Unit:U: Type:D $t ) {
+        my $dx := Directory.instance;    # class method cant use attr
+        say 8;
+        say $t;
+        say $dx.types.to-name;
+        say my $name = $dx.types.to-name{ $t };
+        say $dx.unit.by-name;       #iamerejh
+        say $dx.unit.by-name{ $name };
+        $dx.unit.by-name{ $name };
+
     }
 
     multi method prefix-to-factor(Unit:U:) {

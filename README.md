@@ -30,6 +30,19 @@ $ raku -I. -e 'use Physics :de; say Länge;'
 # FIXME s
 
 
+#iamerejh
+REVIEW LOAD / DICTIONARY COMPLETENESS
+
+AVOID type-to-unit => Unit.find chain looping up from multiply / divide
+
+
+kW/kg should be in say $dx.unit.by-name;
+{A => A, K => K, amp => A, ampere => A, amperes => A, amps => A, atto => atto, billion => billion, candela => cd, candelas => cd, candle => cd, candles => cd, cd => cd, centi => centi, deci => deci, deka => deka, exa => exa, femto => femto, giga => giga, hecto => hecto, kelvin => K, kelvins => K, kg => kg, kilo => kilo, kilogram => kg, kilograms => kg, m => m, m/s => m/s, mega => mega, meter => m, meters => m, metre => m, metres => m, micro => micro, milli => milli, million => million, mol => mol, mole => mol, moles => mol, mols => mol, nano => nano, peta => peta, pico => pico, radian => radian, radians => radian, s => s, sec => s, second => s, seconds => s, secs => s, tera => tera, trillion => trillion, yocto => yocto, yotta => yotta, zepto => zepto, zetta => zetta}
+
+
+
+
+
 # Version 2
 
 ## Issues / Opportunities
@@ -297,7 +310,7 @@ my $u1 = Unit.find( 'J' );
 my $u2 = Unit.find( 'kg m^2 / s^2' );
 my $u3 = Unit.find( 'kg m^2/s^2' );  
 say ~$u3;                                             # 'J'
-say "compare $u1, $u2... " ~ $u2.same-dims($u1);      # 1 (ie. same)
+say "compare $u1, $u2... " ~ $u2.same-dmix($u1);      # 1 (ie. same)
 
 put ListUnits().sort;                # shows predefined and user defined Units
 ```

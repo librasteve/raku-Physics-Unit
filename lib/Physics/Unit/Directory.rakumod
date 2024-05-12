@@ -29,6 +29,11 @@ class Directory {
         }
     }
 
+    my class Dx::Base {
+        has @.names             of Name;
+        has %.by-type{Type};  # of Unit;
+    }
+
     my class Dx::Types {
         has %.to-name{Type}     of Name();
         has %.to-dims{Type}     of Dims();
@@ -36,11 +41,6 @@ class Directory {
         method names( --> Names() ) {
             %.to-name.keys.sort
         }
-    }
-
-    my class Dx::Base {
-        has @.names             of Name;
-        has %.by-type{Type};  # of Unit;
     }
 
     my class Dx::Prefix {

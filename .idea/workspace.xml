@@ -4,11 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="pre my dx spike">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="ok Synthetics">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/spike6.raku" beforeDir="false" afterPath="$PROJECT_DIR$/bin/spike6.raku" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/synopsis-unit.raku" beforeDir="false" afterPath="$PROJECT_DIR$/bin/synopsis-unit.raku" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Directory.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Directory.rakumod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Parser.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Parser.rakumod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/t/01-tst.rakutest" beforeDir="false" afterPath="$PROJECT_DIR$/t/01-tst.rakutest" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,13 +105,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00060" summary="base =&gt; bases">
-      <created>1711625402848</created>
-      <option name="number" value="00060" />
-      <option name="presentableId" value="LOCAL-00060" />
-      <option name="project" value="LOCAL" />
-      <updated>1711625402848</updated>
     </task>
     <task id="LOCAL-00061" summary="microcosm spike">
       <created>1711627608729</created>
@@ -445,7 +442,14 @@
       <option name="project" value="LOCAL" />
       <updated>1715430941848</updated>
     </task>
-    <option name="localTasksCounter" value="109" />
+    <task id="LOCAL-00109" summary="ok Synthetics">
+      <created>1715438639895</created>
+      <option name="number" value="00109" />
+      <option name="presentableId" value="LOCAL-00109" />
+      <option name="project" value="LOCAL" />
+      <updated>1715438639895</updated>
+    </task>
+    <option name="localTasksCounter" value="110" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -463,7 +467,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="GetPostfixByName =&gt; Unit.postfix-by-defn ..." />
     <MESSAGE value="try to unify $dx" />
     <MESSAGE value="plural wip" />
     <MESSAGE value="NewType =&gt; type-bind" />
@@ -488,15 +491,21 @@
     <MESSAGE value="defn default" />
     <MESSAGE value="add SpecificPower" />
     <MESSAGE value="pre my dx spike" />
-    <option name="LAST_COMMIT_MESSAGE" value="pre my dx spike" />
+    <MESSAGE value="ok Synthetics" />
+    <option name="LAST_COMMIT_MESSAGE" value="ok Synthetics" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="perl6LineBreakpoint">
           <url>file://$PROJECT_DIR$/lib/Physics/Unit.rakumod</url>
-          <line>331</line>
+          <line>343</line>
           <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="perl6LineBreakpoint">
+          <url>file://$PROJECT_DIR$/lib/Physics/Unit.rakumod</url>
+          <line>338</line>
+          <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
