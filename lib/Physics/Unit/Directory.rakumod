@@ -20,8 +20,9 @@ class Directory {
     # a microcosm #
 
     my class Dx::Unit {
-        has %.by-name{Name};  # of Unit;
-        has %.to-defn{Name}     of Defn();  #known names incl. postfix (values may be dupes)
+        has %.by-name{Name};  # of Unit;    #instantiated Units only
+
+        has %.to-defn{Name}     of Defn();  #all known names incl. postfix (values may be dupes)
         has %.to-syns{Name}     of Syns();  #list of synonyms (excl. user defined, incl. plurals)
 
         method names( --> Names() ) {

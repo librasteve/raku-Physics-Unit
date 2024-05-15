@@ -69,13 +69,7 @@ role Maths[::Unit] {
         my $x = $l.times( $r.clone );    #clone r too, otherwise subtle bug if self eqv $r
 
         my $t = $x.type;
-
-#        say 23;
-
-        my $u = Unit.type-to-unit( $t );    #iamerejh
-#        my $u = Unit.type-to-xxxx( $t );
-
-#        say 24;
+        my $u = Unit.type-to-unit( $t );
 
         return( $t, $u )
     }

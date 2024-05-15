@@ -14,9 +14,14 @@ use Physics::Unit;
   dmix => ("m"=>1).MixHash, names => ['m','metre','meter','metres','meters'] );
 #]
 
+my $before = Unit.ubn.keys.Set;
 
 my $u = Unit.find: 'henry';
 say $u.raku;
+
+my $after = Unit.ubn.keys.Set;
+
+say $after (-) $before;
 
 exit;
 

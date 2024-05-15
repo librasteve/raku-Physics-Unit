@@ -4,15 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="ok Synthetics">
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="wip test Speed * Speed">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/spike6.raku" beforeDir="false" afterPath="$PROJECT_DIR$/bin/spike6.raku" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/synopsis-unit.raku" beforeDir="false" afterPath="$PROJECT_DIR$/bin/synopsis-unit.raku" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Directory.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Directory.rakumod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/t/01-tst.rakutest" beforeDir="false" afterPath="$PROJECT_DIR$/t/01-tst.rakutest" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/Unit/Definitions/en_SI/types.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/resources/Unit/Definitions/en_SI/types.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,20 +102,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00061" summary="microcosm spike">
-      <created>1711627608729</created>
-      <option name="number" value="00061" />
-      <option name="presentableId" value="LOCAL-00061" />
-      <option name="project" value="LOCAL" />
-      <updated>1711627608730</updated>
-    </task>
-    <task id="LOCAL-00062" summary="Dx::Bases, Dx::Prefix ok">
-      <created>1711630662081</created>
-      <option name="number" value="00062" />
-      <option name="presentableId" value="LOCAL-00062" />
-      <option name="project" value="LOCAL" />
-      <updated>1711630662081</updated>
     </task>
     <task id="LOCAL-00063" summary="drop method prefix-by-name">
       <created>1711631127180</created>
@@ -449,7 +432,21 @@
       <option name="project" value="LOCAL" />
       <updated>1715438639895</updated>
     </task>
-    <option name="localTasksCounter" value="110" />
+    <task id="LOCAL-00110" summary="wip test Speed * Speed">
+      <created>1715534154951</created>
+      <option name="number" value="00110" />
+      <option name="presentableId" value="LOCAL-00110" />
+      <option name="project" value="LOCAL" />
+      <updated>1715534154953</updated>
+    </task>
+    <task id="LOCAL-00111" summary="wip test Speed * Speed">
+      <created>1715534304994</created>
+      <option name="number" value="00111" />
+      <option name="presentableId" value="LOCAL-00111" />
+      <option name="project" value="LOCAL" />
+      <updated>1715534304994</updated>
+    </task>
+    <option name="localTasksCounter" value="112" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -467,7 +464,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="try to unify $dx" />
     <MESSAGE value="plural wip" />
     <MESSAGE value="NewType =&gt; type-bind" />
     <MESSAGE value="plural -&gt; Config" />
@@ -492,19 +488,20 @@
     <MESSAGE value="add SpecificPower" />
     <MESSAGE value="pre my dx spike" />
     <MESSAGE value="ok Synthetics" />
-    <option name="LAST_COMMIT_MESSAGE" value="ok Synthetics" />
+    <MESSAGE value="wip test Speed * Speed" />
+    <option name="LAST_COMMIT_MESSAGE" value="wip test Speed * Speed" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="perl6LineBreakpoint">
           <url>file://$PROJECT_DIR$/lib/Physics/Unit.rakumod</url>
-          <line>343</line>
+          <line>348</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="perl6LineBreakpoint">
           <url>file://$PROJECT_DIR$/lib/Physics/Unit.rakumod</url>
-          <line>338</line>
+          <line>343</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
