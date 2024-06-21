@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="Synth ok">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Build.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/Build.rakumod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-    </list>
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="v2 refactor" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -66,7 +62,7 @@
     "raku.project.structure.proportion": "0.0",
     "raku.project.structure.side.proportion": "0.0",
     "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "preferences.sourceCode.Raku",
+    "settings.editor.selected.configurable": "preferences.keymap",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -100,13 +96,6 @@
       <workItem from="1682961165975" duration="598000" />
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
-    </task>
-    <task id="LOCAL-00064" summary="drop ListBases">
-      <created>1711631651776</created>
-      <option name="number" value="00064" />
-      <option name="presentableId" value="LOCAL-00064" />
-      <option name="project" value="LOCAL" />
-      <updated>1711631651776</updated>
     </task>
     <task id="LOCAL-00065" summary="drop ListBases">
       <created>1711632117580</created>
@@ -444,7 +433,14 @@
       <option name="project" value="LOCAL" />
       <updated>1715790317095</updated>
     </task>
-    <option name="localTasksCounter" value="113" />
+    <task id="LOCAL-00113" summary="v2 refactor">
+      <created>1718989756298</created>
+      <option name="number" value="00113" />
+      <option name="presentableId" value="LOCAL-00113" />
+      <option name="project" value="LOCAL" />
+      <updated>1718989756298</updated>
+    </task>
+    <option name="localTasksCounter" value="114" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -462,7 +458,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="NewType =&gt; type-bind" />
     <MESSAGE value="plural -&gt; Config" />
     <MESSAGE value="Bases =&gt; Base" />
     <MESSAGE value="Physics::Unit::type-hint -&gt; Unit.type-hint" />
@@ -487,7 +482,8 @@
     <MESSAGE value="ok Synthetics" />
     <MESSAGE value="wip test Speed * Speed" />
     <MESSAGE value="Synth ok" />
-    <option name="LAST_COMMIT_MESSAGE" value="Synth ok" />
+    <MESSAGE value="v2 refactor" />
+    <option name="LAST_COMMIT_MESSAGE" value="v2 refactor" />
   </component>
   <component name="edument.perl6idea.pm.RakuPackageManagerManager">
     <pmList />
