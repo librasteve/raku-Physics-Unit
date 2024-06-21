@@ -1,0 +1,28 @@
+#Physics::Units::Definitions::en_SI - derived.yaml
+
+#SI Derived Units
+
+# Format key:
+#- {names: [symbol, synonym-one, synonym-two ...], defn: 'definition string'}
+
+- {names: [sr, steradian],           defn: 'radian^2'        }
+- {names: [Hz, hertz],               defn: '1 / s'           }
+- {names: [N,  newton],              defn: 'kg m / s^2'      }
+- {names: [Pa, pascal],              defn: 'N / m^2'         }
+- {names: [J,  joule],               defn: 'kg m^2 / s^2'    }
+- {names: [W,  watt],                defn: 'kg m^2 / s^3'    }
+- {names: [C,  coulomb],             defn: 'A s'             }
+- {names: [V,  volt],                defn: 'kg m^2 / A s^3'  }
+- {names: [F,  farad],               defn: 'A^2 s^4 / kg m^2'}
+- {names: [Ω,  ohm],                 defn: 'kg m^2 / A^2 s^3'}
+- {names: [S,  siemens],             defn: 'A^2 s^3 / kg m^2'}
+- {names: [Wb, weber],               defn: 'kg m^2 / A s^2'  }
+- {names: [T,  tesla],               defn: 'kg / A s^2'      }
+- {names: [H,  henry],               defn: 'kg m^2 / A^2 s^2'}
+- {names: [°C, celsius, Centigrade], defn: 'K + 273.15'      }
+- {names: [lm, lumen],               defn: 'cd sr'           }
+- {names: [lx, lux],                 defn: 'm^-2 cd'         }
+- {names: [Bq, becquerel],           defn: '1 Hz'            }
+- {names: [Gy, gray],                defn: 'J / kg'          }
+- {names: [Sv, sievert],             defn: 'J / kg'          }
+- {names: [kat,katal],               defn: 'mol s^-1'        }

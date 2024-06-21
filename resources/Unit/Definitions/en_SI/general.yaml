@@ -1,0 +1,253 @@
+#Physics::Units::Definitions::en_SI - general.yaml
+
+#General Units
+
+# Definition is built on SI Base and Derived Units
+
+# %LOCALE% is substituted to 'us' or 'imp' gallons, pints, mpg etc.
+
+# Where a Type has no new items, it must be commented out
+
+# Format key:
+# Type1:
+#- {names: [symbol, synonym-one  ...], defn: 'definition string'}
+#- {names: [symbol, synonym-one  ...], defn: 'definition string'}
+
+# Type2:
+#- {names: [symbol, synonym-one  ...], defn: 'definition string'}
+#- {names: [symbol, synonym-one  ...], defn: 'definition string'}
+
+Dimensionless:
+  - {names: [①, (1), one, unity],        defn: '1'}          #U-2460 CIRCLED DIGIT ONE
+  - {names: [semi, demi, hemi],          defn: '1/2'}
+  - {names: ['%' , percent],             defn: '1/100'}
+  - {names: [ABV],                       defn: '1/100'}
+  - {names: [pi],                        defn: '3.1415926535897932385'}
+
+Angle:
+  - {names: [°, degree, deg, º],         defn: 'pi radians / 180'}
+  - {names: [ᵍ, gon, grad],              defn: 'pi radians / 200'}
+
+Solid Angle:
+  - {names: [deg²],                      defn: 'deg^2'}
+  - {names: [sp, spat],                  defn: '4 pi steradian'}
+
+Time:
+  - {names: [min, minute],               defn: '60 s'}
+  - {names: [hr, hour],                  defn: '60 min'}
+  - {names: [day],                       defn: '24 hr'}
+  - {names: [week],                      defn: '7 day'}
+  - {names: [fortnight],                 defn: '2 week'}
+  - {names: [yr, year],                  defn: '365.25 day'}
+  - {names: [month],                     defn: 'year / 12'}    # an average month
+  - {names: [century, centuries],        defn: '100 yr'}
+  - {names: [millenium, millenia],       defn: '1000 yr'}
+
+Frequency:
+  - {names: [cycle],                     defn: '1 Hz'}
+  - {names: [revolution],                defn: '1'}
+  - {names: [rpm],                       defn: 'revolution per minute'}
+
+Length:
+  - {names: [km],                        defn: 'kilometre'}
+  - {names: [fm],                        defn: 'femtometre'}   #for 'MeV.fm'
+  - {names: [μ, micron],                 defn: '1e-6 m'}
+  - {names: [å, angstrom],               defn: '1e-10 m'}
+  - {names: [au, astronomical-unit],     defn: '1.49598e11 m'}
+  - {names: [ly, light-year],            defn: '9.46e15 m'}
+  - {names: [parsec],                    defn: '3.083e16 m'}
+  - {names: [ft, foot, feet],            defn: '0.3048 m'}
+  - {names: [in, inch],                  defn: 'ft/12'}
+  - {names: [yard],                      defn: '3 ft'}
+  - {names: [fathom],                    defn: '2 yard'}
+  - {names: [rod, pole, perch],          defn: '5.5 yard'}
+  - {names: [furlong],                   defn: '40 rod'}
+  - {names: [mile],                      defn: '5280 ft'}
+  - {names: [nmile, nautical-mile],      defn: '1852 m'}
+  - {names: [ca, cable],                 defn: '185.2 m'}
+  - {names: [pica],                      defn: 'in/6'}    #chosen defn not unique
+  - {names: [point],                     defn: 'pica/12'}
+
+Area:
+  - {names: [m^2, m2, m²],               defn: 'm^2'}
+  - {names: [are],                       defn: '100 square metre'}
+  - {names: [hectare],                   defn: '100 are'}
+  - {names: [barn],                      defn: '1e-28 square metre'}
+  - {names: [acre],                      defn: '43560 square feet'}
+
+Volume:
+  - {names: [m^3, m3, m³],               defn: 'm^3'}
+  - {names: [l, L, litre, liter],        defn: 'm^3/1000'}
+  - {names: [cc],                        defn: 'cubic centimetre'}
+  - {names: [bottle],                    defn: '750 millilitre'}
+  - {names: [fluidram],                  defn: '3.5516 millilitre'}
+  - {names: [minim],                     defn: '0.059194 millilitre'}
+  - {names: [alcohol-unit],              defn: '10 millilitre'}            # of pure alcohol
+  - {names: [us-gallon],                 defn: '3.785411784 litre'}
+  - {names: [imp-gallon],                defn: '4.54609 litre'}
+  - {names: [gallon],                    defn: '1 %LOCALE%-gallon'}
+  - {names: [firkin],                    defn: '9 gallon'}
+  - {names: [barrel],                    defn: '36 gallon'}
+  - {names: [quart],                     defn: 'gallon/4'}
+  - {names: [peck],                      defn: '8 quart'}
+  - {names: [bushel],                    defn: '4 peck'}
+  - {names: [fifth],                     defn: 'us-gallon/5'}
+  - {names: [us-pint],                   defn: 'us-gallon/8'}
+  - {names: [imp-pint],                  defn: 'imp-gallon/8'}
+  - {names: [pint],                      defn: '1 %LOCALE%-pint'}
+  - {names: [cup],                       defn: 'us-pint/2'}
+  - {names: [floz, fluid-ounce],         defn: 'cup/8'}
+  - {names: [gill],                      defn: '4 fluid-ounce'}
+  - {names: [tablespoon, tbsp],          defn: 'fluid-ounce / 2'}
+  - {names: [teaspoon, tsp],             defn: 'tablespoon / 3'}
+  - {names: [cord],                      defn: '128 cubic feet'}
+  - {names: [stere],                     defn: '1 cubic metre'}
+
+Speed:
+  - {names: [m/s],                       defn: 'm/s'}
+  - {names: [mph],                       defn: 'mile per hour'}
+  - {names: [kph],                       defn: 'kilometre per hour'}
+  - {names: [kps],                       defn: 'kilometre per second'}
+  - {names: [fps],                       defn: 'feet per second'}
+  - {names: [knot],                      defn: 'nmile per hour'}
+
+AngularSpeed:
+  - {names: [radians per second],        defn: 'Hz'}  #the SI unit (radians=1)
+  - {names: [revs, revolutions per second], defn: '2 pi * Hz'}
+  - {names: [rpm],                       defn: '60 revs'}
+
+Acceleration:
+  - {names: [m/s^2],                     defn: 'm/s^2'}
+  - {names: [g0, earth-gravity],         defn: '9.80665 m/s^2'}
+
+Mass:
+  - {names: [g, gram, gm, gramme],       defn: 'kg / 1000'}
+  - {names: [u, atomic-mass-unit, Da, Dalton], defn: '1.6605402e-27 kg'}
+  - {names: [metric-ton, tonne],         defn: '1000 kg'}
+  - {names: [grain],                     defn: '0.0648 gm'}
+  - {names: [lbm, pounds-mass],          defn: '0.45359237 kg'}
+  - {names: [oz, ounce],                 defn: 'lbm/16'}
+  - {names: [stone],                     defn: '14 lbm'}
+  - {names: [hundredweight],             defn: '100 lbm'}
+  - {names: [ton, short-ton],            defn: '2000 lbm'}
+  - {names: [long-ton],                  defn: '2240 lbm'}
+  - {names: [slug],                      defn: 'lbm g0 s^2/ft'}
+  - {names: [dram],                      defn: 'ounce / 16'}
+  - {names: [troy-pound],                defn: '0.373 kg'}
+  - {names: [troy-ounce],                defn: '31.103 gm'}
+  - {names: [pennyweight],               defn: '1.555 gm'}
+  - {names: [scruple],                   defn: '1.296 gm'}
+  - {names: [carat, karat],              defn: '200 milligram'}
+  - {names: [j-point],                   defn: '2 carat'}
+
+MomentOfInertia:
+  - {names: [kg m^2],                    defn: 'kg m^2'}
+
+Momentum:
+  - {names: [kg m/s],                    defn: 'kg m/s'}
+  - {names: [slug ft/s],                 defn: 'slug feet/s'}
+
+AngularMomentum:
+  - {names: [kg m^2/s],                  defn: 'kg m^2 / s'}
+
+Force:
+  - {names: [lb, lbs, pound, pound-force], defn: 'slug foot / s^2'}
+  - {names: [ounce-force],               defn: 'pound-force / 16'}
+  - {names: [dyne],                      defn: 'gm centimetre / s^2'}
+  - {names: [gram-force],                defn: 'gm g0'}
+  - {names: [kgf],                       defn: 'kilo gram-force'}
+
+Torque:
+  - {names: [Nm, newton-metre],          defn: 'N m'}
+
+Impulse:
+  - {names: [Ns],                        defn: 'N * s'}
+  - {names: [pound-second],              defn: 'pound * s'}
+
+Pressure:
+  - {names: [bar],                       defn: '1e5 pascal'}
+  - {names: [torr],                      defn: '133.322368 pascal'}  #(101325 / 760)
+  - {names: [psi],                       defn: 'pound per inch^2'}
+  - {names: [atm, atmosphere],           defn: '101325 pascal'}
+  - {names: [mmHg],                      defn: '133.322 pascal'}
+
+Density:
+  - {names: [kg/m^3],                    defn: 'kg / m^3'}
+  - {names: [°proof],                    defn: '923 kg / m^3'}   #UK metric https://en.wikipedia.org/wiki/Alcohol_proof (US version is just 2x ABV)
+
+Energy:
+  - {names: [eV, electron-volt],         defn: '1.60217733e-19 joule'}
+  - {names: [MeV],                       defn: 'mega electron-volt'}
+  - {names: [GeV],                       defn: 'giga electron-volt'}
+  - {names: [TeV],                       defn: 'tera electron-volt'}
+  - {names: [cal, calorie],              defn: '4.184 joule'}
+  - {names: [kcal],                      defn: 'kilocalorie'}
+  - {names: [btu, british-thermal-unit], defn: '1055.056 joule'}
+  - {names: [therm],                     defn: '1.0e5 btu'}
+  - {names: [erg],                       defn: '1.0e-7 joule'}
+  - {names: [kWh],                       defn: 'kilowatt hour'}
+  - {names: [Eₕ, E_h, Ha],               defn: '4.3597447222071e-18 joule'}    #Hartree energy
+
+Power:
+  - {names: [us-horsepower, us-hp],      defn: '550 foot pound-force / s'}
+  - {names: [PS, horsepower, hp],        defn: '75 kg * g0 * m / s'}
+
+#Current:
+
+#Potential:
+
+Conductance:
+  - {names: [mho],                       defn: '1 / ohm'}
+
+#Capacitance:
+
+#Inductance:
+
+Magnetic_flux:
+  - {names: [Mx, maxwell],               defn: '1e-8 weber'}
+
+Magnetic_field:
+  - {names: [gauss],                     defn: '1e-4 tesla'}
+
+Temperature:
+  - {names: [°R, Rankine],               defn: '5/9 * K'}
+  - {names: [°F, Fahrenheit],            defn: '5/9 * K + 459.67'}
+
+Dose:
+  - {names: [rad],                       defn: 'gray / 100'}
+  - {names: [rem],                       defn: 'sievert / 100'}
+
+FuelConsumption:
+  - {names: [m^3/m],                     defn: 'm^3 / metre'}
+  - {names: [l/100km],                   defn: '0.00001 litre / metre'}
+
+FuelEfficiency:
+  - {names: [m/m^3],                     defn: 'metre / m^3'}
+  - {names: [mpg],                       defn: 'mile / gallon'}
+
+Flow:
+  - {names: [m^3/s],                     defn: 'm^3 / second'}
+  - {names: [gpd],                       defn: 'gallon / day'}
+  - {names: [sv, sverdup],               defn: '1000000 m^3/s'}
+
+SpecificEnergy:
+  - {names: [J/kg],                      defn: 'joule / kg'}
+  - {names: [MJ/kg],                     defn: 'mega joule / kg'}
+
+SpecificPower:
+  - {names: [kW/kg],                     defn: 'kilo W / kg'}
+  - {names: [hp/lb],                     defn: 'hp / lb'}
+
+Irradiance:
+  - {names: [W/m^2],                     defn: 'W / m^2'}
+
+Insolation:
+  - {names: [kWh/m^2],                   defn: 'kWh / m^2'}
+  - {names: [Langley],                   defn: 'cal / 10000 m^2'}
+
+ThermalResistance:
+  - {names: [Km^2/W],                    defn: 'K m^2 / W'}
+  - {names: [tog],                       defn: '0.1 K m^2 / W'}
+
+ThermalConductance:
+  - {names: [W/m^2K],                    defn: 'W / m^2 K'}

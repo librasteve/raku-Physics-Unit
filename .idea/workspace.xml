@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="t -&gt; rakutest">
-      <change beforePath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Physics/Unit.rakumod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/raku-Physics-Unit.iml" beforeDir="false" afterPath="$PROJECT_DIR$/raku-Physics-Unit.iml" afterDir="false" />
-    </list>
+    <list default="true" id="83edbff2-fae9-40a0-92d9-43ecf04e9122" name="Changes" comment="v2 refactor" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,40 +13,72 @@
   <component name="ComposerSettings">
     <execution />
   </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints>
+      <file url="file://$PROJECT_DIR$/lib/Physics/Unit/Maths.rakumod" />
+    </disable_hints>
+  </component>
   <component name="Git.Settings">
+    <option name="PUSH_AUTO_UPDATE" value="true" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/lib/Physics/Unit.rakumod" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectId" id="2OqIQbjwB1jeolXPuRASGTTRaBH" />
   <component name="ProjectLevelVcsManager">
     <OptionsSetting value="false" id="Update" />
+    <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/stephenroe/Library/CloudStorage/Dropbox/DockerWorld/raku-Physics-Unit&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/Users/stephenroe/Library/CloudStorage/Dropbox/GitWorld/raku-Physics-Unit",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "raku.project.structure.last.edited": "Project",
+    "raku.project.structure.proportion": "0.0",
+    "raku.project.structure.side.proportion": "0.0",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "preferences.keymap",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="Raku.Backup.Sdk">
     <option name="projectSdkPaths">
       <map>
         <entry key="$PROJECT_DIR$/.idea/misc.xml" value="$USER_HOME$/.rakubrew/versions/moar-2022.12/bin" />
       </map>
     </option>
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/lib/Physics/Unit" />
+      <recent name="$PROJECT_DIR$/lib/Physics/Unit/Definitions/SI" />
+      <recent name="$PROJECT_DIR$/bin" />
+    </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -68,14 +97,393 @@
       <workItem from="1683129778541" duration="435000" />
       <workItem from="1683304249945" duration="31000" />
     </task>
+    <task id="LOCAL-00065" summary="drop ListBases">
+      <created>1711632117580</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1711632117580</updated>
+    </task>
+    <task id="LOCAL-00066" summary="Dictionary =&gt; Directory">
+      <created>1711647869116</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1711647869116</updated>
+    </task>
+    <task id="LOCAL-00067" summary="rm ListTypeNames">
+      <created>1711651670562</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1711651670562</updated>
+    </task>
+    <task id="LOCAL-00068" summary="rm ListProtoTypes">
+      <created>1711652432973</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1711652432973</updated>
+    </task>
+    <task id="LOCAL-00069" summary="drop ListPrototypes">
+      <created>1711652971741</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1711652971741</updated>
+    </task>
+    <task id="LOCAL-00070" summary="tighten NewType">
+      <created>1711715062019</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1711715062019</updated>
+    </task>
+    <task id="LOCAL-00071" summary="types.to-basetype =&gt; bases.by-type">
+      <created>1711715303726</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1711715303727</updated>
+    </task>
+    <task id="LOCAL-00072" summary="rm GetUnit">
+      <created>1711798928434</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1711798928435</updated>
+    </task>
+    <task id="LOCAL-00073" summary="prefix.by-name =&gt; .to-unit">
+      <created>1711799430873</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1711799430873</updated>
+    </task>
+    <task id="LOCAL-00074" summary="postfix.by-name =&gt; .to-defn">
+      <created>1711799599592</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1711799599592</updated>
+    </task>
+    <task id="LOCAL-00075" summary="defn-by-name =&gt; unit.to-defn">
+      <created>1711799787514</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1711799787514</updated>
+    </task>
+    <task id="LOCAL-00076" summary="Str =&gt; Name">
+      <created>1711800466611</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1711800466611</updated>
+    </task>
+    <task id="LOCAL-00077" summary="Array[Name] =&gt; Syns">
+      <created>1711800793651</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1711800793651</updated>
+    </task>
+    <task id="LOCAL-00078" summary="Array[Int] =&gt; Dims">
+      <created>1711801074469</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1711801074469</updated>
+    </task>
+    <task id="LOCAL-00079" summary="unit-by-name =&gt; unit.by-name">
+      <created>1711801359317</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1711801359317</updated>
+    </task>
+    <task id="LOCAL-00080" summary="rm get-syns">
+      <created>1711801728799</created>
+      <option name="number" value="00080" />
+      <option name="presentableId" value="LOCAL-00080" />
+      <option name="project" value="LOCAL" />
+      <updated>1711801728799</updated>
+    </task>
+    <task id="LOCAL-00081" summary="rm ListSyns, ListDefns, ListUnits">
+      <created>1711802549967</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1711802549967</updated>
+    </task>
+    <task id="LOCAL-00082" summary="GetPrefixToFactor =&gt; Unit.prefix-to-factor">
+      <created>1711803054274</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1711803054274</updated>
+    </task>
+    <task id="LOCAL-00083" summary="GetPostfixByName =&gt; Unit.postfix-by-defn ...">
+      <created>1711803483228</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1711803483228</updated>
+    </task>
+    <task id="LOCAL-00084" summary="try to unify $dx">
+      <created>1711804131011</created>
+      <option name="number" value="00084" />
+      <option name="presentableId" value="LOCAL-00084" />
+      <option name="project" value="LOCAL" />
+      <updated>1711804131011</updated>
+    </task>
+    <task id="LOCAL-00085" summary="plural wip">
+      <created>1711810104911</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1711810104911</updated>
+    </task>
+    <task id="LOCAL-00086" summary="NewType =&gt; type-bind">
+      <created>1711897513458</created>
+      <option name="number" value="00086" />
+      <option name="presentableId" value="LOCAL-00086" />
+      <option name="project" value="LOCAL" />
+      <updated>1711897513459</updated>
+    </task>
+    <task id="LOCAL-00087" summary="plural -&gt; Config">
+      <created>1711910347276</created>
+      <option name="number" value="00087" />
+      <option name="presentableId" value="LOCAL-00087" />
+      <option name="project" value="LOCAL" />
+      <updated>1711910347276</updated>
+    </task>
+    <task id="LOCAL-00088" summary="Bases =&gt; Base">
+      <created>1711966553029</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1711966553030</updated>
+    </task>
+    <task id="LOCAL-00089" summary="Physics::Unit::type-hint -&gt; Unit.type-hint">
+      <created>1711981463201</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1711981463201</updated>
+    </task>
+    <task id="LOCAL-00090" summary="spike defile">
+      <created>1711993513754</created>
+      <option name="number" value="00090" />
+      <option name="presentableId" value="LOCAL-00090" />
+      <option name="project" value="LOCAL" />
+      <updated>1711993513754</updated>
+    </task>
+    <task id="LOCAL-00091" summary="Directory ok">
+      <created>1711995837877</created>
+      <option name="number" value="00091" />
+      <option name="presentableId" value="LOCAL-00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1711995837877</updated>
+    </task>
+    <task id="LOCAL-00092" summary="Postfix ok ok">
+      <created>1711996114123</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1711996114123</updated>
+    </task>
+    <task id="LOCAL-00093" summary="Prefix ok">
+      <created>1711997992804</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1711997992804</updated>
+    </task>
+    <task id="LOCAL-00094" summary="Derived ok">
+      <created>1711998143201</created>
+      <option name="number" value="00094" />
+      <option name="presentableId" value="LOCAL-00094" />
+      <option name="project" value="LOCAL" />
+      <updated>1711998143201</updated>
+    </task>
+    <task id="LOCAL-00095" summary="Base ok">
+      <created>1711998305882</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1711998305882</updated>
+    </task>
+    <task id="LOCAL-00096" summary="Dims ok">
+      <created>1711998492687</created>
+      <option name="number" value="00096" />
+      <option name="presentableId" value="LOCAL-00096" />
+      <option name="project" value="LOCAL" />
+      <updated>1711998492687</updated>
+    </task>
+    <task id="LOCAL-00097" summary="Types / Base wip">
+      <created>1712050297326</created>
+      <option name="number" value="00097" />
+      <option name="presentableId" value="LOCAL-00097" />
+      <option name="project" value="LOCAL" />
+      <updated>1712050297326</updated>
+    </task>
+    <task id="LOCAL-00098" summary="defile ok">
+      <created>1712068552070</created>
+      <option name="number" value="00098" />
+      <option name="presentableId" value="LOCAL-00098" />
+      <option name="project" value="LOCAL" />
+      <updated>1712068552071</updated>
+    </task>
+    <task id="LOCAL-00099" summary="units.yaml =&gt; general.yaml">
+      <created>1712069225859</created>
+      <option name="number" value="00099" />
+      <option name="presentableId" value="LOCAL-00099" />
+      <option name="project" value="LOCAL" />
+      <updated>1712069225859</updated>
+    </task>
+    <task id="LOCAL-00100" summary="add General.rakumod">
+      <created>1712069257214</created>
+      <option name="number" value="00100" />
+      <option name="presentableId" value="LOCAL-00100" />
+      <option name="project" value="LOCAL" />
+      <updated>1712069257214</updated>
+    </task>
+    <task id="LOCAL-00101" summary="make parts dynamic">
+      <created>1712072500073</created>
+      <option name="number" value="00101" />
+      <option name="presentableId" value="LOCAL-00101" />
+      <option name="project" value="LOCAL" />
+      <updated>1712072500074</updated>
+    </task>
+    <task id="LOCAL-00102" summary="make parts dynamic">
+      <created>1712072615841</created>
+      <option name="number" value="00102" />
+      <option name="presentableId" value="LOCAL-00102" />
+      <option name="project" value="LOCAL" />
+      <updated>1712072615842</updated>
+    </task>
+    <task id="LOCAL-00103" summary="config =&gt; Config">
+      <created>1712076321013</created>
+      <option name="number" value="00103" />
+      <option name="presentableId" value="LOCAL-00103" />
+      <option name="project" value="LOCAL" />
+      <updated>1712076321013</updated>
+    </task>
+    <task id="LOCAL-00104" summary="autoload Measure classes drop">
+      <created>1712256585176</created>
+      <option name="number" value="00104" />
+      <option name="presentableId" value="LOCAL-00104" />
+      <option name="project" value="LOCAL" />
+      <updated>1712256585176</updated>
+    </task>
+    <task id="LOCAL-00105" summary="Synthetic wip">
+      <created>1712496199065</created>
+      <option name="number" value="00105" />
+      <option name="presentableId" value="LOCAL-00105" />
+      <option name="project" value="LOCAL" />
+      <updated>1712496199066</updated>
+    </task>
+    <task id="LOCAL-00106" summary="defn default">
+      <created>1714316286866</created>
+      <option name="number" value="00106" />
+      <option name="presentableId" value="LOCAL-00106" />
+      <option name="project" value="LOCAL" />
+      <updated>1714316286866</updated>
+    </task>
+    <task id="LOCAL-00107" summary="add SpecificPower">
+      <created>1715266130427</created>
+      <option name="number" value="00107" />
+      <option name="presentableId" value="LOCAL-00107" />
+      <option name="project" value="LOCAL" />
+      <updated>1715266130428</updated>
+    </task>
+    <task id="LOCAL-00108" summary="pre my dx spike">
+      <created>1715430941847</created>
+      <option name="number" value="00108" />
+      <option name="presentableId" value="LOCAL-00108" />
+      <option name="project" value="LOCAL" />
+      <updated>1715430941848</updated>
+    </task>
+    <task id="LOCAL-00109" summary="ok Synthetics">
+      <created>1715438639895</created>
+      <option name="number" value="00109" />
+      <option name="presentableId" value="LOCAL-00109" />
+      <option name="project" value="LOCAL" />
+      <updated>1715438639895</updated>
+    </task>
+    <task id="LOCAL-00110" summary="wip test Speed * Speed">
+      <created>1715534154951</created>
+      <option name="number" value="00110" />
+      <option name="presentableId" value="LOCAL-00110" />
+      <option name="project" value="LOCAL" />
+      <updated>1715534154953</updated>
+    </task>
+    <task id="LOCAL-00111" summary="wip test Speed * Speed">
+      <created>1715534304994</created>
+      <option name="number" value="00111" />
+      <option name="presentableId" value="LOCAL-00111" />
+      <option name="project" value="LOCAL" />
+      <updated>1715534304994</updated>
+    </task>
+    <task id="LOCAL-00112" summary="Synth ok">
+      <created>1715790317095</created>
+      <option name="number" value="00112" />
+      <option name="presentableId" value="LOCAL-00112" />
+      <option name="project" value="LOCAL" />
+      <updated>1715790317095</updated>
+    </task>
+    <task id="LOCAL-00113" summary="v2 refactor">
+      <created>1718989756298</created>
+      <option name="number" value="00113" />
+      <option name="presentableId" value="LOCAL-00113" />
+      <option name="project" value="LOCAL" />
+      <updated>1718989756298</updated>
+    </task>
+    <option name="localTasksCounter" value="114" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="t -&gt; rakutest" />
-    <option name="LAST_COMMIT_MESSAGE" value="t -&gt; rakutest" />
+    <MESSAGE value="plural -&gt; Config" />
+    <MESSAGE value="Bases =&gt; Base" />
+    <MESSAGE value="Physics::Unit::type-hint -&gt; Unit.type-hint" />
+    <MESSAGE value="spike defile" />
+    <MESSAGE value="Directory ok" />
+    <MESSAGE value="Postfix ok ok" />
+    <MESSAGE value="Prefix ok" />
+    <MESSAGE value="Derived ok" />
+    <MESSAGE value="Base ok" />
+    <MESSAGE value="Dims ok" />
+    <MESSAGE value="Types / Base wip" />
+    <MESSAGE value="defile ok" />
+    <MESSAGE value="units.yaml =&gt; general.yaml" />
+    <MESSAGE value="add General.rakumod" />
+    <MESSAGE value="make parts dynamic" />
+    <MESSAGE value="config =&gt; Config" />
+    <MESSAGE value="autoload Measure classes drop" />
+    <MESSAGE value="Synthetic wip" />
+    <MESSAGE value="defn default" />
+    <MESSAGE value="add SpecificPower" />
+    <MESSAGE value="pre my dx spike" />
+    <MESSAGE value="ok Synthetics" />
+    <MESSAGE value="wip test Speed * Speed" />
+    <MESSAGE value="Synth ok" />
+    <MESSAGE value="v2 refactor" />
+    <option name="LAST_COMMIT_MESSAGE" value="v2 refactor" />
   </component>
   <component name="edument.perl6idea.pm.RakuPackageManagerManager">
     <pmList />

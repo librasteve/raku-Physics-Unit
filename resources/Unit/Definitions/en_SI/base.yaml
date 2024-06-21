@@ -1,0 +1,14 @@
+#Physics::Units::Definitions::en_SI - base.yaml
+
+#SI Base Units
+
+# Format key:
+#Type:       [symbol, synonym-one, synonym-two ...]
+- Length:      [m, metre, meter]
+- Mass:        [kg, kilogram]
+- Time:        [s, sec, second]
+- Current:     [A, amp, ampere]
+- Temperature: [K, kelvin]
+- Substance:   [mol, mole]
+- Luminosity:  [cd, candela, candle]
+- Angle:       [radian, rad]

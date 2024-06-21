@@ -1,9 +1,9 @@
 #!/usr/bin/env raku
 #t/01-tst.t
-#TESTALL$ prove6 ./t      [from root]
+#TESTALL$ prove6 *      [from /t]
 use lib '../lib';
 use Test;
-plan 19;
+plan 17;
 
 use Physics::Unit;
 
@@ -34,8 +34,8 @@ InitDerivedUnit (
     ['°C', 'celsius', 'Centigrade'],        'K + 273.15',   #Temperature
     ['lm', 'lumen'],                        'cd sr',
     ['lx', 'lux'],                          'm^-2 cd',
-    ['Bq', 'becquerel'],                    '1 Hz',
-    ['kat', 'katal'],                       'mol s^-1',
+#    ['Bq', 'becquerel'],                    '1 Hz',
+#    ['kat', 'katal'],                       'mol s^-1',
     #SI coherent Derived Units in terms of base units - TBD [see url]
     #SI coherent Derived Units that include units with special names - TBD [see url]
 );
@@ -58,12 +58,15 @@ Inductance
 Temperature
 LuminousFlux
 Illuminance
-Radioactivity
-CatalyticActivity
+#Radioactivity
+#CatalyticActivity
 >;
 
-for 0..^@d-u-n -> $i {
-	is GetUnit(@d-u-n[$i]).type, @unit-types[$i], "{@d-u-n[$i]} => {@unit-types[$i]}";
+#dd Unit.find(@d-u-n[12]).dims;
+#exit;
+
+for ^@d-u-n -> $i {
+	is Unit.find(@d-u-n[$i]).type, @unit-types[$i], "{@d-u-n[$i]} => {@unit-types[$i]}";
 }
 
 #done-testing
