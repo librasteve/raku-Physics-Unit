@@ -228,7 +228,7 @@ FuelEfficiency:
 Flow:
   - {names: [m^3/s],                     defn: 'm^3 / second'}
   - {names: [gpd],                       defn: 'gallon / day'}
-  - {names: [sv, sverdup],               defn: '1000000 m^3/s'}
+  - {names: [sv, sverdrup],              defn: '1000000 m^3/s'}
 
 SpecificEnergy:
   - {names: [J/kg],                      defn: 'joule / kg'}
