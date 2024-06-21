@@ -26,7 +26,7 @@ class Directory {
         has %.to-syns{Name}     of Syns();  #list of synonyms (excl. user defined, incl. plurals)
 
         method names( --> Names() ) {
-            %.by-name.keys.sort
+            %.to-defn.keys.sort
         }
     }
 
@@ -35,7 +35,7 @@ class Directory {
         has %.by-type{Type};  # of Unit;
     }
 
-    my class Dx::Types {
+    my class Dx::Type {
         has %.to-name{Type}     of Name();
         has %.to-dims{Type}     of Dims();
 
@@ -57,8 +57,8 @@ class Directory {
 
     ### Attributes ###
     has Dx::Unit    $.unit    .= new;
-    has Dx::Base    $.bases   .= new;
-    has Dx::Types   $.types   .= new;
+    has Dx::Base    $.base    .= new;
+    has Dx::Type    $.type    .= new;
     has Dx::Prefix  $.prefix  .= new;
     has Dx::Postfix $.postfix .= new;
 }

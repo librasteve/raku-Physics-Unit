@@ -5,7 +5,7 @@ class Unit::Types {
 
     method load( @a ) {
         for @a -> %h {
-            $.dx.types.to-name{%h.keys} = %h.values;
+            $.dx.type.to-name{%h.keys} = %h.values;
         }
     }
 }

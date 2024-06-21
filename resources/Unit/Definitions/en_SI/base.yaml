@@ -11,4 +11,4 @@
 - Temperature: [K, kelvin]
 - Substance:   [mol, mole]
 - Luminosity:  [cd, candela, candle]
-- Angle:       [radian]     #FIXME add rad
+- Angle:       [radian, rad]

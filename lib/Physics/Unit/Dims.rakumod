@@ -5,7 +5,7 @@ class Unit::Dims {
 
     method load( @a ) {
         for @a -> %h {
-            $.dx.types.to-dims{%h.keys} = %h.values;
+            $.dx.type.to-dims{%h.keys} = %h.values;
         }
     }
 }

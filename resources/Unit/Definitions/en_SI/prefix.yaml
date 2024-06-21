@@ -29,7 +29,7 @@ Prefix:
 - {names: [z, zepto],     defn: 1e-21}
 - {names: [y, yocto],     defn: 1e-24}
 
-# others FIXME mv to another group (may need to translate)
+# others
 - {names: [mn, million],  defn: 1000000}
 - {names: [bn, billion],  defn: 1000000000}
 - {names: [tn, trillion], defn: 1000000000000}

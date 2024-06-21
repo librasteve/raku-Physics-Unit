@@ -10,7 +10,14 @@ class Unit {
     also does Parser[Unit];
 
     my $cg = Config.new;
-    has $.dx = Directory.instance;
+
+    sub dxi{
+        # class method cant use attr, this sub avoids circular loading
+        Directory.instance;
+    }
+
+    # also an attribute for child classes
+    has $.dx = dxi;
 
     my \NumBases = 8;
 
@@ -49,7 +56,7 @@ class Unit {
         my $u = Unit.new(:$defn, names => [$defn]);
         $u.type: $type;
 
-        $.dx.types.to-name{$type} = $defn;
+        dxi.type.to-name{$type} = $defn;
 
         return $type;
     }
@@ -63,7 +70,7 @@ class Unit {
 
         #2 check if name (if set) is a base type
         with $.name {
-            for $.dx.types.to-name.kv -> $k, $v {
+            for dxi.type.to-name.kv -> $k, $v {
                 return $k when $v;
             }
         }
@@ -76,7 +83,7 @@ class Unit {
 
         }(
             gather {
-                for $.dx.types.to-dims.kv -> $key, $value {
+                for dxi.type.to-dims.kv -> $key, $value {
                     take $key if $value eqv self.dims;
                 }
             }
@@ -87,7 +94,7 @@ class Unit {
     multi method names(@n)  {
 
         if @n {
-            if $.dx.unit.to-syns{@n.first} -> @syns {
+            if dxi.unit.to-syns{@n.first} -> @syns {
                 #1 predefined Unit, assign synonyms
                 @!names = @syns;
 
@@ -97,7 +104,7 @@ class Unit {
             }
         } else {
             #3 lookup defn in the postfix synonyms (eg. 'mm')
-            for $.dx.postfix.to-syns.kv -> $k, $v {
+            for dxi.postfix.to-syns.kv -> $k, $v {
                 if $v.grep($.defn) {
                     @!names = |$v;
                 }
@@ -106,8 +113,8 @@ class Unit {
             @!names = [$.defn] unless @!names;
         }
 
-        @!names.map( { $.dx.unit.by-name{$_} =   self } );
-        @!names.map( { $.dx.unit.to-defn{$_} = $.defn } );
+        @!names.map( { dxi.unit.by-name{$_} =   self } );
+        @!names.map( { dxi.unit.to-defn{$_} = $.defn } );
 
         say "load-names: {@!names}" if $cg.db;
     }
@@ -135,7 +142,7 @@ class Unit {
 
     #| deep clone
     method clone {
-        nextwith :names([]), :dims(@!dims.clone), :dmix($!dmix.clone);   # FIXME rm names?
+        nextwith :names([]), :dims(@!dims.clone), :dmix($!dmix.clone);
     }
 
     #| clear non-numeric attrs (used by role Maths)
@@ -172,8 +179,8 @@ class Unit {
                 }
             }
             for @synonyms -> $name {
-                $.dx.unit.to-defn{$name} = $defn;
-                $.dx.unit.to-syns{$name} = @synonyms;
+                dxi.unit.to-defn{$name} = $defn;
+                dxi.unit.to-syns{$name} = @synonyms;
             }
         }
 
@@ -200,8 +207,8 @@ class Unit {
         for 0 ..^ NumBases -> $i {
             given @.dims[$i] {
                 when 0  { $ds = '' }
-                when 1  { $ds = "{$.dx.bases.names[$i]}" }
-                default { $ds = "{$.dx.bases.names[$i]}$_" }
+                when 1  { $ds = "{dxi.base.names[$i]}" }
+                default { $ds = "{dxi.base.names[$i]}$_" }
             }
             @dim-str.push: $ds if $ds;
         }
@@ -215,8 +222,8 @@ class Unit {
         for 0 ..^ NumBases -> $i {
             given @.dims[$i] {
                 when 0  { $ds = '' }
-                when 1  { $ds = "{$.dx.bases.names[$i]}" }
-                default { $ds = "{$.dx.bases.names[$i]}%pwr-sup-rev{$_}" }
+                when 1  { $ds = "{dxi.base.names[$i]}" }
+                default { $ds = "{dxi.base.names[$i]}%pwr-sup-rev{$_}" }
             }
             @dim-str.push: $ds if $ds;
         }
@@ -226,28 +233,24 @@ class Unit {
     ### general & class methods ###
 
     sub subst-shortest( $u ) {
-        my $dx = Directory.instance;
-
         # substitutes shortest name if >1 unit name has same dimensions
         # ... so that eg. 'J' beats 'kg m^2 / s^2'
         # ... needs 'J' to be instantiated first
 
         my @same-dmix;
-        for $dx.unit.by-name.kv -> $k,$v {
+        for dxi.unit.by-name.kv -> $k,$v {
             @same-dmix.push($k) if $v.same-dmix($u)
         }
 
         if @same-dmix {
             my @sort-by-size = @same-dmix.sort({$^a.chars cmp $^b.chars});
-            return $dx.unit.by-name{@sort-by-size[0]};  #shortest
+            return dxi.unit.by-name{@sort-by-size[0]};  #shortest
         } else {
             return $u;
         }
     }
 
     multi method find( Unit:U: Unit:D $u ) {
-        my $dx := Directory.instance;    # class method cant use attr
-
         #1 if Unit, eg. from Measure.new( ... unit => $u ), just return it
         say "UF1 from $u" if $cg.db;
 
@@ -255,18 +258,16 @@ class Unit {
     }
 
     multi method find( Unit:U: Str() $u ) {
-        my $dx = Directory.instance;    # class method cant use attr
-
         #2 if unit or prefix already instantiated
         say "UF2 from $u"if $cg.db;
 
-        return $_ with $dx.unit.by-name{$u};
-        return $_ with $dx.prefix.to-unit{$u};
+        return $_ with dxi.unit.by-name{$u};
+        return $_ with dxi.prefix.to-unit{$u};
 
         #3 if name in our defns, instantiate it
         say "UF3 from $u" if $cg.db;
 
-        for $dx.unit.to-defn -> %p {
+        for dxi.unit.to-defn -> %p {
             if %p.key.grep($u) {
                 return Unit.new( defn => %p.value, names => [%p.key] );
             }
@@ -278,49 +279,32 @@ class Unit {
         subst-shortest(Unit.new( defn => $u ));
     }
 
-    multi method type-to-unit(Unit:U: Any:U) {         # FIXME does test need this multi?
-        die "Cannot get the Unit of an undefined Type";
-    }
-
     multi method type-to-unit(Unit:U: Type:D $t ) {
-        my $dx := Directory.instance;    # class method cant use attr
-
-        Unit.find: $dx.types.to-name{ $t };
+        Unit.find: dxi.type.to-name{ $t };
     }
 
     multi method type-to-unit(Unit:D:) {
-        Unit.find: $.dx.types.to-name{ $.type };
-    }
-
-    multi method ubn(Unit:U:) {
-        my $dx := Directory.instance;
-        $dx.unit.by-name;
+        Unit.find: dxi.type.to-name{ $.type };
     }
 
     multi method prefix-to-factor(Unit:U:) {
-        my $dx := Directory.instance;    # class method cant use attr
-
-        $dx.prefix.to-factor;
+        dxi.prefix.to-factor;
     }
 
     multi method postfix-to-defn(Unit:U:) {
-        my $dx := Directory.instance;    # class method cant use attr
-
-        $dx.postfix.to-defn;
+        dxi.postfix.to-defn;
     }
 
     multi method postfix-to-syns(Unit:U:) {
-        my $dx := Directory.instance;    # class method cant use attr
-
-        $dx.postfix.to-syns;
+        dxi.postfix.to-syns;
     }
 
     #| Bind new type eg. m-1
     method type-bind( Str $type-name ) {
         for @!names -> $name {
-            $.dx.types.to-name{$type-name} = $name;
+            dxi.type.to-name{$type-name} = $name;
         }
-        $.dx.types.to-dims{$type-name} = self.dims;
+        dxi.type.to-dims{$type-name} = self.dims;
     }
 
     #| Apply or provide type hints

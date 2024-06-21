@@ -13,7 +13,7 @@
 - Substance:             [ 0, 0, 0, 0, 0, 1, 0, 0]
 - Luminosity:            [ 0, 0, 0, 0, 0, 0, 1, 0]
 - Angle:                 [ 0, 0, 0, 0, 0, 0, 0, 1]
-- AngularSpeed:          [ 0, 0,-1, 0, 0, 0, 0, 1]  #FIXME maybe A=0 (see also disambiguate)
+- AngularSpeed:          [ 0, 0,-1, 0, 0, 0, 0, 1]
 - SolidAngle:            [ 0, 0, 0, 0, 0, 0, 0, 2]
 - Frequency:             [ 0, 0,-1, 0, 0, 0, 0, 0]
 - Area:                  [ 2, 0, 0, 0, 0, 0, 0, 0]

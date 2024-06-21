@@ -28,10 +28,10 @@ class Unit::Base is Unit {
             $u.type: $type;
 
             # update Directory
-            $.dx.types.to-name{$type} = $u.name;
-            $.dx.bases.by-type{$type} = $u;
+            $.dx.type.to-name{$type} = $u.name;
+            $.dx.base.by-type{$type} = $u;
 
-            $.dx.bases.names.push: $u.name;
+            $.dx.base.names.push: $u.name;
 
             $.dx.postfix.to-defn{$u.name} = @synonyms[1];    #extended name as value
             $.dx.postfix.to-syns{$u.name} = @synonyms;       #all synonyms as value
