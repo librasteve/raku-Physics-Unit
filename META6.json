@@ -1,7 +1,7 @@
 {
   "name": "Physics::Unit",
   "description": "Some support for physical units.",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "perl": "6.d",
   "authors": [
     "librasteve"
@@ -33,7 +33,8 @@
     "Unit/Definitions/en_SI/types.yaml",
     "Unit/Definitions/en_SI/dims.yaml",
     "Unit/Definitions/en_SI/base.yaml",
-    "Unit/Definitions/en_SI/general.yaml"
+    "Unit/Definitions/en_SI/general.yaml",
+    ".DS_Store"
   ],
   "license": "Artistic-2.0",
   "tags": [

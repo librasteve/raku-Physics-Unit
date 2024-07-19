@@ -79,7 +79,14 @@ Volume:
   - {names: [m^3, m3, m³],               defn: 'm^3'}
   - {names: [l, L, litre, liter],        defn: 'm^3/1000'}
   - {names: [cc],                        defn: 'cubic centimetre'}
-  - {names: [bottle],                    defn: '750 millilitre'}
+  - {names: [bottle],                    defn: '0.75 litre'}
+  - {names: [magnum],                    defn: '1.5 litre'}
+  - {names: [jeroboam],                  defn: '3 litre'}
+  - {names: [rehoboam],                  defn: '4.5 litre'}
+  - {names: [imperial],                  defn: '6 litre'}
+  - {names: [salmanazar],                defn: '9 litre'}
+  - {names: [balthazar],                 defn: '12 litre'}
+  - {names: [nebuchadnezzar],            defn: '15 litre'}
   - {names: [fluidram],                  defn: '3.5516 millilitre'}
   - {names: [minim],                     defn: '0.059194 millilitre'}
   - {names: [alcohol-unit],              defn: '10 millilitre'}            # of pure alcohol
