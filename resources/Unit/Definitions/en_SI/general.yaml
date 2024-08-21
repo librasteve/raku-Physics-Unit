@@ -180,7 +180,7 @@ Pressure:
 
 Density:
   - {names: [kg/m^3],                    defn: 'kg / m^3'}
-  - {names: [°proof],                    defn: '923 kg / m^3'}   #UK metric https://en.wikipedia.org/wiki/Alcohol_proof (US version is just 2x ABV)
+  - {names: [°proof],                    defn: '9.23 kg / m^3'}   #UK metric https://en.wikipedia.org/wiki/Alcohol_proof (US version is just 2x ABV)
 
 Energy:
   - {names: [eV, electron-volt],         defn: '1.60217733e-19 joule'}
