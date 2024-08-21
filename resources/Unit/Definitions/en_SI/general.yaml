@@ -94,6 +94,7 @@ Volume:
   - {names: [imp-gallon],                defn: '4.54609 litre'}
   - {names: [gallon],                    defn: '1 %LOCALE%-gallon'}
   - {names: [firkin],                    defn: '9 gallon'}
+  - {names: [keg],                       defn: '18 gallon'}
   - {names: [barrel],                    defn: '36 gallon'}
   - {names: [quart],                     defn: 'gallon/4'}
   - {names: [peck],                      defn: '8 quart'}
