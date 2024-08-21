@@ -93,7 +93,7 @@ Volume:
   - {names: [us-gallon],                 defn: '3.785411784 litre'}
   - {names: [imp-gallon],                defn: '4.54609 litre'}
   - {names: [gallon],                    defn: '1 %LOCALE%-gallon'}
-  - {names: [firkin],                    defn: '9 gallon'}
+  - {names: [firkin, pony-keg],          defn: '9 gallon'}
   - {names: [keg],                       defn: '18 gallon'}
   - {names: [barrel],                    defn: '36 gallon'}
   - {names: [quart],                     defn: 'gallon/4'}
@@ -106,6 +106,7 @@ Volume:
   - {names: [cup],                       defn: 'us-pint/2'}
   - {names: [floz, fluid-ounce],         defn: 'cup/8'}
   - {names: [gill],                      defn: '4 fluid-ounce'}
+  - {names: [case],                      defn: '288 fluid-ounce'}
   - {names: [tablespoon, tbsp],          defn: 'fluid-ounce / 2'}
   - {names: [teaspoon, tsp],             defn: 'tablespoon / 3'}
   - {names: [cord],                      defn: '128 cubic feet'}
