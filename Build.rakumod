@@ -13,7 +13,7 @@ class Build {
 		mkdir "$*HOME/$raph/Unit/Definitions/en_SI";
 
 		for @parts -> $part {
-				copy "resources/$path/$part.yaml", "$*HOME/$raph/$path/$part.yaml";
+			copy "resources/$path/$part.yaml", "$*HOME/$raph/$path/$part.yaml";
 		}
 
 		exit 0

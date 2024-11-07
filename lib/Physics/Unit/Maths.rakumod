@@ -115,10 +115,10 @@ role Maths[::Unit] {
     }
 
     #| used by Measure cmp
-    #| maybe rename to method cmp?
     method same-unit( Unit $u ) {
         return 0 unless $u.dims  eqv self.dims;
         return 0 unless $u.factor == self.factor;
+        return 0 unless $u.offset == self.offset;
         return 1;
     }
 }
