@@ -75,12 +75,12 @@ The ① symbol is used to denote Dimensionless units.
 # Operation Principles & Edge Cases
 
 ## Operation Principles
-a. Definition can be shared with several unit names - thus J and Nm can remain distinct
-b. Unit.find first tries name match, then calls Unit.new to try definition match
-c. Matching names is exact; definitions is loose
-d. Defn matches dimension Mix (shallow) - thus 'kg m^2 / s^2' and 'N m' do remain distinct
-e. Long strings (eg. 'kg m^2/s^2') auto reduce to SI derived units (eg. 'J') [if Unit already instaniated]
-f. Override with Unit.new(defn=>'kg m^2/s^2', names=>['kg m^2/s^2']);
+1. Definition can be shared with several unit names - thus J and Nm can remain distinct
+1. Unit.find first tries name match, then calls Unit.new to try definition match
+1. Matching names is exact; definitions is loose
+1. Defn matches dimension Mix (shallow) - thus 'kg m^2 / s^2' and 'N m' do remain distinct
+1. Long strings (eg. 'kg m^2/s^2') auto reduce to SI derived units (eg. 'J') [if Unit already instaniated]
+1. Override with Unit.new(defn=>'kg m^2/s^2', names=>['kg m^2/s^2']);
 
 ## Edge Cases
 Unit.find('J');           #stock unit name=>'J'.., type=>Energy, defn=>'kg m^2 / s^2'
