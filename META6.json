@@ -31,8 +31,7 @@
         "Unit/Definitions/en_SI/types.yaml",
         "Unit/Definitions/en_SI/dims.yaml",
         "Unit/Definitions/en_SI/base.yaml",
-        "Unit/Definitions/en_SI/general.yaml",
-        "text.txt"
+        "Unit/Definitions/en_SI/general.yaml"
     ],
     "license": "Artistic-2.0",
     "tags": [
