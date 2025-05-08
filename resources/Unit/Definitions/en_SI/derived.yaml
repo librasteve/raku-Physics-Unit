@@ -19,7 +19,7 @@
 - {names: [Wb, weber],               defn: 'kg m^2 / A s^2'  }
 - {names: [T,  tesla],               defn: 'kg / A s^2'      }
 - {names: [H,  henry],               defn: 'kg m^2 / A^2 s^2'}
-- {names: [°C, celsius, Centigrade], defn: 'K + 273.15'      }
+- {names: [°C, ºC, celsius, Centigrade], defn: 'K + 273.15'  }
 - {names: [lm, lumen],               defn: 'cd sr'           }
 - {names: [lx, lux],                 defn: 'm^-2 cd'         }
 - {names: [Bq, becquerel],           defn: '1 Hz'            }
