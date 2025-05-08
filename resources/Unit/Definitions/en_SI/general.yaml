@@ -22,6 +22,7 @@ Dimensionless:
   - {names: [semi, demi, hemi],          defn: '1/2'}
   - {names: ['%' , percent],             defn: '1/100'}
   - {names: [ABV],                       defn: '1/100'}
+  - {names: [us-proof],                  defn: '1/200'}       #(US proof is just 2x ABV)
   - {names: [pi],                        defn: '3.1415926535897932385'}
 
 Angle:
@@ -182,7 +183,7 @@ Pressure:
 
 Density:
   - {names: [kg/m^3],                    defn: 'kg / m^3'}
-  - {names: [°proof],                    defn: '9.23 kg / m^3'}   #UK metric https://en.wikipedia.org/wiki/Alcohol_proof (US version is just 2x ABV)
+  - {names: [°proof, proof],             defn: '9.23 kg / m^3'}   #UK metric https://en.wikipedia.org/wiki/Alcohol_proof
 
 Energy:
   - {names: [eV, electron-volt],         defn: '1.60217733e-19 joule'}
@@ -219,8 +220,8 @@ Magnetic_field:
   - {names: [gauss],                     defn: '1e-4 tesla'}
 
 Temperature:
-  - {names: [°R, Rankine],               defn: '5/9 * K'}
-  - {names: [°F, Fahrenheit],            defn: '5/9 * K + 459.67'}
+  - {names: [°R, ºR, Rankine],           defn: '5/9 * K'}
+  - {names: [°F, ºF, Fahrenheit],        defn: '5/9 * K + 459.67'}
 
 Dose:
   - {names: [rad],                       defn: 'gray / 100'}
