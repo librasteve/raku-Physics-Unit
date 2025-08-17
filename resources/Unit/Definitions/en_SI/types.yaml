@@ -41,6 +41,7 @@
 - Flow:                   'm^3/s'
 - SpecificEnergy:         'J/kg'
 - SpecificPower:          'kW/kg'
+- SpecificHeat:           'J/kg K'
 - Irradiance:             'W/m^2'
 - Insolation:             'kWh/m^2'
 - ThermalResistance:      'Km^2/W'

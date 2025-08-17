@@ -248,6 +248,10 @@ SpecificPower:
   - {names: [kW/kg],                     defn: 'kilo W / kg'}
   - {names: [hp/lb],                     defn: 'hp / lb'}
 
+SpecificHeat:
+  - {names: [J/kg.K],                    defn: 'joule / kg K'}
+  - {names: [cal/g.K],                   defn: 'cal / gram K'}
+
 Irradiance:
   - {names: [W/m^2],                     defn: 'W / m^2'}
 
