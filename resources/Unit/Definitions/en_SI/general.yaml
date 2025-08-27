@@ -25,6 +25,9 @@ Dimensionless:
   - {names: [us-proof],                  defn: '1/200'}       #(US proof is just 2x ABV)
   - {names: [pi],                        defn: '3.1415926535897932385'}
 
+Currency:
+  - {names: [$, dollar],                 defn: '$' }
+
 Angle:
   - {names: [°, degree, deg, º],         defn: 'pi radians / 180'}
   - {names: [ᵍ, gon, grad],              defn: 'pi radians / 200'}

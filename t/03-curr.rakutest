@@ -1,0 +1,15 @@
+#!/usr/bin/env raku
+#t/03-curr.t
+#TESTALL$ prove6 *      [from /t]
+use lib '../lib';
+use Test;
+plan 17;
+
+use Physics::Unit;
+
+my Unit $u .=new(defn => '$', names => ['$']);
+
+is $u.name,'$',				    '$u.name exists';
+is ~$u.type,'Currency',		'$u.units made';
+
+done-testing
