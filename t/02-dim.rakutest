@@ -1,5 +1,5 @@
 #!/usr/bin/env raku
-#t/01-tst.t
+#t/02-dim.t
 #TESTALL$ prove6 *      [from /t]
 use lib '../lib';
 use Test;

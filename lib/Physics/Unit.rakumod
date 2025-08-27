@@ -19,7 +19,7 @@ class Unit {
     # also an attribute for child classes
     has $.dx = dxi;
 
-    my \NumBases = 8;
+    my \NumBases = 9;
 
     has Bool    $!final  = False;
     has Real    $!factor = 1;

@@ -5,6 +5,7 @@
 # Format key:
 #- Type:                  'type unit'
 - Dimensionless:          'unity'
+- Currency:               'dollar'
 - Angle:                  'radian'
 - AngularSpeed:           'radians per second'
 - SolidAngle:             'steradian'
