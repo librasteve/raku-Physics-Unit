@@ -30,6 +30,7 @@ Prefix:
 - {names: [y, yocto],     defn: 1e-24}
 
 # others
-- {names: [mn, million],  defn: 1000000}
-- {names: [bn, billion],  defn: 1000000000}
-- {names: [tn, trillion], defn: 1000000000000}
+- {names: [th, thousand],  defn: 1000}
+- {names: [mn, million],   defn: 1000000}
+- {names: [bn, billion],   defn: 1000000000}
+- {names: [tn, trillion],  defn: 1000000000000}
