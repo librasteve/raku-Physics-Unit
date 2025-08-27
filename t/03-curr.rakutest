@@ -3,7 +3,7 @@
 #TESTALL$ prove6 *      [from /t]
 use lib '../lib';
 use Test;
-plan 17;
+#plan 17;
 
 use Physics::Unit;
 

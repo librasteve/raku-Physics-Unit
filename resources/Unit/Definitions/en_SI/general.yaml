@@ -26,7 +26,7 @@ Dimensionless:
   - {names: [pi],                        defn: '3.1415926535897932385'}
 
 Currency:
-  - {names: [$, dollar],                 defn: '$' }
+  - {names: [$, dollar, USD],            defn: '$' }
 
 Angle:
   - {names: [°, degree, deg, º],         defn: 'pi radians / 180'}
