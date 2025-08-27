@@ -26,6 +26,7 @@ class Config {
         Momentum       => <Momentum Impulse>,
         Frequency      => <Frequency Radioactivity>,
         SpecificEnergy => <SpecificEnergy Dose>,
+        Insolation     => <Insolation SpectralFluxDensity>,
     );
 
     # main Loader

@@ -45,5 +45,6 @@
 - SpecificHeat:           'J/kg K'
 - Irradiance:             'W/m^2'
 - Insolation:             'kWh/m^2'
+- SpectralFluxDensity:    'W/m^2 Hz'
 - ThermalResistance:      'Km^2/W'
 - ThermalConductance:     'W/m^2K'
