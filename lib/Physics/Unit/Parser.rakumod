@@ -18,17 +18,19 @@ role Parser[::Unit] {
         $defn = $dx.postfix.to-defn{$defn} // $defn;
 
         #| rm compound names from element unit-name match candidates (to force regen of dmix)
-        my $unit-names = $dx.unit.to-defn.keys.grep({ !/<[\s*^./]>/ }).join('|');
+        my $unit-names       = $dx.unit.to-defn.keys.grep({ !/<[\s*^./]>/ }).join('|');
+        my $prefix-names     = $dx.prefix.to-unit.keys.join('|');
 
-        my $prefix-names = $dx.prefix.to-unit.keys.join('|');
-
-        my $pwr-prewords = $cg.pwr-preword.keys.join('|');
-        my $pwr-postwords = $cg.pwr-postword.keys.join('|');
+        my $pwr-prewords     = $cg.pwr-preword.keys.join('|');
+        my $pwr-postwords    = $cg.pwr-postword.keys.join('|');
         my $pwr-superscripts = $cg.pwr-superscript.keys.join('|');
+        my $factor-names     = $cg.factor-names.keys.join('|');
 
         #escape quote non alphanum| characters...
         $unit-names ~~ s:g/ (<-[a..z A..Z 0..9 \|]>) / '$0' /;
         $pwr-superscripts ~~ s:g/ (<-[a..z A..Z 0..9 \|]>) / '$0' /;
+
+        say "Parsing defn: «$defn»" if $cg.db;
 
         #use Grammar::Tracer;
         my grammar UnitGrammar {
@@ -43,7 +45,7 @@ role Parser[::Unit] {
             token sep { ['*' || '.' || ' *' || ' .' || ' ' || '⋅'] }
             token element { <factor> || <pnp-before> || <pnp-after> }
 
-            token factor { <number> }
+            token factor { <number> || <$factor-names> }
             token offset { <number> }
             token number {
                 \S+ <?{ defined +"$/" }>
@@ -108,18 +110,22 @@ role Parser[::Unit] {
                     make $unit;
                 } else {
                     $unit = $<pnp-before><prefix-name>.made<unit> ||
-                        $<pnp-after><prefix-name>.made<unit>;
+                            $<pnp-after><prefix-name>.made<unit>;
                     $defn = $<pnp-before><prefix-name>.made<defn> ||
-                        $<pnp-after><prefix-name>.made<defn>;
-                    $pwr = $<pnp-before><pwr-before>.made ||
-                        $<pnp-after>.made || 1;
+                            $<pnp-after><prefix-name>.made<defn>;
+                    $pwr  = $<pnp-before><pwr-before>.made ||
+                            $<pnp-after>.made || 1;
                     make $unit.raise($pwr, $defn);
                 }
             }
 
             #| handle factor and offset matches
             method factor($/) {
-                make Unit.new.times($/.Real);
+                with $/.Real {
+                    make Unit.new.times($_);
+                } else {
+                    make Unit.new.times($cg.factor-names{$/.Str});
+                }
             }
             method offset($/) {
                 make $<number>;
@@ -134,7 +140,7 @@ role Parser[::Unit] {
                 make %(:$defn, :$unit);
             }
             method prefix($/) {
-                make %( unit => Unit.find($/.Str).clone);
+                make %(unit => Unit.find($/.Str).clone);
 
             }
             method name($/) {
@@ -150,8 +156,8 @@ role Parser[::Unit] {
             }
             method pnp-after($/) {
                 make $<pwr-after><pwr-postwd>.made ||
-                    $<pwr-after><pwr-supers>.made ||
-                    $<pwr-after><pwr-normal>.made;
+                     $<pwr-after><pwr-supers>.made ||
+                     $<pwr-after><pwr-normal>.made;
             }
             method pwr-postwd($/) {
                 make $cg.pwr-postword{$/.Str}.Int;

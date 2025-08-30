@@ -15,6 +15,14 @@ class Config {
     #locale for 'us' or 'imp' gallons, pints, mpg etc.
     has $.locale = 'imp';
 
+    #factor names
+    has %.factor-names = (
+        th => 1000,          thousand => 1000,
+        mn => 1000000,       million  => 1000000,
+        bn => 1000000000,    billion  => 1000000000,
+        tn => 1000000000000, trillion => 1000000000000,
+    );
+
     submethod TWEAK{
         $!locale = ($_ ~~ /en_US/) ?? 'us' !! 'imp'    with %*ENV<LANG>;
         $!locale = ($_ ~~ /en_US/) ?? 'us' !! $!locale with %*ENV<RAKULANG>;
