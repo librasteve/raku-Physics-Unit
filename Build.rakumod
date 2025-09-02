@@ -16,6 +16,10 @@ class Build {
 			copy "resources/$path/$part.yaml", "$*HOME/$raph/$path/$part.yaml";
 		}
 
+        #| setup exchange rates on zef install as part of build
+        #| note this in the README
+        #| zef install Physics::Unit --force-install to reload
+
 		exit 0
 	}
 }

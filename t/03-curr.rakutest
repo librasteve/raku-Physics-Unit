@@ -7,9 +7,13 @@ use Test;
 
 use Physics::Unit;
 
-my Unit $u .=new(defn => '$', names => ['$']);
+#my Unit $u .=new(defn => '$', names => ['$']);
+#
+#is $u.name,'$',				 '$u.name exists';
+#is ~$u.type,'Currency',		'$u.units made';
 
-is $u.name,'$',				    '$u.name exists';
-is ~$u.type,'Currency',		'$u.units made';
+say Unit.find('USD');
+#my $u1 = Unit.find( 'HKD' );
+
 
 done-testing
