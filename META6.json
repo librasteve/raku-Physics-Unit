@@ -34,7 +34,9 @@
         "Unit/Definitions/en_SI/types.yaml",
         "Unit/Definitions/en_SI/dims.yaml",
         "Unit/Definitions/en_SI/base.yaml",
-        "Unit/Definitions/en_SI/general.yaml"
+        "Unit/Definitions/en_SI/general.yaml",
+        "Unit/Definitions/en_SI/currency.yaml",
+        "Unit/Definitions/en_SI/currency-template.yaml"
     ],
     "license": "Artistic-2.0",
     "tags": [
