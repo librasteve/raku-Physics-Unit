@@ -3,7 +3,7 @@
 #TESTALL$ prove6 ./t      [from root]
 use lib '../lib';
 use Test;
-plan 12;
+plan 14;
 
 use Physics::Unit;
 
@@ -29,19 +29,22 @@ is ~$fg,'fg',				'new named ok';
 
 #more intricate unit expression (using the newly defined unit 'ff'):
 my $gonzo = Unit.new( defn => "13 square millimeters per ff", names => ['gonzo'] );
-is ~$gonzo,'gonzo',					    'new intricate name ok';
+is ~$gonzo,'gonzo',					      'new intricate name ok';
 is $gonzo.dims.Str, '1 0 1 0 0 0 0 0 0',  'new intricate dims ok';
 
 #parsing of input
-Unit.find('J');
-my $u1 = Unit.find( 'kg m^2 / s^2' );
-#my $u2 = GetUnit( 'kg m^2/s^2' );
-#ok $u2.same-dmix($u1),		'parse & cmp ok';
+my $u1 = Unit.find('J');
+my $u2 = Unit.find( 'kg m^2 / s^2' );
+ok $u2.same-dmix($u1),		'parse & cmp ok';
 
 #SI recommended string representation
 is "{$u1.factor} {$u1.pretty}",'1 m²⋅kg⋅s⁻²', 'SI recommended ok';
 
 #SI derived unit representation
 is "{$u1.factor} {$u1.name}",'1 J', 'SI derived ok';
+
+my $c1 = Unit.find('USD');
+my $c2 = Unit.find('US$');
+ok $u2.same-dmix($u1),		'currency ok';
 
 #done-testing
