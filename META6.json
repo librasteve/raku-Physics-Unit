@@ -7,13 +7,16 @@
     ],
     "auth": "zef:librasteve",
     "depends": [
-        "YAMLish"
+        "YAMLish",
+        "HTTP::Tiny",
+        "JSON::Fast"
     ],
     "build-depends": [],
     "provides": {
         "Physics::Unit": "lib/Physics/Unit.rakumod",
         "Physics::Unit::Base": "lib/Physics/Unit/Base.rakumod",
         "Physics::Unit::Config": "lib/Physics/Unit/Config.rakumod",
+        "Physics::Unit::Currency": "lib/Physics/Unit/Currency.rakumod",
         "Physics::Unit::Derived": "lib/Physics/Unit/Derived.rakumod",
         "Physics::Unit::Dims": "lib/Physics/Unit/Dims.rakumod",
         "Physics::Unit::Directory": "lib/Physics/Unit/Directory.rakumod",

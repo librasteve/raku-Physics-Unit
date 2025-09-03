@@ -23,9 +23,10 @@ A set of stock SI, Imperial and US Unit objects for raku that are employed by [P
 ```zef install Physics::Unit```
 
 The ```locale``` for units is set to 'us' or 'imp' (imperial) automatically depending on your ```%*ENV<LANG>``` system value.
-You can override this with ```export RAKULAND='en_US'``` or ```export RAKULAND='anything else'```.
-This affects vanilla gallons, pints, mpg, etc. so don't worry if you are from Europe.
-You can always use ```imp-pint``` vs ```us-pint``` explicitly to override.
+
+You can override this with ```export RAKULAND='en_US'``` or ```export RAKULAND='anything else'```. This affects gallons, pints, mpg, etc. so don't worry if you are from Europe. You can always use ```imp-pint``` vs ```us-pint``` explicitly to override.
+
+Currency exchange rates are fetched from https://latest.currency-api.pages.dev/v1/currencies/usd.json on module installation. You need to reinstall to get the latest rates.
 
 # Synopsis - Physics::Unit
 

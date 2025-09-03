@@ -45,7 +45,7 @@ class Config {
         my $pul = Physics::Unit::en_SI.new(
             raph => '.raph-config',
             path => 'Unit/Definitions/en_SI',
-            parts => <base types dims derived prefix general>,
+            parts => <base types dims derived prefix general currency>,
         );
 
         $pul.load;

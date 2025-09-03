@@ -193,7 +193,8 @@ class Unit {
     method gist      { self.Str }
 
     method raku      {
-        my $name-string = $.name ?? qq|[{@.names.map( {"'$_'"} ).join(',')}]| !! '[]';
+        my $name-string = qq|[{@.names.map( {"'$_'"} ).join(',')}]|;
+#        my $name-string = $.name ?? qq|[{@.names.map( {"'$_'"} ).join(',')}]| !! '[]';
 
         return qq:to/END/;
           Unit.new( factor => $.factor, offset => $.offset, defn => '$.defn', type => '{$.type}',

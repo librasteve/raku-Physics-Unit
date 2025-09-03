@@ -1,0 +1,40 @@
+#Physics::Units::Definitions::en_SI - currency.yaml
+
+#Currency Units
+
+#iamerejh ... Currency loader and live rates
+# https://latest.currency-api.pages.dev/v1/currencies/eur.json
+# https://latest.currency-api.pages.dev/v1/currencies/usd.json
+
+#| Build.rakumod substitutes defn eg GBP => 0.8 USD
+
+Currency:
+  - { names: [ EUR, €, euro ],                       defn: 'EUR' }       # Euro (symbol usually prefix, e.g. €100, but suffix in some countries)
+  - { names: [ JPY, ¥, yen ],                        defn: 'JPY' }       # Japanese Yen (symbol usually prefix, e.g. ¥1000)
+  - { names: [ GBP, £, pound ],                      defn: 'GBP' }       # British Pound (symbol usually prefix, e.g. £100)
+  - { names: [ AUD, A$, Australian dollar ],         defn: 'AUD' }       # Australian Dollar (symbol usually prefix, e.g. A$100)
+  - { names: [ CAD, C$, Canadian dollar ],           defn: 'CAD' }       # Canadian Dollar (symbol usually prefix, e.g. C$100)
+  - { names: [ CHF, SFr, Swiss franc ],              defn: 'CHF' }       # Swiss Franc (symbol usually suffix, e.g. 100 Fr.)
+  - { names: [ CNY, CN¥, yuan, renminbi ],           defn: 'CNY' }       # Chinese Yuan (symbol usually prefix, e.g. ¥100)
+  - { names: [ HKD, HK$, Hong Kong dollar ],         defn: 'HKD' }       # Hong Kong Dollar (symbol usually prefix, e.g. HK$100)
+  - { names: [ NZD, NZ$, New Zealand dollar ],       defn: 'NZD' }       # New Zealand Dollar (symbol usually prefix, e.g. NZ$100)
+  - { names: [ SGD, S$, Singapore dollar ],          defn: 'SGD' }       # Singapore Dollar (symbol usually prefix, e.g. S$100)
+  - { names: [ ZAR, R, rand ],                       defn: 'ZAR' }       # South African Rand (symbol usually prefix, e.g. R100)
+  - { names: [ MXN, Mex$, peso ],                    defn: 'MXN' }       # Mexican Peso (symbol usually prefix, e.g. Mex$100)
+  - { names: [ SEK, Skr, krona, Swedish krona ],     defn: 'SEK' }       # Swedish Krona (symbol usually suffix, e.g. 100 kr)
+  - { names: [ NOK, Nkr, Norwegian krone ],          defn: 'NOK' }       # Norwegian Krone (symbol usually suffix, e.g. 100 kr)
+  - { names: [ DKK, Dkr, Danish krone ],             defn: 'DKK' }       # Danish Krone (symbol usually suffix, e.g. 100 kr)
+  - { names: [ THB, ฿, baht ],                       defn: 'THB' }       # Thai Baht (symbol usually prefix, e.g. ฿100)
+  - { names: [ PLN, zł, zloty ],                     defn: 'PLN' }       # Polish Zloty (symbol usually suffix, e.g. 100 zł)
+  - { names: [ MYR, RM, ringgit ],                   defn: 'MYR' }       # Malaysian Ringgit (symbol usually prefix, e.g. RM100)
+  - { names: [ TRY, ₺, lira, Turkish lira ],         defn: 'TRY' }       # Turkish Lira (symbol usually prefix, e.g. ₺100)
+  - { names: [ INR, ₹, rupee, Indian rupee ],        defn: 'INR' }       # Indian Rupee (symbol usually prefix, e.g. ₹100)
+  - { names: [ RUB, ₽, ruble, Russian ruble ],       defn: 'RUB' }       # Russian Ruble (symbol usually suffix, e.g. 100 ₽)
+  - { names: [ BRL, R$, real, Brazilian real ],      defn: 'BRL' }       # Brazilian Real (symbol usually prefix, e.g. R$100)
+  - { names: [ KRW, ₩, won, Korean won ],            defn: 'KRW' }       # South Korean Won (symbol usually prefix, e.g. ₩1000)
+  - { names: [ TWD, NT$, New Taiwan dollar ],        defn: 'TWD' }       # New Taiwan Dollar (symbol usually prefix, e.g. NT$100)
+  - { names: [ IDR, Rp, rupiah, Indonesian rupiah ], defn: 'IDR' }       # Indonesian Rupiah (symbol usually prefix, e.g. Rp1000)
+  - { names: [ SAR, SR, ر.س, riyal, Saudi riyal ],   defn: 'SAR' }       # Saudi Riyal (symbol usually prefix, e.g. SR100)
+  - { names: [ AED, د.إ, dirham, UAE dirham ],       defn: 'AED' }       # UAE Dirham (symbol usually prefix, e.g. د.إ100)
+  - { names: [ CZK, Kč, koruna, Czech koruna ],      defn: 'CZK' }       # Czech Koruna (symbol usually suffix, e.g. 100 Kč)
+  - { names: [ HUF, Ft, forint, Hungarian forint ],  defn: 'HUF' }       # Hungarian Forint (symbol usually suffix, e.g. 100 Ft)
