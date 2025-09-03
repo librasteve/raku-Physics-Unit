@@ -2,11 +2,8 @@
 
 #Currency Units (template)
 
-#Currency loader and live rates
-# https://latest.currency-api.pages.dev/v1/currencies/eur.json
-# https://latest.currency-api.pages.dev/v1/currencies/usd.json
-
-#| Build.rakumod substitutes defn eg GBP => 0.8 USD
+#Build.rakumod substitutes defn eg GBP => 0.8 USD
+#https://latest.currency-api.pages.dev/v1/currencies/usd.json
 
 Currency:
   - { names: [ EUR, €, euro ],                       defn: 'EUR' }       # Euro (symbol usually prefix, e.g. €100, but suffix in some countries)
