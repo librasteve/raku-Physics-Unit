@@ -81,8 +81,10 @@ Area:
 Volume:
   - {names: [m^3, m3, m³],               defn: 'm^3'}
   - {names: [l, L, litre, liter],        defn: 'm^3/1000'}
-  - {names: [mm^3, mm3, mm³ ],           defn: 'cubic millimetre' }
+  - {names: [mm^3, mm3, mm³],            defn: 'cubic millimetre'}
+  - {names: [cubic mm],                  defn: 'cubic millimetre'}
   - {names: [cm^3, cm3, cm³, cc],        defn: 'cubic centimetre'}
+  - {names: [cubic cm ],                 defn: 'cubic millimetre' }
   - {names: [bottle],                    defn: '0.75 litre'}
   - {names: [magnum],                    defn: '1.5 litre'}
   - {names: [jeroboam],                  defn: '3 litre'}
