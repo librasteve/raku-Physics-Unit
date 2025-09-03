@@ -8,7 +8,7 @@
 Currency:
   - { names: [ EUR, €, euro ],                       defn: 'EUR' }       # Euro (symbol usually prefix, e.g. €100, but suffix in some countries)
   - { names: [ JPY, ¥, yen ],                        defn: 'JPY' }       # Japanese Yen (symbol usually prefix, e.g. ¥1000)
-  - { names: [ GBP, £, pound ],                      defn: 'GBP' }       # British Pound (symbol usually prefix, e.g. £100)
+  - { names: [ GBP, £, sterling ],                   defn: 'GBP' }       # British Pound (symbol usually prefix, e.g. £100)
   - { names: [ AUD, A$, Australian dollar ],         defn: 'AUD' }       # Australian Dollar (symbol usually prefix, e.g. A$100)
   - { names: [ CAD, C$, Canadian dollar ],           defn: 'CAD' }       # Canadian Dollar (symbol usually prefix, e.g. C$100)
   - { names: [ CHF, SFr, Swiss franc ],              defn: 'CHF' }       # Swiss Franc (symbol usually suffix, e.g. 100 Fr.)
