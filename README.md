@@ -1,19 +1,6 @@
 [![License: Artistic-2.0](https://img.shields.io/badge/License-Artistic%202.0-0298c3.svg)](https://opensource.org/licenses/Artistic-2.0)
 [![raku-physics-unit -> DH](https://github.com/librasteve/raku-Physics-Unit/actions/workflows/unit-weekly.yaml/badge.svg)](https://github.com/librasteve/raku-Physics-Unit/actions/workflows/unit-weekly.yaml)
 
-
-# Version 2
-
-This version of Physics::Unit is a breaking change and a major refactor of the configuration files, build and load process to enable pluggable definitions. All configuration data is now loaded from resource YAML files, Config.rakumod and en_SI.rakumod. _See below for long term goals._
-
-Synthetic Units (e.g. .type => ```synthetic:m-1``) allows Measure calculations to produce intermediate results without dredefined units for every intermediate step.
-
-CreateUnit is consolidated to Unit.new, GetUnit becomes Unit.find and all non method parts of API are replaced.
-
-*You will need to upgrade Physics::Measure to v2+ also*
-
----
-
 # Physics::Unit
 A set of stock SI, Imperial and US Unit objects for raku that are employed by [Physics::Measure](https://github.com/librasteve/raku-Physics-Measure) objects.
 
