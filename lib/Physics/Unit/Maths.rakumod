@@ -56,7 +56,7 @@ role Maths[::Unit] {
         self.factor: self.factor ** $d;
         self.dims >>*=>> $d;
 
-        my $e-can = $.dx.unit.to-syns{$e}[0];   #lookup the canonical name
+        my $e-can = $.dx.unit.to-syns{$e}[0];   #lookup the canonical name (first synonym)
         self.dmix{$e-can} = $d;
 
         return self;

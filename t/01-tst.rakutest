@@ -29,8 +29,8 @@ is ~$fg,'fg',				'new named ok';
 
 #more intricate unit expression (using the newly defined unit 'ff'):
 my $gonzo = Unit.new( defn => "13 square millimeters per ff", names => ['gonzo'] );
-is ~$gonzo,'gonzo',					      'new intricate name ok';
-is $gonzo.dims.Str, '1 0 1 0 0 0 0 0 0',  'new intricate dims ok';
+is ~$gonzo,'gonzo',					        'new intricate name ok';
+is $gonzo.dims.Str, '1 0 1 0 0 0 0 0 0 0',  'new intricate dims ok';
 
 #parsing of input
 my $u1 = Unit.find('J');

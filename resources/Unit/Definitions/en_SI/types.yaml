@@ -6,6 +6,7 @@
 #- Type:                  'type unit'
 - Dimensionless:          'unity'
 - Currency:               'dollar'
+- Data:                   'bit'
 - Angle:                  'radian'
 - AngularSpeed:           'radians per second'
 - SolidAngle:             'steradian'

@@ -18,8 +18,9 @@ class Unit::Prefix is Unit {
                 defn   => %h<defn>,
                 names  => [$name],
                 type   => 'prefix',
-                );
+            );
 
+            # all Prefix get loaded same way for Parser
             $.dx.prefix.to-unit{$name} = $u;
             $.dx.prefix.by-symbol{$code} = $u;
             $.dx.prefix.to-factor{$name} = %h<defn>;

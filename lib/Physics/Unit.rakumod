@@ -19,10 +19,10 @@ class Unit {
     # also an attribute for child classes
     has $.dx = dxi;
 
-    my \NumBases = 9;
+    my \NumBases = 10;
 
     has Bool    $!final  = False;
-    has Real    $!factor = 1;
+    has FatRat()    $!factor = 1;
     has Real    $!offset = 0;
     has Defn()  $!defn is default('');
     has Type    $!type;
@@ -153,7 +153,7 @@ class Unit {
         @!names = [];
     }
 
-    #| loader populates Directory, but does not (yet) instatiate Unit objects
+    #| loader populates Directory, but does not instantiate Unit objects
     method load( %data ) {
 
         my @a;
@@ -161,7 +161,7 @@ class Unit {
             @a.append: |%data{$k};
         }
 
-        #eg. ['N',  'newton'],           'kg m / s^2',
+        #eg. ['N',  'newton'],     defn: 'kg m / s^2',
         #      |     ^^^^^^ synonyms      ^^^^^^^^^^ defn
         #	   |
         #	   > canonical name
@@ -194,11 +194,9 @@ class Unit {
 
     method raku      {
         my $name-string = qq|[{@.names.map( {"'$_'"} ).join(',')}]|;
-#        my $name-string = $.name ?? qq|[{@.names.map( {"'$_'"} ).join(',')}]| !! '[]';
 
         return qq:to/END/;
-          Unit.new( factor => $.factor, offset => $.offset, defn => '$.defn', type => '{$.type}',
-          dims => [{@!dims.join(',')}], dmix => {$!dmix.raku}, names => $name-string );
+          Unit.new( factor => $.factor, offset => $.offset, defn => '$.defn', type => '{$.type}', dims => [{@!dims.join(',')}], dmix => {$!dmix.raku}, names => $name-string );
         END
     }
 
@@ -260,7 +258,7 @@ class Unit {
 
     multi method find( Unit:U: Str() $u ) {
         #2 if unit or prefix already instantiated
-        say "UF2 from $u"if $cg.db;
+        say "UF2 from $u" if $cg.db;
 
         return $_ with dxi.unit.by-name{$u};
         return $_ with dxi.prefix.to-unit{$u};
@@ -298,6 +296,10 @@ class Unit {
 
     multi method postfix-to-syns(Unit:U:) {
         dxi.postfix.to-syns;
+    }
+
+    multi method binary-to-defn(Unit:U:) {
+        dxi.binary.to-defn;
     }
 
     #| Bind new type eg. m-1

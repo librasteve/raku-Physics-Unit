@@ -18,7 +18,7 @@ say $ff.pretty;			# 'm⋅s⁻¹' SI recommended string representation
 say $ff.raku;			#  or 'say $ff;' or 'dd $ff;' for details
 
 #Unit.new( factor => 0.00016631, offset => 0, defn => 'furlong / fortnight', type => Speed,
-#			 dims => [1,0,-1,0,0,0,0,0], dmix => ("fortnight"=>-1,"furlong"=>1).MixHash, names => ['ff'] );
+#			 dims => [1,0,-1,0,0,0,0,0,0,0], dmix => ("fortnight"=>-1,"furlong"=>1).MixHash, names => ['ff'] );
 
 # New Unit by renaming an existing one
 my $fh = $ff.new( <fh fi> );

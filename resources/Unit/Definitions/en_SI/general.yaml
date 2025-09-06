@@ -25,6 +25,9 @@ Dimensionless:
   - {names: [us-proof],                  defn: '1/200'}       #(US proof is just 2x ABV)
   - {names: [pi],                        defn: '3.1415926535897932385'}
 
+Data:
+  - {names: [B, byte],                   defn: '8 bit'}   #iamerejh need to move Data to new type
+
 Angle:
   - {names: [°, degree, deg, º],         defn: 'pi radians / 180'}
   - {names: [ᵍ, gon, grad],              defn: 'pi radians / 200'}
@@ -72,7 +75,9 @@ Length:
 Area:
   - {names: [m^2, m2, m²],               defn: 'm^2'}
   - {names: [mm^2, mm2, mm²],            defn: 'square millimetre' }
-  - {names: [cm^2, cm2, cm²],            defn: 'square centimetre' }
+  - {names: [square mm ],                defn: 'square millimetre' }
+  - {names: [cqm^2, cm2, cm²],           defn: 'square centimetre' }
+  - {names: [square cm ],                defn: 'square centimetre' }
   - {names: [are],                       defn: '100 square metre'}
   - {names: [hectare],                   defn: '100 are'}
   - {names: [barn],                      defn: '1e-28 square metre'}

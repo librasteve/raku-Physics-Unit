@@ -1,6 +1,6 @@
 #Physics::Units::Definitions::en_SI - prefix.yaml
 
-#SI Prefixes
+#SI & Binary Prefixes
 #avoid 1e2 format to encourage Rats
 
 # Format key:
@@ -8,23 +8,37 @@
 #- {names: [symbol, name], defn: 'definition string'}
 
 Prefix:
-- {names: [da, deka],     defn: 10}
-- {names: [h, hecto],     defn: 100}
-- {names: [k, kilo],      defn: 1000}
-- {names: [M, mega],      defn: 1000000}
-- {names: [G, giga],      defn: 1000000000}
-- {names: [T, tera],      defn: 1000000000000}
-- {names: [P, peta],      defn: 1000000000000000}
-- {names: [E, exa],       defn: 1000000000000000000}
-- {names: [Z, zetta],     defn: 1000000000000000000000}
-- {names: [Y, yotta],     defn: 1000000000000000000000000}
-- {names: [d, deci],      defn: 0.1}
-- {names: [c, centi],     defn: 0.01}
-- {names: [m, milli],     defn: 0.001}
-- {names: [μ, micro],     defn: 0.000001}
-- {names: [n, nano],      defn: 0.000000001}
-- {names: [p, pico],      defn: 0.000000000001}
-- {names: [f, femto],     defn: 0.000000000000001}
-- {names: [a, atto],      defn: 0.000000000000000001}
-- {names: [z, zepto],     defn: 1e-21}
-- {names: [y, yocto],     defn: 1e-24}
+  - {names: [ Q, quetta ],    defn: 1000000000000000000000000000000     } # 1e30
+  - {names: [ R, ronna ],     defn: 1000000000000000000000000000        } # 1e27
+  - {names: [ Y, yotta ],     defn: 1000000000000000000000000           } # 1e24
+  - {names: [ Z, zetta ],     defn: 1000000000000000000000              } # 1e21
+  - {names: [ E, exa ],       defn: 1000000000000000000                 } # 1e18
+  - {names: [ P, peta ],      defn: 1000000000000000                    } # 1e15
+  - {names: [ T, tera ],      defn: 1000000000000                       } # 1e12
+  - {names: [ G, giga ],      defn: 1000000000                          } # 1e9
+  - {names: [ M, mega ],      defn: 1000000                             } # 1e6
+  - {names: [ k, kilo ],      defn: 1000                                } # 1e3
+  - {names: [ h, hecto ],     defn: 100                                 } # 1e2
+  - {names: [ da, deka ],     defn: 10                                  } # 1e1
+  - {names: [ d, deci ],      defn: 0.1                                 } # 1e-1
+  - {names: [ c, centi ],     defn: 0.01                                } # 1e-2
+  - {names: [ m, milli ],     defn: 0.001                               } # 1e-3
+  - {names: [ μ, micro ],     defn: 0.000001                            } # 1e-6
+  - {names: [ n, nano ],      defn: 0.000000001                         } # 1e-9
+  - {names: [ p, pico ],      defn: 0.000000000001                      } # 1e-12
+  - {names: [ f, femto ],     defn: 0.000000000000001                   } # 1e-15
+  - {names: [ a, atto ],      defn: 0.000000000000000001                } # 1e-18
+  - {names: [ z, zepto ],     defn: 0.000000000000000000001             } # 1e-21
+  - {names: [ y, yocto ],     defn: 0.000000000000000000000001          } # 1e-24
+  - {names: [ r, ronto ],     defn: 0.000000000000000000000000001       } # 1e-27
+  - {names: [ q, quecto ],    defn: 0.000000000000000000000000000001    } # 1e-30
+  - {names: [Qi, quebi],      defn: 1267650600228229401496703205376     } # 2**100
+  - {names: [Ri, robi],       defn: 1237940039285380274899124224        } # 2**90
+  - {names: [Yi, yobi],       defn: 1208925819614629174706176           } # 2**80
+  - {names: [Zi, zebi],       defn: 1180591620717411303424              } # 2**70
+  - {names: [Ei, exbi],       defn: 1152921504606846976                 } # 2**60
+  - {names: [Pi, pebi],       defn: 1125899906842624                    } # 2**50
+  - {names: [Ti, tebi],       defn: 1099511627776                       } # 2**40
+  - {names: [Gi, gibi],       defn: 1073741824                          } # 2**30
+  - {names: [Mi, mebi],       defn: 1048576                             } # 2**20
+  - {names: [Ki, kibi],       defn: 1024                                } # 2**10

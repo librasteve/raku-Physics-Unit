@@ -44,13 +44,18 @@ class Directory {
         }
     }
 
-    my class Dx::Prefix {
+    my class Dx::Prefix {       # an SI or Binary Prefix (eg <m milli> or <Ki Kibi>)
         has %.to-unit{Name};  # of Unit;
         has %.to-factor{Name}   of Real;
-        has %.by-symbol{Symbol} of Name();  #prefix has one symbol plus one name
+        has %.by-symbol{Symbol} of Name();  # Prefix has one symbol, one name
     }
 
-    my class Dx::Postfix {
+    my class Dx::Postfix {      # a raku SI postfix operator (
+        has %.to-defn{Name}     of Defn();  #extended defn (eg. cm => 'centimetre') to decongest Grammar namespace
+        has %.to-syns{Name}     of Syns();  #list of synonyms [n, nano] X~ [m, metre, meter, metres, meters]
+    }
+
+    my class Dx::Binary {       # a raku binary postfix operator (
         has %.to-defn{Name}     of Defn();  #extended defn (eg. cm => 'centimetre') to decongest Grammar namespace
         has %.to-syns{Name}     of Syns();  #list of synonyms [n, nano] X~ [m, metre, meter, metres, meters]
     }
@@ -61,5 +66,6 @@ class Directory {
     has Dx::Type    $.type    .= new;
     has Dx::Prefix  $.prefix  .= new;
     has Dx::Postfix $.postfix .= new;
+    has Dx::Binary  $.binary  .= new;
 }
 
