@@ -12,6 +12,13 @@ role Maths[::Unit] {
         return self;
     }
 
+    multi method times( FatRat() $r ) {
+
+        self.factor: self.factor * $r;
+
+        return self;
+    }
+
     multi method times( Unit $r ) {
         self.clear;
 
@@ -34,6 +41,13 @@ role Maths[::Unit] {
     }
 
     multi method share( Real $r ) {
+
+        self.factor: self.factor / $r;
+
+        return self;
+    }
+
+    multi method share( FatRat() $r ) {
 
         self.factor: self.factor / $r;
 

@@ -1,6 +1,7 @@
 #| Definition Str Parser for Units
 
 use Physics::Unit::Config;
+use Physics::Unit::FatRatStr;
 
 role Parser[::Unit] {
     my $cg = Config.new;
@@ -122,7 +123,11 @@ role Parser[::Unit] {
             #| handle factor and offset matches
             method factor($/) {
                 with $/.Real {
-                    make Unit.new.times($_);
+                    if $_ ~~ Num {
+                        make Unit.new.times($/.Str.FatRatStr);
+                    } else {
+                        make Unit.new.times($_);
+                    }
                 } else {
                     make Unit.new.times($cg.factor-names{$/.Str});
                 }

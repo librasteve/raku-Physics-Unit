@@ -15,20 +15,18 @@ class Unit {
         # class method cant use attr, this sub avoids circular loading
         Directory.instance;
     }
-
-    # also an attribute for child classes
-    has $.dx = dxi;
+    has $.dx = dxi;    # also make an attribute for child classes
 
     my \NumBases = 10;
 
-    has Bool    $!final  = False;
-    has FatRat()    $!factor = 1;
-    has Real    $!offset = 0;
-    has Defn()  $!defn is default('');
-    has Type    $!type;
-    has Name    @!names  = [];
-    has Int     @.dims   = 0 xx NumBases;
-    has MixHash $.dmix is rw = ∅.MixHash;
+    has Bool     $!final  = False;
+    has FatRat() $!factor = 1;
+    has Real     $!offset = 0;
+    has Defn()   $!defn is default('');
+    has Type     $!type;
+    has Name     @!names  = [];
+    has Int      @.dims   = 0 xx NumBases;
+    has MixHash  $.dmix is rw = ∅.MixHash;
 
     ### accessor methods ###
 
