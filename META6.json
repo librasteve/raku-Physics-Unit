@@ -1,7 +1,7 @@
 {
     "name": "Physics::Unit",
     "description": "Some support for physical units.",
-    "version": "2.0.15",
+    "version": "2.0.16",
     "authors": [
         "librasteve"
     ],
@@ -26,8 +26,7 @@
         "Physics::Unit::Parser": "lib/Physics/Unit/Parser.rakumod",
         "Physics::Unit::Postfix": "lib/Physics/Unit/Postfix.rakumod",
         "Physics::Unit::Types": "lib/Physics/Unit/Types.rakumod",
-        "Physics::Unit::en_SI": "lib/Physics/Unit/en_SI.rakumod",
-        "Physics::Unit::FatRatStr": "lib/Physics/Unit/FatRatStr.rakumod"
+        "Physics::Unit::en_SI": "lib/Physics/Unit/en_SI.rakumod"
     },
     "resources": [
         "Unit/Definitions/en_SI/derived.yaml",

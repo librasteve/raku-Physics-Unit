@@ -1,7 +1,7 @@
 #| Definition Str Parser for Units
 
 use Physics::Unit::Config;
-use Physics::Unit::FatRatStr;
+use FatRatStr;
 
 role Parser[::Unit] {
     my $cg = Config.new;
@@ -38,9 +38,9 @@ role Parser[::Unit] {
             token TOP {
                 ^  \s* <numerator=.compound>
                   [\s* <divider> \s* <denominator=.compound>]?
-                  [\s* '+' \s* <offset>]? \s*                $
+                  [\s* '+' \s* <offset>]? \s*                $      #offset '+' hardwired
             }
-            #offset '+' hardwired
+
             token divider { '/' || 'per' }
             token compound { <element>+ % <sep> }
             token sep { ['*' || '.' || ' *' || ' .' || ' ' || '⋅'] }
@@ -48,10 +48,10 @@ role Parser[::Unit] {
 
             token factor { <number> || <$factor-names> }
             token offset { <number> }
+
             token number {
-                \S+ <?{ defined +"$/" }>
+                \S+ <?{ defined +"$/" }>            #get chars, assert coerce to Real via +
             }
-            #get chars, assert coerce to Real via +
 
             token pnp-before {
                 <pwr-before>  \s+? <prefix-name>

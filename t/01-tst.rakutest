@@ -3,7 +3,7 @@
 #TESTALL$ prove6 ./t      [from root]
 use lib '../lib';
 use Test;
-plan 14;
+plan 15;
 
 use Physics::Unit;
 
@@ -46,5 +46,7 @@ is "{$u1.factor} {$u1.name}",'1 J', 'SI derived ok';
 my $c1 = Unit.find('USD');
 my $c2 = Unit.find('US$');
 ok $u2.same-dmix($u1),		'currency ok';
+
+ok Unit.find('Dalton').factor ~~ FatRat,    'fatratstr ok';
 
 #done-testing
