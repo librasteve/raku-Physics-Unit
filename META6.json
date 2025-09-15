@@ -1,7 +1,7 @@
 {
     "name": "Physics::Unit",
     "description": "Some support for physical units.",
-    "version": "2.0.16",
+    "version": "2.0.17",
     "authors": [
         "librasteve"
     ],
@@ -9,7 +9,9 @@
     "depends": [
         "YAMLish",
         "HTTP::Tiny",
-        "JSON::Fast"
+        "JSON::Fast",
+        "FatRatStr",
+        "IO::Socket::SSL"
     ],
     "build-depends": [],
     "provides": {

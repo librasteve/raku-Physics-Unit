@@ -43,5 +43,14 @@
         </SOURCES>
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library name="FatRatStr" type="raku">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES>
+          <root url="raku://1166071006:FatRatStr!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
   </component>
 </module>

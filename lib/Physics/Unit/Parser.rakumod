@@ -50,7 +50,7 @@ role Parser[::Unit] {
             token offset { <number> }
 
             token number {
-                \S+ <?{ defined +"$/" }>            #get chars, assert coerce to Real via +
+                \S+ <?{ defined +"$/" }>    #get chars, assert coerce to Real via +
             }
 
             token pnp-before {
