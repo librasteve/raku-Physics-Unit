@@ -52,5 +52,23 @@
         </SOURCES>
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library name="OpenSSL:ver&lt;0.2.4+&gt;" type="raku">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES>
+          <root url="raku://1166071006:OpenSSL:ver&lt;0.2.4+&gt;!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="IO::Socket::SSL" type="raku">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES>
+          <root url="raku://1166071006:IO::Socket::SSL!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
   </component>
 </module>
