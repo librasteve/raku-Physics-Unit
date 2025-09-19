@@ -206,6 +206,7 @@ Energy:
   - {names: [therm],                     defn: '1.0e5 btu'}
   - {names: [erg],                       defn: '1.0e-7 joule'}
   - {names: [kWh],                       defn: 'kilowatt hour'}
+  - {names: [MWh],                       defn: 'megawatt hour' }
   - {names: [Eₕ, E_h, Ha],               defn: '4.3597447222071e-18 joule'}    #Hartree energy
 
 Power:
