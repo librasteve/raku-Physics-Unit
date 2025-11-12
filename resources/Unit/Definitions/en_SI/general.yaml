@@ -58,7 +58,7 @@ Length:
   - {names: [μ, micron],                 defn: '1e-6 m'}
   - {names: [å, angstrom],               defn: '1e-10 m'}
   - {names: [au, astronomical-unit],     defn: '1.49598e11 m'}
-  - {names: [ly, light-year],            defn: '9.46e15 m'}
+  - {names: [ly, lightyear, light-year], defn: '9.46e15 m'}
   - {names: [parsec],                    defn: '3.083e16 m'}
   - {names: [ft, foot, feet],            defn: '0.3048 m'}
   - {names: [in, inch],                  defn: 'ft/12'}
