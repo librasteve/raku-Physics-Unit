@@ -1,7 +1,7 @@
 {
     "name": "Physics::Unit",
     "description": "Some support for physical units.",
-    "version": "2.0.17",
+    "version": "2.0.18",
     "authors": [
         "librasteve"
     ],

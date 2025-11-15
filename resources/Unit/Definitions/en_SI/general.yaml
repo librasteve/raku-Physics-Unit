@@ -26,7 +26,7 @@ Dimensionless:
   - {names: [pi],                        defn: '3.1415926535897932385'}
 
 Data:
-  - {names: [B, byte],                   defn: '8 bit'}   #iamerejh need to move Data to new type
+  - {names: [B, byte],                   defn: '8 bit'}
 
 Angle:
   - {names: [°, degree, deg, º],         defn: 'pi radians / 180'}
@@ -38,7 +38,7 @@ Solid Angle:
 
 Time:
   - {names: [min, minute],               defn: '60 s'}
-  - {names: [hr, hour],                  defn: '60 min'}
+  - {names: [hr, hour, h],               defn: '60 min'}
   - {names: [day],                       defn: '24 hr'}
   - {names: [week],                      defn: '7 day'}
   - {names: [fortnight],                 defn: '2 week'}
