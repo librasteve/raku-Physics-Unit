@@ -143,7 +143,7 @@ Acceleration:
 Mass:
   - {names: [g, gram, gm, gramme],       defn: 'kg / 1000'}
   - {names: [u, atomic-mass-unit, Da, Dalton], defn: '1.6605402e-27 kg'}
-  - {names: [metric-ton, tonne],         defn: '1000 kg'}
+  - {names: [tonne, metric-ton],         defn: '1000 kg'}
   - {names: [grain],                     defn: '0.0648 gm'}
   - {names: [lbm, pounds-mass],          defn: '0.45359237 kg'}
   - {names: [oz, ounce],                 defn: 'lbm/16'}
