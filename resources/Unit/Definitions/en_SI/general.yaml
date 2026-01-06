@@ -23,6 +23,7 @@ Dimensionless:
   - {names: ['%' , percent],             defn: '1/100'}
   - {names: [ABV],                       defn: '1/100'}
   - {names: [us-proof],                  defn: '1/200'}       #(US proof is just 2x ABV)
+  - {names: [ppm],                       defn: '1/1000000' }
   - {names: [pi],                        defn: '3.1415926535897932385'}
 
 Data:
