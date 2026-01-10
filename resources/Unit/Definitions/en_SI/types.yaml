@@ -22,6 +22,7 @@
 - MomentOfInertia:        'kg m^2'
 - AngularMomentum:        'kg m^2/s'
 - Pressure:               'pascal'
+- ArealDensity:           'kg/m^2'
 - Density:                'kg/m^3'
 - Energy:                 'joule'
 - Power:                  'watt'
@@ -49,3 +50,5 @@
 - SpectralFluxDensity:    'W/m^2 Hz'
 - ThermalResistance:      'Km^2/W'
 - ThermalConductance:     'W/m^2K'
+- DataRate:               'b/s'
+- DataDensity:            'b/m^3'

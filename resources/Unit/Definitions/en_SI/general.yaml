@@ -83,6 +83,13 @@ Area:
   - {names: [hectare],                   defn: '100 are'}
   - {names: [barn],                      defn: '1e-28 square metre'}
   - {names: [acre],                      defn: '43560 square feet'}
+  - {names: [A0],                        defn: '1 m^2'}
+  - {names: [A1],                        defn: 'A0 / 2'}
+  - {names: [A2],                        defn: 'A1 / 2'}
+  - {names: [A3],                        defn: 'A2 / 2'}
+  - {names: [A4],                        defn: 'A3 / 2'}
+  - {names: [A5],                        defn: 'A4 / 2'}
+  - {names: [A6],                        defn: 'A5 / 2'}
 
 Volume:
   - {names: [m^3, m3, m³],               defn: 'm^3'}
@@ -192,6 +199,10 @@ Pressure:
   - {names: [atm, atmosphere],           defn: '101325 pascal'}
   - {names: [mmHg],                      defn: '133.322 pascal'}
 
+ArealDensity:
+  - {names: [kg/m^2],                    defn: 'kg / m^2'}
+  - {names: [gsm],                       defn: 'g / m^2' }
+
 Density:
   - {names: [kg/m^3],                    defn: 'kg / m^3'}
   - {names: [°proof, proof],             defn: '9.23 kg / m^3'}   #UK metric https://en.wikipedia.org/wiki/Alcohol_proof
@@ -206,6 +217,7 @@ Energy:
   - {names: [btu, british-thermal-unit], defn: '1055.056 joule'}
   - {names: [therm],                     defn: '1.0e5 btu'}
   - {names: [erg],                       defn: '1.0e-7 joule'}
+  - {names: [Wh],                        defn: 'watt hour'}
   - {names: [kWh],                       defn: 'kilowatt hour'}
   - {names: [MWh],                       defn: 'megawatt hour' }
   - {names: [GWh],                       defn: 'gigawatt hour' }
@@ -281,3 +293,17 @@ ThermalResistance:
 
 ThermalConductance:
   - {names: [W/m^2K],                    defn: 'W / m^2 K'}
+
+DataRate:
+  - {names: [bps],                       defn: 'b / s'}
+  - {names: [kbps],                      defn: 'kilo b / s'}
+  - {names: [Mbps],                      defn: 'mega b / s'}
+  - {names: [Gbps],                      defn: 'giga b / s'}
+  - {names: [Tbps],                      defn: 'tera b / s'}
+
+DataDensity:
+  - {names: [b/m^3],                     defn: 'b / m^3'}
+  - {names: [kb/m^3],                    defn: 'kilo b / m^3'}
+  - {names: [Mb/m^3],                    defn: 'mega b / m^3'}
+  - {names: [Gb/m^3],                    defn: 'giga b / m^3'}
+  - {names: [Tb/m^3],                    defn: 'tera b / m^3'}
