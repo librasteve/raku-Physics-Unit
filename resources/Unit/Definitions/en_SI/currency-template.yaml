@@ -8,7 +8,7 @@
 Currency:
   - { names: [ EUR, €, euro ],                       defn: 'EUR' }       # Euro (symbol usually prefix, e.g. €100, but suffix in some countries)
   - { names: [ JPY, ¥, yen ],                        defn: 'JPY' }       # Japanese Yen (symbol usually prefix, e.g. ¥1000)
-  - { names: [ GBP, £, sterling ],                   defn: 'GBP' }       # British Pound (symbol usually prefix, e.g. £100)
+  - { names: [ GBP, £, sterling, UKP ],              defn: 'GBP' }       # British Pound (symbol usually prefix, e.g. £100)
   - { names: [ AUD, A$, Australian dollar ],         defn: 'AUD' }       # Australian Dollar (symbol usually prefix, e.g. A$100)
   - { names: [ CAD, C$, Canadian dollar ],           defn: 'CAD' }       # Canadian Dollar (symbol usually prefix, e.g. C$100)
   - { names: [ CHF, SFr, Swiss franc ],              defn: 'CHF' }       # Swiss Franc (symbol usually suffix, e.g. 100 Fr.)
@@ -21,6 +21,7 @@ Currency:
   - { names: [ SEK, Skr, krona, Swedish krona ],     defn: 'SEK' }       # Swedish Krona (symbol usually suffix, e.g. 100 kr)
   - { names: [ NOK, Nkr, Norwegian krone ],          defn: 'NOK' }       # Norwegian Krone (symbol usually suffix, e.g. 100 kr)
   - { names: [ DKK, Dkr, Danish krone ],             defn: 'DKK' }       # Danish Krone (symbol usually suffix, e.g. 100 kr)
+  - { names: [ ISK, Ikr, krona, Icelandic krona ],   defn: 'ISK' }       # Icelandic Króna (symbol usually suffix, e.g. 100 kr)
   - { names: [ THB, ฿, baht ],                       defn: 'THB' }       # Thai Baht (symbol usually prefix, e.g. ฿100)
   - { names: [ PLN, zł, zloty ],                     defn: 'PLN' }       # Polish Zloty (symbol usually suffix, e.g. 100 zł)
   - { names: [ MYR, RM, ringgit ],                   defn: 'MYR' }       # Malaysian Ringgit (symbol usually prefix, e.g. RM100)
