@@ -17,10 +17,17 @@ class Config {
 
     #factor names
     has %.factor-names = (
-        th => 1000,          thousand => 1000,
-        mn => 1000000,       million  => 1000000,
-        bn => 1000000000,    billion  => 1000000000,
-        tn => 1000000000000, trillion => 1000000000000,
+        thousand    => 1000,                  th => 1000,
+        million     => 1000000,               mn => 1000000,
+        billion     => 1000000000,            bn => 1000000000,
+        trillion    => 1000000000000,         tn => 1000000000000,
+        quadrillion => 1000000000000000,
+        quintillion => 1000000000000000000,
+        sextillion  => 1000000000000000000000,
+        septillion  => 1000000000000000000000000,
+        octillion   => 1000000000000000000000000000,
+        nonillion   => 1000000000000000000000000000000,
+        decillion   => 1000000000000000000000000000000000,
     );
 
     submethod TWEAK{
