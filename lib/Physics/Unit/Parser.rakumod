@@ -8,7 +8,7 @@ role Parser[::Unit] {
 
     method parse($defn is copy, $dx) {
         # Generally defn parsing proceeds by finding elements which are themselves
-        # Unit objects and then recursively getting them (which can invoice recursive
+        # Unit objects and then recursively getting them (which can involve recursive
         # calls to this parser). The class method Unit.find is used to do this.
 
         #6.d faster regexes with Strings {<$str>} & slower with Arrays {<@arr>}
@@ -33,7 +33,7 @@ role Parser[::Unit] {
 
         say "Parsing defn: «$defn»" if $cg.db;
 
-        #use Grammar::Tracer;
+#        use Grammar::Tracer;
         my grammar UnitGrammar {
             token TOP {
                 ^  \s* <numerator=.compound>
@@ -65,11 +65,11 @@ role Parser[::Unit] {
                 <prefix>? \s*? <name>
             }
             token prefix { <$prefix-names> }
-            token name { <$unit-names> }
+            token name   { <$unit-names>   }
 
-            token pwr-before { <$pwr-prewords> }
-            token pwr-after { <pwr-postwd> || <pwr-supers> || <pwr-normal> }
-            token pwr-postwd { <$pwr-postwords> }
+            token pwr-before { <$pwr-prewords>     }
+            token pwr-after  { <pwr-postwd> || <pwr-supers> || <pwr-normal> }
+            token pwr-postwd { <$pwr-postwords>    }
             token pwr-supers { <$pwr-superscripts> }
 
             token pwr-normal {
@@ -82,7 +82,7 @@ role Parser[::Unit] {
         }
 
         my class UnitActions {
-            ##say "in xxx...", $/.made;  #<== handy debug line, paste just after make
+            ##say "in xxx...", $/.made.raku;  #<== handy debug line, paste just after make
 
             #| assemble result with math operations from numerator and denominator (&offset)
             method TOP($/) {
@@ -92,15 +92,20 @@ role Parser[::Unit] {
                 $nu.share($de) if $de;
                 $nu.offset: +$os if $os;
                 make $nu;
+#                say "in TOP...", $/.made.raku;
             }
 
             #| accumulates element Units using times
             method compound($/) {
                 my $acc = Unit.new;
+                my $offset = 0;
                 for $<element>>>.made -> $x {
                     $acc.times($x);
+                    $offset += $x.offset;
                 }
+                $acc.offset: $offset;
                 make $acc;
+#                say "in compound...", $/.made.raku;
             }
 
             #| makes a list of element units (either factor or prefix-name-power)
@@ -118,6 +123,7 @@ role Parser[::Unit] {
                             $<pnp-after>.made || 1;
                     make $unit.raise($pwr, $defn);
                 }
+#                say "in element...", $/.made.raku;
             }
 
             #| handle factor and offset matches
@@ -134,6 +140,7 @@ role Parser[::Unit] {
             }
             method offset($/) {
                 make $<number>;
+#                say "in offset...", $/.made.raku;
             }
 
             #| make both unit and defn from prefix-name matches
@@ -143,6 +150,7 @@ role Parser[::Unit] {
                 my $pfix = $<prefix>.made<unit>;
                 $unit.times($pfix) if $pfix;
                 make %(:$defn, :$unit);
+#                say "in prefix-name...", $/.made.raku;
             }
             method prefix($/) {
                 make %(unit => Unit.find($/.Str).clone);
@@ -153,6 +161,7 @@ role Parser[::Unit] {
                 my $unit = Unit.find($defn).clone;
                 $unit.dmix = ∅.MixHash;
                 make %(:$defn, :$unit);
+#                say "in name...", $/.made.raku;
             }
 
             #| extract (signed) power digits from various grammar options
