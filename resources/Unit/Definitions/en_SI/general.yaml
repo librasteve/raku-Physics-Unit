@@ -65,6 +65,7 @@ Length:
   - {names: [parsec],                    defn: '3.083e16 m'}
   - {names: [ft, foot, feet],            defn: '0.3048 m'}
   - {names: [in, inch],                  defn: 'ft/12'}
+  - {names: [thou],                      defn: 'in/1000' }
   - {names: [yard],                      defn: '3 ft'}
   - {names: [fathom],                    defn: '2 yard'}
   - {names: [rod, pole, perch],          defn: '5.5 yard'}
