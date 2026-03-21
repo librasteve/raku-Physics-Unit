@@ -14,6 +14,7 @@ role Parser[::Unit] {
         #6.d faster regexes with Strings {<$str>} & slower with Arrays {<@arr>}
         $defn .= trim;
         $defn .= subst('%LOCALE%', $cg.locale);
+        $defn .= subst('of a', '');
 
         #| preprocess postfix units to extended defn - eg. cm to centimetre
         $defn = $dx.postfix.to-defn{$defn} // $dx.binary.to-defn{$defn} // $defn;
