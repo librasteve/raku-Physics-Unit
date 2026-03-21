@@ -128,11 +128,12 @@ role Maths[::Unit] {
         return 1;
     }
 
-    #| used by Measure cmp
+    #| used by Measure cmp and in
     method same-unit( Unit $u ) {
         return 0 unless $u.dims  eqv self.dims;
         return 0 unless $u.factor == self.factor;
         return 0 unless $u.offset == self.offset;
+        return 0 unless $u.names eqv self.names;
         return 1;
     }
 }
