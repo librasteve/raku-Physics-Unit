@@ -30,7 +30,6 @@ class Config {
         nonillion       => 1000000000000000000000000000000,
         decillion       => 1000000000000000000000000000000000,
 
-        th => 1000,
         mn => 1000000,
         bn => 1000000000,
         tn => 1000000000000,
@@ -52,9 +51,6 @@ class Config {
         demi       => <1/2>,
         hemi       => <1/2>,
         sesqui     => <3/2>,   # one and a half
-        bi         => 2,
-        tri        => 3,
-        quadri     => 4,
         whole      => 1,
         half       => <1/2>,
         quarter    => <1/4>,

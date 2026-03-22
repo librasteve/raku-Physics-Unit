@@ -54,10 +54,10 @@ role Parser[::Unit] {
                 \S+ <?{ defined +"$/" }>    #get chars, assert coerce to Real via +
             }
 
+            #pnp==prefix-name-power
             token pnp-before {
                 <pwr-before>  \s+? <prefix-name>
             }
-            #pnp==prefix-name-power
             token pnp-after {
                 <prefix-name> \s*? <pwr-after>?
             }
