@@ -17,9 +17,12 @@ class Build {
 			copy "resources/$path/$part.yaml", "$*HOME/$raph/$path/$part.yaml";
 		}
 
+        note "Selection of us / imperial depends on your locale";
+        note "***export CRAGDOMAIN=[us|imp] to override***";
+
         #| setup exchange rates
         note "Fetching currency exchange rates";
-        note "***reinstall Physics::Unit for latest rates***";
+        note "***zef install Physics::Unit --force-install for latest rates***";
 
         use HTTP::Tiny;
         use JSON::Fast;

@@ -12,9 +12,6 @@ class Config {
         '⁻¹' => -1, '⁻²' => -2, '⁻³' => -3, '⁻⁴' => -4,
     );
 
-    #locale for 'us' or 'imp' gallons, pints, mpg etc.
-    has $.locale = 'imp';
-
     #factor names
     has %.factor-names = (
         hundred         => 100,
@@ -64,9 +61,14 @@ class Config {
         tenth      => <1/10>,
     );
 
+    #locale for 'us' or 'imp' gallons, pints, mpg etc.
+    has $.locale = 'us';
+
+    #only en_GB gets imperial by default
     submethod TWEAK{
-        $!locale = ($_ ~~ /en_US/) ?? 'us' !! 'imp'    with %*ENV<LANG>;
-        $!locale = ($_ ~~ /en_US/) ?? 'us' !! $!locale with %*ENV<RAKULANG>;
+        $!locale = ($_ ~~ /en_GB/) ?? 'imp' !! $!locale with %*ENV<LANG>;
+        $!locale = ($_ ~~ /en_GB/) ?? 'imp' !! $!locale with %*ENV<RAKULANG>;
+        $!locale =  $_                                  with %*ENV<CRAGDOMAIN>;
     }
 
     has %.type-hint = %(
