@@ -68,6 +68,7 @@ class Config {
     submethod TWEAK{
         $!locale = ($_ ~~ /en_GB/) ?? 'imp' !! $!locale with %*ENV<LANG>;
         $!locale = ($_ ~~ /en_GB/) ?? 'imp' !! $!locale with %*ENV<RAKULANG>;
+        $!locale = ($_ ~~ /en_GB/) ?? 'imp' !! $!locale with qx|defaults read -g AppleLocale|;
         $!locale =  $_                                  with %*ENV<CRAGDOMAIN>;
     }
 

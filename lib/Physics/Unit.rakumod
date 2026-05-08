@@ -21,7 +21,7 @@ class Unit {
 
     has Bool     $!final  = False;
     has FatRat() $!factor = 1;
-    has Real     $!offset = 0;
+    has FatRat() $!offset = 0;
     has Defn()   $!defn is default('');
     has Type     $!type;
     has Name     @!names  = [];

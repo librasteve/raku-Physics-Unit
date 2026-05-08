@@ -18,7 +18,7 @@ class Build {
 		}
 
         note "Selection of us / imperial depends on your locale";
-        note "***export CRAGDOMAIN=[us|imp] to override***";
+        note "***export CRAGLANG=[us|imp] to override***";
 
         #| setup exchange rates
         note "Fetching currency exchange rates";
